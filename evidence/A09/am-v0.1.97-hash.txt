@@ -1,0 +1,7 @@
+AM v0.1.97 双面哈希登记（轮二十五：route-A 榨干后侦察收口 = C01 设计件 + A09 爆炸半径实测[推翻上轮乐观] + 决策收口单 P1-P7；执行侧进入候决策态）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = f2722fc981c446c2822639291e82dfc7e5b865c537a8158602bc334871f159f0
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 前轮: v0.1.96 = cfec7d6a80cecd3b7fde880f969ad78c685aa85c6998701e98f817e3f3bafa64（evidence/A02/am-v0.1.96-hash.txt）
+- 同轮事实: 支 TR31(C01设计+A09侦察 ae16042)+TR32(决策单+本登记) 并入 dev；C01=P1 不放宽下新建 registry 受控端点层，字段闭集草案标"v0.1原文不在库待Authority认"，未进码 BACKLOG；A09 实测爆炸半径 687文件/32命名空间/80home/78env/233测试/schema7(改=spine不兼容)/host_release15，两语义点(destination_branch 'culler'=Git分支功能语义非品牌?/migrate-home vs D20矛盾)+S1-S5分步WBS，未进码 BACKLOG(半做必破绿)；PENDING-DECISIONS-002.md=route-A榨干后全部剩余卡点收敛一屏P1-P7可一键答；诚实边界:不硬冲巨票/不臆造安全字段/不擅改route-B为C/不扩218授权/外发只warlockedward/main不推；blcheck 69/0；status无改(C01/A09维持BACKLOG,A02 EVIDENCED,ledger27)；worktree仅dev；main远端dd087c7未推；PR#1留探针；不宣称项目安全
+- 候决策(7项任一即连做): P1 C01字段→整张C01 · P2/P4 A09分支名+分步窗口→A09-S1先行 · P5 route C→A32降轻门 · P6 ADR定稿笔 · P7 A06加密机制→A06起
