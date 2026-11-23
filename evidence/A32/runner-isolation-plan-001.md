@@ -22,9 +22,16 @@ rootless 下容器 root/uid 会被 **subuid 偏移**（如映射到宿主 100000
 ## 2. 采纳方案：独立 Docker 栈（语义无损 + 真隔离）
 四个改动，缺一不可（**只做前三 = 白做**）：
 1. **独立 containerd 实例** `shz-ci-containerd`：独立 `--root /var/lib/shz-ci/containerd --state /run/shz-ci-containerd --address /run/shz-ci-containerd/containerd.sock` + 独立生成的 config。
-2. **独立 dockerd** `shz-ci-docker`：root 运行，`--containerd=/run/shz-ci-containerd/containerd.sock`、`--data-root /var/lib/shz-ci/docker`、`-H unix:///run/shz-ci-docker.sock`、`--group shzci`（socket 组权限给 CI 用户）、**`--bridge shz-br0 --bip=10.199.0.1/16 --default-address-pool base=10.199.64.0/18,size=24`**（避开 172.17–172.31 全部既有网段）。**不复用主 containerd、不共用 data-root** ⇒ 与 nexusflow 等的容器/卷/镜像状态目录完全无交集。
+2. **独立 dockerd** `shz-ci-docker`：root 运行，`--containerd=/run/shz-ci-containerd/containerd.sock`、data-root=`/var/lib/shz-ci/docker`（经 `--config-file` 传入，见 §2a）、`-H unix:///run/shz-ci-docker.sock`、独立 `--pidfile`（见 §2a）、`--group shzci`（socket 组权限给 CI 用户）、**`--bridge shz-br0`**（`shz-br0@10.199.0.1/16` 由 unit `ExecStartPre` 幂等预建；`--bip` 与其互斥，见 §2a）＋ `--default-address-pool base=10.199.64.0/18,size=24`（避开 172.17–172.31 全部既有网段）。**不复用主 containerd、不共用 data-root** ⇒ 与 nexusflow 等的容器/卷/镜像状态目录完全无交集。
 3. **job 环境指向专用 socket**：仅在本 job `env: DOCKER_HOST=unix:///run/shz-ci-docker.sock`（不动宿主全局、不影响其他项目）。
 4. **把 `shzci` 移出 `docker` 组** ⇒ 宿主 root dockerd 对 CI **彻底不可达**（隔离闭环；若漏这步，runner 仍能用默认 socket 碰到所有项目＝本方案的全部意义归零）。
+
+### 2a. S1–S2 实跑实施偏差（2026-11-23，§2 字面形被运行证伪，实现语义等价）
+下列三处冲突均于 S2 实跑由 dockerd 报错实证（§2 字面照抄不可运行）：
+1. **`--data-root` flag 与宿主配置文件冲突**：`/etc/docker/daemon.json` 含同名指令（`data-root=/data-shunhong/docker_data`）⇒ dockerd "specified both as a flag and in the configuration file" 即 exit 1 ⇒ 实现=专用 daemon 用独立 `--config-file /etc/shz-ci/daemon.json`（仅 data-root 一项），flags 不再带 data-root。
+2. **`--bridge` 与 `--bip` 互斥**：dockerd 自报 "You specified -b & --bip, mutually exclusive options" ⇒ 实现=unit `ExecStartPre` 幂等预建 `shz-br0@10.199.0.1/16`（存在则跳过），dockerd 仅持 `--bridge shz-br0` 附着既有桥。
+3. **第二 dockerd 须独立 pidfile**：默认 `/var/run/docker.pid` 与主 daemon 互斥（"process with PID … is still running"）⇒ 实现=`--pidfile=/run/shz-ci-docker/docker.pid`。
+S1 的 containerd 实例无冲突（独立 root/state/address＋独立生成 config，实跑绿）。S2 判据全过：独立 `DockerRootDir=/var/lib/shz-ci/docker`、`shz-br0` 10.199.0.1/16、`images` 空表证非共享、socket `root:shzci`、主 daemon 数据根与容器数未动。
 
 ## 3. 分步实施 + 各自验证（每步可独立回退；**顺序不可颠倒**）
 | 步 | 动作 | 通过判据 | 回退 |
