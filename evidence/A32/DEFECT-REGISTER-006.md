@@ -28,6 +28,12 @@
 - **本机不可证**：Linux 上 Docker 绑定/卸载真跑（本机 docker 是 Docker Desktop＝macOS 语义）。⇒ **Linux 侧 EVIDENCED 由自托管 runner 的下一跑产出**；其完成前本件只到 CODED，A31/A32/A02 的延付具名**不解除**。
 - **残留未知**：Linux 是否真无同名 xattr 困扰（按 tmpfs/无 provenance 推断，非实测）；若下一跑出现新的 Linux 特有 teardown 问题，本件续记更正段（append-only）。
 
+## 5.1 ⚑ 扫描门对本件**不可用**（分域纪律第 2 类命中：tag-only 目录）
+seal `b9cedfea3afcabacf15d218d6b996f18c228987c39fbf41e858737302548d3fc`（551 条，`partial/inconclusive`）：blame-join 落本件改动行 **0**，但**该"0"是空断言**——间接覆盖核验：`mc/boundarydocker/` 与 `mc/e2e/` **整目录 0 个文件有 finding**，而同为 Go 的 `mc/verbs/` 有 6 条（全仓仅 49 个 .go 文件带 finding）。两目录**每个文件都带 `docker_boundary`/`docker_e2e` 构建标签**（默认构建集排除），据此判定**扫描器未解析 tag-only 目录** ⇒ "0 落行"无法区分"干净"与"未扫"，**本件不援引扫描作背书**。
+同类边界：`.github/*.yml` 在扫描中 0 命中 ⇒ workflow 改动**在扫描范围外**；其验证=`dashboard` 门 984/0（三守卫实际解析该 YAML）+ 全道绿。
+⇒ 本件与 A32 返工的**有效证据链**（不掺水）：① `go vet` 四组（darwin/linux × 两 tag）②gofmt 净 ③`mc/check.sh` 26 包/0/0 ④`dashboard` 984/0 ⑤**真 Linux 运行**（自托管 runner 产；macOS Docker Desktop 语义不可替代）。
+**纪律产出**：扫描覆盖判定须按 **①语言 ②构建标签可见性** 双维核——只查"文件是否在覆盖集"仍不够，**tag-gated 文件默认不在任何解析集**。前例=v0.1.90（shell 不被解析）；本例=tag-only Go 目录。
+
 ## 6. 同族其它命中（**登记不修**：不在本次 CI 车道，且改它们超出授权面）
 | 位置 | 形态 | 为何本轮不动 |
 |---|---|---|
