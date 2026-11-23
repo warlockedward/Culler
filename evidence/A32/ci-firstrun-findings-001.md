@@ -18,3 +18,18 @@
 - T-a：opt-in-lanes 修正形状（三选一，属 A32 自身返工）：①内联 buildx 构 mc-prod（仿 release-images，重）；②改调 update 式轻量镜像；③把 Docker 道移出 PR、改 schedule/manual（尊重"这些本就是 opt-in 重道"的原意）。
 - T-b：监督平台测加 `//go:build darwin` 或 Linux 正确跳过（独立测试健康票；触他人测，需专票）。
 - T-c：`application-package-linux` 归因（基线 run）。
+
+## 最终 job 全表（run completed / conclusion=failure，收尾补全）
+| 结论 | job | 定性 |
+|---|---|---|
+| **success** | **fast-suite-macos** | ★**权威交接门绿**（AGENTS"hand off 前必跑"的整套 check，含 mc/deployment/dashboard/resident/runner 全快套件）⇒**合入 dev 的 A02/A25b/A25a/A23 等在 Mac 权威门上健康**，这是本轮对"我的代码对不对"的核心正面信号 |
+| success | security-acceptance / application-package(mac) | 既有门绿 |
+| failure | deployment-linux / -amd64 | **已证=既有**（§已证2，基线容器单变量） |
+| failure | opt-in-lanes | **已证=我 job 缺陷 + 形状被证伪**（§已证3） |
+| failure | release-checks | **级联**：该 job=“Require every release check to succeed”聚合门，因上游 Linux job 红连带红，非独立缺陷 |
+| failure | release-images | "Check the Project image with the runtime volume"（Linux 镜像校验步，我未碰；无基线→未归因，疑首跑环境） |
+| failure | application-package-linux | §未证4，未归因 |
+| failure | dashboard-browser / -amd64 | 真实 Chromium×真实 mc smoke 报 **34 fail + 2 errors**（含一条 Discord 主机命令卡 30004ms 超时）。**我没改 dashboard/或 smoke**；但**无法用基线 run 证既有**（此 fork 首跑无历史）⇒**未归因，初判=首跑环境性（真实浏览器/Docker/provider 依赖面），但明确不假装已证**。若后续要治 fork CI，此项须专门复跑定性 |
+
+## 净战略事实（修正我先前对 Actions 的乐观预期）
+"启用 Actions 即一键解锁全部 Linux 端到端证据"**不成立**：fork 的重 Linux/浏览器/镜像 job 首跑即红（多数既有/环境性，少数未归因），runner 现阶段跑不了需要 mc-prod/Chromium/provider 的道。⇒ **拿 A02/A31/A25 的 Linux 端到端证据，现实中只剩两条**：路 A=218 真宿主（需扩权令，见用户决策）；路 B=先修 build-prod 守卫让 runner 能造 mc-prod（敏感发布件，独立票）。快套件 macOS 绿已保证"不回归"，Linux "已跑通"仍待真域证据。

@@ -1,0 +1,7 @@
+AM v0.1.95 双面哈希登记（轮二十三：Actions 启用→历史首次真 CI；fast-suite-macos 绿=合入代码不回归；deployment-linux 证既有、opt-in-lanes 证 A32 形状伪、余未归因；外发边界固化）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = e461ae2460951f14b575ee7b8ebdfed55a689fab1b6e6bce6ac46d712cc7200c
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 前轮: v0.1.94 = c16222aae6e68b7569b56811ee72abb4ca0642285076d72c8fc3da862b4fa6d6（evidence/A02/am-v0.1.94-hash.txt）
+- 同轮事实: run 45097992173=PR#1 首跑（base/head 均 warlockedward，未碰 main/官方；外发边界入记忆 remote-push-boundary）；fast-suite-macos 绿（权威门，合入不回归）；deployment-linux/-amd64 红=基线容器单变量证既有非 A02/A25b；opt-in-lanes 红=我 job 缺 mc-prod 步+build-prod systemd 守卫 headless exit3⇒A32 形状证伪；release-checks=级联；release-images/application-package-linux/dashboard-browser×2=未归因（首跑无基线，诚实标未证）；A31/A32/A02 维持不升 EVIDENCED；ledger 26 不变；blcheck 69/0；PR#1 留作探针未关；不宣称项目安全
+- 候用户: A/B/C 拿 Linux 证据路径 · ADR 定稿笔 · A06 机制归属（三者不解锁则 B01→B02→C/D 主干治理上推不动）
