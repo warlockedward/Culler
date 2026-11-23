@@ -1,0 +1,10 @@
+AM v0.2.2 双面哈希登记（轮三十：W1 推 main 且核未发布 + DEFECT-006 真 Linux 首跑暴露并修 + 扫描分域第 2 类命中（tag-only 不解析）+ A32 返工现场建镜像/恢复两道/加 dispatch（发布步骤 10 处门核过）+ runner 隔离方案（否决 rootless 保 uid 语义））
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 7fb971e72659109f6ea2e98563f4d0f3b5373df6d81d90c0d1ff062ed2bef496
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 前轮: v0.2.1 = 14c5701d681b22ed65772b32486d57823498ed9fffb31d8e1b6d5581bf8266f1（evidence/A32/am-v0.2.1-hash.txt 实读）；再前 v0.2.0 = 64259a7346555d2ff5f61080e25f7cbff4dfea2457b577b7294b0c61f54dc46c（evidence/C01/am-v0.2.0-hash.txt 实读）
+- 自纠记: 本件首稿把前轮值误填为扫描 seal b9cedfea（那是缺陷件 §5.1 的扫描封印），且把 v0.2.1 值错记为 4763b313（那是 v0.1.98）——两处均由读文件核出并改正；违'值须出自工件非记忆'的现行自案
+- 同轮并入 dev 的四提交: bb7551f(DEFECT-006 平台分派修复) / 4f4fcfd(扫描 tag-only 负面结论 §5.1) / 67dfefd(A32 现场建 mc-prod+恢复 update_docker/nightly+timeout150+dispatch) / deefd13(runner 隔离方案)
+- 关键事实: main dd087c7→bba39ef 非强推，releases/tags 均 0 未变=未发布；runner 首接单实跑；DEFECT-006 真因=/private/tmp 硬编码（注释"verified both ways"被证伪，入 §F）；修=6 文件编译期 OS 分派零断言变更，vet 四组+全道 26/0/0+dashboard 984/0；扫描对 tag-only 目录与 .github/*.yml 不解析⇒"落行0"空断言不援引为背书；隔离方案=独立 containerd+dockerd+移出 docker 组（漏则归零），rootless 因偏移容器 uid 破坏 A03/A16/A21/A29 双 uid 语义而否决；≥8 套其他项目共存实测；风险如实列（iptables 并存需 S3/S5 实测；非 VM 级隔离；arm 缺口另计）
+- 时序约束: 正跑的 job 用共享 daemon，隔离改动必须待其结束（S0 先暂停接单+取基线）
+- 账: blcheck 69/0 / ledger 29 EVIDENCED 不变（延付具名未解除）/ worktree 仅 dev / 外发仅 warlockedward / 不宣称项目安全
