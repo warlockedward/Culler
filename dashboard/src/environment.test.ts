@@ -6,7 +6,7 @@ test("environment actions preserve the exact request and response", async () => 
   for (const action of ["get", "save", "approve", "assist", "retry", "deny", "cache-clear"]) {
     const calls: unknown[] = [];
     const nudges: string[] = [];
-    const body = { project_id: "garden", configuration: { dockerfile: { path: ".culler/Dockerfile", content: "FROM sha256:abc\nRUN echo '$PATH'\n" } }, revision_id: "revision-1" };
+    const body = { project_id: "garden", configuration: { dockerfile: { path: ".shorizon/Dockerfile", content: "FROM sha256:abc\nRUN echo '$PATH'\n" } }, revision_id: "revision-1" };
     const result = { environment: { project_id: "garden", phase: "approval" } };
     const mc = { async run(argv: string[], input?: string) { calls.push({ argv, input }); return { code: 0, json: result, stderr: "" }; } };
     const response = await handleApi(...apiReq("POST", `/api/environment/${action}`, body), deps({ mc, nudgeResident: async reason => { nudges.push(reason); } }));

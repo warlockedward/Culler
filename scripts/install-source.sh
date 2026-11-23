@@ -192,7 +192,7 @@ done
 parse_args "$@"
 
 . "$REPO_DIR/scripts/source-update-guard.sh"
-culler_require_source_update_idle "${MC_HOME_IN:-$HOME/.culler}" || exit 1
+culler_require_source_update_idle "${MC_HOME_IN:-$HOME/.shorizon}" || exit 1
 
 [ "$SMOKE" -eq 0 ] || [ "$DEV" -eq 0 ] || \
   fail "--smoke is production-only; development never exercises real provider or supervision routes"
@@ -600,7 +600,7 @@ if terminal_setup; then
       -o "$SETUP_SCRATCH/mc" ./cmd/mc >/dev/null 2>&1 ) || \
     fail "The setup program build failed. Repair the host tools, then run sh scripts/install-source.sh again."
   say "✓ The setup program is ready"
-  [ -n "$MC_HOME_IN" ] || MC_HOME_IN="$HOME/.culler"
+  [ -n "$MC_HOME_IN" ] || MC_HOME_IN="$HOME/.shorizon"
   check_runtime_bindings
   export MC_HOME="$MC_HOME_IN"
   cd "$REPO_DIR"
@@ -680,7 +680,7 @@ fi
 # --- 3. Hand off to the wizard ---------------------------------------------
 
 if [ "$DEV" -eq 0 ]; then
-  ask_explicit MC_HOME_IN "deployment home (MC_HOME)" "$HOME/.culler"
+  ask_explicit MC_HOME_IN "deployment home (MC_HOME)" "$HOME/.shorizon"
   check_runtime_bindings
 fi
 collect_runtime_inputs

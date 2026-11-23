@@ -5,7 +5,7 @@ let smoke: Smoke;
 const garden = "journal-race-garden";
 const library = "journal-race-library";
 const digest = `sha256:${"a".repeat(64)}`;
-const dockerfile = "FROM retained-base\nCOPY .culler/tools.md /tmp/tools.md\nRUN install-tools\n";
+const dockerfile = "FROM retained-base\nCOPY .shorizon/tools.md /tmp/tools.md\nRUN install-tools\n";
 const buildFile = "# Image input\n\n**Keep these bytes.**\n<script>literal input</script>\n";
 
 function gate() {
@@ -16,8 +16,8 @@ function gate() {
 
 function fixture(phase: "active" | "approval" | "build" = "active", project = garden): any {
   const prefix = project === garden ? "race" : "library";
-  const configuration = { base_digest: digest, dockerfile: { path: ".culler/Dockerfile", content: dockerfile },
-    build_files: [{ path: ".culler/tools.md", content: buildFile }], build_args: {},
+  const configuration = { base_digest: digest, dockerfile: { path: ".shorizon/Dockerfile", content: dockerfile },
+    build_files: [{ path: ".shorizon/tools.md", content: buildFile }], build_args: {},
     setup: { command: "install-dependencies", directory: "." } };
   const revision = { id: `${prefix}-proposal`, editor: `setup:${prefix}-agent`, configuration,
     explanation: "Install the Project tools in the image. The Project checks need these tools." };
@@ -263,8 +263,8 @@ test("completed history without acceptance evidence does not claim setup is acti
 test("the file comparison preserves exact changed Dockerfile and build file contents", async () => {
   const { page } = smoke;
   const before = { base_digest: digest,
-    dockerfile: { path: ".culler/Dockerfile", content: "FROM retained-base\nRUN old-tools\n" },
-    build_files: [{ path: ".culler/tools.md", content: "# Old image input\n\n  Keep indentation.\n" }] };
+    dockerfile: { path: ".shorizon/Dockerfile", content: "FROM retained-base\nRUN old-tools\n" },
+    build_files: [{ path: ".shorizon/tools.md", content: "# Old image input\n\n  Keep indentation.\n" }] };
   // An earlier acceptance supplies the accepted version of each file.
   const view = fixture("approval");
   view.revisions[1].configuration = before;
@@ -295,11 +295,11 @@ test("the file comparison preserves exact changed Dockerfile and build file cont
   const ofType = (type: string) => lines.filter(([kind]) => kind === type).map(([, text]) => text);
   expect(ofType("context")).toEqual(["FROM retained-base"]);
   expect(ofType("change-deletion")).toEqual(["RUN old-tools"]);
-  expect(ofType("change-addition")).toEqual(["COPY .culler/tools.md /tmp/tools.md", "RUN install-tools"]);
+  expect(ofType("change-addition")).toEqual(["COPY .shorizon/tools.md /tmp/tools.md", "RUN install-tools"]);
   expect(await complete(dockerfileView)).toBe(dockerfile);
 
-  await page.locator("summary").filter({ hasText: "Changed: .culler/tools.md" }).click();
-  const buildSelector = '[data-journal-key="race-proposal:file:.culler/tools.md"] .file-view';
+  await page.locator("summary").filter({ hasText: "Changed: .shorizon/tools.md" }).click();
+  const buildSelector = '[data-journal-key="race-proposal:file:.shorizon/tools.md"] .file-view';
   await ready(buildSelector);
   const buildView = page.locator(buildSelector);
   const build = await rows(buildView);

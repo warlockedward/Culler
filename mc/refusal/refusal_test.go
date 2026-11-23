@@ -305,13 +305,13 @@ func TestDetailRejectsUnenumeratedIdentifiers(t *testing.T) {
 // message is full of secrets must render a detail with none of them.
 func TestDetailNeverCarriesHostileInput(t *testing.T) {
 	secrets := []string{
-		"/Users/vinchenkov/.culler/auth.json",
+		"/Users/vinchenkov/.shorizon/auth.json",
 		"vinchenkov",
 		"hunter2",
 		"sk-ant-api03-abcdef",
 		"deadbeefcafe",
 	}
-	msg := "mount source /Users/vinchenkov/.culler/auth.json rejected " +
+	msg := "mount source /Users/vinchenkov/.shorizon/auth.json rejected " +
 		"for user vinchenkov with token sk-ant-api03-abcdef nonce deadbeefcafe password hunter2"
 
 	d, err := refusal.DetailFor(refusal.Refusal{

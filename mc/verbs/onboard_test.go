@@ -744,7 +744,7 @@ func TestOnboardProjectExistingRepoSetsRelativeWorktreesAndMinimalProfile(t *tes
 		t.Fatal(err)
 	}
 	// The artifact plane is the Project's own `.mc-artifacts`, a SIBLING of
-	// `.culler` (which is a protected jurisdiction root, so nothing
+	// `.shorizon` (which is a protected jurisdiction root, so nothing
 	// beneath it can be mounted). Judged against the derivation every other half
 	// reads, not against a hand-spelled literal.
 	canonicalRoot, err := filepath.EvalSymlinks(root)

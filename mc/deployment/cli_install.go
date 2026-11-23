@@ -117,7 +117,7 @@ func CLIPathCommand(directory string) string {
 
 func CLICommand(home, command string) string {
 	userHome, _ := os.UserHomeDir()
-	defaultHome, _ := CanonicalHome(filepath.Join(userHome, ".culler"))
+	defaultHome, _ := CanonicalHome(filepath.Join(userHome, ".shorizon"))
 	if home == defaultHome && (os.Getenv("MC_HOME") == "" || os.Getenv("MC_HOME") == home) {
 		return "culler " + command
 	}
@@ -130,7 +130,7 @@ func cliShellBlock(home, directory string) string {
 }
 
 func writeCLIFile(path string, body []byte, mode os.FileMode) error {
-	f, err := os.CreateTemp(filepath.Dir(path), ".culler-command-")
+	f, err := os.CreateTemp(filepath.Dir(path), ".shorizon-command-")
 	if err != nil {
 		return err
 	}

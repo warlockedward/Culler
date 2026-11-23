@@ -128,30 +128,30 @@ func TestAgentsViewPinRejectsInvalidValues(t *testing.T) {
 }
 
 func TestAgentsViewPathsFollowTheMCHomeLayout(t *testing.T) {
-	got := AgentsViewPathsFor("/Users/alice/.culler")
+	got := AgentsViewPathsFor("/Users/alice/.shorizon")
 	want := AgentsViewPaths{
-		Executable:        "/Users/alice/.culler/bin/agentsview",
-		Root:              "/Users/alice/.culler/agentsview",
-		Data:              "/Users/alice/.culler/agentsview/data",
-		Config:            "/Users/alice/.culler/agentsview/data/config.toml",
-		DebugLog:          "/Users/alice/.culler/agentsview/data/debug.log",
-		Token:             "/Users/alice/.culler/agentsview/token",
-		Home:              "/Users/alice/.culler/agentsview/home",
-		ClaudeTraceRoot:   "/Users/alice/.culler/agentsview/traces/claude/projects",
-		ClaudeTraceCopies: "/Users/alice/.culler/agentsview/traces/claude/projects/culler",
-		CodexTraceRoot:    "/Users/alice/.culler/agentsview/traces/codex/sessions",
-		OpenCodeTraceRoot: "/Users/alice/.culler/agentsview/traces/opencode",
-		StdoutLog:         "/Users/alice/.culler/logs/agentsview.stdout.log",
-		StderrLog:         "/Users/alice/.culler/logs/agentsview.stderr.log",
-		Health:            "/Users/alice/.culler/health/agentsview.json",
+		Executable:        "/Users/alice/.shorizon/bin/agentsview",
+		Root:              "/Users/alice/.shorizon/agentsview",
+		Data:              "/Users/alice/.shorizon/agentsview/data",
+		Config:            "/Users/alice/.shorizon/agentsview/data/config.toml",
+		DebugLog:          "/Users/alice/.shorizon/agentsview/data/debug.log",
+		Token:             "/Users/alice/.shorizon/agentsview/token",
+		Home:              "/Users/alice/.shorizon/agentsview/home",
+		ClaudeTraceRoot:   "/Users/alice/.shorizon/agentsview/traces/claude/projects",
+		ClaudeTraceCopies: "/Users/alice/.shorizon/agentsview/traces/claude/projects/culler",
+		CodexTraceRoot:    "/Users/alice/.shorizon/agentsview/traces/codex/sessions",
+		OpenCodeTraceRoot: "/Users/alice/.shorizon/agentsview/traces/opencode",
+		StdoutLog:         "/Users/alice/.shorizon/logs/agentsview.stdout.log",
+		StderrLog:         "/Users/alice/.shorizon/logs/agentsview.stderr.log",
+		Health:            "/Users/alice/.shorizon/health/agentsview.json",
 	}
 	if got != want {
 		t.Fatalf("paths = %+v\nwant %+v", got, want)
 	}
-	if key := WikiKeyPath("/Users/alice/.culler"); key != "/Users/alice/.culler/state/wiki-key" {
+	if key := WikiKeyPath("/Users/alice/.shorizon"); key != "/Users/alice/.shorizon/state/wiki-key" {
 		t.Fatalf("wiki key = %q", key)
 	}
-	if root := WikiExportRoot("/Users/alice/.culler"); root != "/Users/alice/.culler/wiki" {
+	if root := WikiExportRoot("/Users/alice/.shorizon"); root != "/Users/alice/.shorizon/wiki" {
 		t.Fatalf("wiki export root = %q", root)
 	}
 }

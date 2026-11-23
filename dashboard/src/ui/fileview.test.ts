@@ -5,11 +5,11 @@ const pierre = await import("./pierre/pierre.js");
 
 const lines = (count: number, text = "RUN step") => Array.from({ length: count }, (_, at) => `${text} ${at + 1}`).join("\n") + "\n";
 const accepted = {
-  dockerfile: { path: ".culler/Dockerfile", content: lines(20) },
+  dockerfile: { path: ".shorizon/Dockerfile", content: lines(20) },
   build_files: [{ path: "old.sh", content: "rm -rf cache\nexit 0\n" }, { path: "same.sh", content: "echo same\n" }],
 };
 const proposed = {
-  dockerfile: { path: ".culler/Dockerfile", content: lines(20).replace("RUN step 10\n", "RUN step ten\n") },
+  dockerfile: { path: ".shorizon/Dockerfile", content: lines(20).replace("RUN step 10\n", "RUN step ten\n") },
   build_files: [{ path: "same.sh", content: "echo same\n" }, { path: "new.sh", content: "install tool\nverify tool\nlist tool\n" }],
 };
 
@@ -24,7 +24,7 @@ function compare(file: ReturnType<typeof proposalFiles>["buildFiles"][number]) {
 describe("file comparison", () => {
   test("a first proposal adds each file", () => {
     const files = proposalFiles(null, proposed);
-    expect(files.dockerfile).toEqual({ path: ".culler/Dockerfile", before: null, after: proposed.dockerfile.content, change: "Added", lang: "dockerfile" });
+    expect(files.dockerfile).toEqual({ path: ".shorizon/Dockerfile", before: null, after: proposed.dockerfile.content, change: "Added", lang: "dockerfile" });
     expect(files.buildFiles.map(file => [file.path, file.change])).toEqual([["same.sh", "Added"], ["new.sh", "Added"]]);
     expect(compare(files.dockerfile!)).toMatchObject({ type: "new", added: 20, removed: 0, lines: 20 });
   });
@@ -58,7 +58,7 @@ describe("file comparison", () => {
   test("an unchanged file shows its contents without a comparison", () => {
     const [unchanged] = proposalFiles(accepted, proposed).buildFiles;
     expect(compare(unchanged!)).toEqual({ input: { file: { name: "same.sh", contents: "echo same\n" } }, lines: 1 });
-    expect(fileViewInput({ path: ".culler/tools/build.sh", before: "a\n", after: "a\n", change: "Unchanged" }).file?.name).toBe("build.sh");
+    expect(fileViewInput({ path: ".shorizon/tools/build.sh", before: "a\n", after: "a\n", change: "Unchanged" }).file?.name).toBe("build.sh");
     expect(viewLines({ file: { name: "empty", contents: "" } })).toBe(0);
     expect(viewLines({ file: { name: "open", contents: "one\ntwo" } })).toBe(2);
     expect(viewLines({ file: { name: "windows", contents: "one\r\ntwo\r\n" } })).toBe(2);

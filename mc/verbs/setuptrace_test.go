@@ -17,7 +17,7 @@ func TestSetupTraceRegistrationRetainsOperationIdentityAndResult(t *testing.T) {
 			op := environmentWork(t, db)[0]
 			if test.kind == "validate" {
 				config := environmentTestConfiguration()
-				config.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
+				config.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
 				view := environmentCall(t, db, environmentSetupID(op), "report", EnvironmentRequest{OperationID: op.ID, Outcome: "proposal", Configuration: &config, Summary: "The Project requires an image."})
 				state := view["environment"].(EnvironmentState)
 				environmentCall(t, db, nil, "approve", EnvironmentRequest{ProjectID: op.ProjectID, RevisionID: state.DraftRevisionID})

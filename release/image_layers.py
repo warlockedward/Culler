@@ -13,7 +13,7 @@ def forbidden_path(name):
     while name.startswith("./"):
         name = name[2:]
     parts = PurePosixPath(name.lstrip("/")).parts
-    if any(part in {".culler", ".mission-control", "OPERATOR-INPUTS.md"} for part in parts):
+    if any(part in {".shorizon", ".mission-control", "OPERATOR-INPUTS.md"} for part in parts):
         return True
     path = "/".join(parts)
     return any(path == base or path.startswith(base + "/") for base in (

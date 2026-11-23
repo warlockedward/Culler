@@ -22,11 +22,11 @@
 # field (the installed mc is still the old release), and a new manifest file
 # (the installed mc's host release validation does not know it).
 #
-# Environment: MC_HOME (defaults to ~/.culler).
+# Environment: MC_HOME (defaults to ~/.shorizon).
 set -eu
 
 REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-MC_HOME=${MC_HOME:-$HOME/.culler}
+MC_HOME=${MC_HOME:-$HOME/.shorizon}
 HOST_ROOT="$MC_HOME/release/host"
 
 say() { printf '%s\n' "$*"; }

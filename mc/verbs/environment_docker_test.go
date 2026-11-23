@@ -130,11 +130,11 @@ const report={operation_id:envelope.run_id,outcome:"complete",configuration:enve
 if(process.env.FIXTURE_IMAGE_DECISION) {
  if(envelope.environment.kind==="setup") {
   const content="FROM culler-project-base:"+envelope.environment.configuration.base_digest.slice(7)+"\nRUN printf image-dependency >/usr/local/share/image-dependency-proof\n";
-  report.configuration.dockerfile={path:".culler/Dockerfile",content};
+  report.configuration.dockerfile={path:".shorizon/Dockerfile",content};
   report.outcome="proposal";report.summary="The development workflow requires the additional system file.";
-  await Bun.write(".culler/Dockerfile",content);
+  await Bun.write(".shorizon/Dockerfile",content);
  } else if(process.env.FIXTURE_IMAGE_DECISION==="deny") {
-  if(await Bun.file(".culler/Dockerfile").exists())throw Error("The denied image file remains in the source");
+  if(await Bun.file(".shorizon/Dockerfile").exists())throw Error("The denied image file remains in the source");
   report.summary="Setup used the current image. The proposed image tool remains unavailable.";
  } else if(await Bun.file("/usr/local/share/image-dependency-proof").text()!=="image-dependency")throw Error("The additional image file is absent");
 }

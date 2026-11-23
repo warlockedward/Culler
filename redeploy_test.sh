@@ -555,7 +555,7 @@ for WIDTH in 80 40; do
     for stage in early late; do
       setup_case "schema-differs-$WIDTH-$record-$stage"
       printf 'schema=previous records=5\n' >"$case_root/spine.db"
-      supervision="$case_root/home/.culler/supervision"
+      supervision="$case_root/home/.shorizon/supervision"
       case "$record" in
         supervision) recorded=$previous IMAGE_RELEASE=$release ;;
         image) recorded= IMAGE_RELEASE=$previous ;;
@@ -669,7 +669,7 @@ for target in default named; do
   for WIDTH in 80 40; do
     setup_case "reset-confirmed-$target-$WIDTH"
     printf 'schema=previous records=5\n' >"$case_root/spine.db"
-    CASE_MC_HOME= shown="~/.culler"
+    CASE_MC_HOME= shown="~/.shorizon"
     if [ "$target" = named ]; then
       CASE_MC_HOME=/srv/culler shown=/srv/culler
     fi

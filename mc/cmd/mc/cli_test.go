@@ -38,7 +38,7 @@ var mcBin string
 
 // testHome stands in for the operator's home directory in every child mc
 // process this package spawns. Stripping MC_HOME does not make a child
-// hermetic: MC_HOME falls back to $HOME/.culler, so a test that
+// hermetic: MC_HOME falls back to $HOME/.shorizon, so a test that
 // supplies no MC_HOME resolves the operator's REAL deployment. One uncached run
 // of this package wrote 382 records into the live deployment's mc.ndjson that
 // way. $HOME is what has to move.
@@ -1824,7 +1824,7 @@ func TestDispatchRoutingResolution(t *testing.T) {
 		writeRouting(t, spine, defaultRoutingMarkdown)
 		proposalTask(t, spine, "default home")
 		home := t.TempDir()
-		root := filepath.Join(home, ".culler")
+		root := filepath.Join(home, ".shorizon")
 		if err := os.MkdirAll(root, 0o700); err != nil {
 			t.Fatal(err)
 		}

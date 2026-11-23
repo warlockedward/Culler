@@ -18,7 +18,7 @@ func configuredCanonicalHome() (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("resolve default MC_HOME: %w", err)
 		}
-		home = filepath.Join(userHome, ".culler")
+		home = filepath.Join(userHome, ".shorizon")
 	}
 	return deployment.CanonicalHome(home)
 }

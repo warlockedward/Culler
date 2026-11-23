@@ -111,7 +111,7 @@ export SHZ_PACKAGE_ROOT SHZ_RELEASE_RECORD
 say 'Culler passed the download checks.'
 
 check_updates=0
-selected_home=${MC_HOME:-$HOME/.culler}
+selected_home=${MC_HOME:-$HOME/.shorizon}
 selected_bin=${MC_BIN_DIR:-}
 expect_home=0
 expect_bin=0

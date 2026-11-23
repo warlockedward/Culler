@@ -48,7 +48,7 @@ func inspectBytes(t *testing.T, value any) string {
 }
 
 func TestHelperCreateArgsPinLeastPrivilegeEnvelope(t *testing.T) {
-	names, err := deployment.RuntimeNames("/Users/alice/.culler")
+	names, err := deployment.RuntimeNames("/Users/alice/.shorizon")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func TestHelperCreateArgsPinLeastPrivilegeEnvelope(t *testing.T) {
 }
 
 func TestHelperCreateArgsCarryTheHostZone(t *testing.T) {
-	names, err := deployment.RuntimeNames("/Users/alice/.culler")
+	names, err := deployment.RuntimeNames("/Users/alice/.shorizon")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func TestHelperCreateArgsCarryTheHostZone(t *testing.T) {
 }
 
 func TestHelperExactRequiresTheHostZone(t *testing.T) {
-	names, err := deployment.RuntimeNames("/Users/alice/.culler")
+	names, err := deployment.RuntimeNames("/Users/alice/.shorizon")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -165,7 +165,7 @@ func exactHelperFixture(names deployment.Names, imageID string) helperContainerI
 }
 
 func TestHelperDatabaseResetRequiresIdleProcesses(t *testing.T) {
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	imageID := "sha256:" + strings.Repeat("a", 64)
 	pinNativeArchitecture(t, "arm64")
 	image := helperImageInspect{ID: imageID, OS: "linux", Architecture: "arm64"}
@@ -207,7 +207,7 @@ func TestHelperDatabaseResetRequiresIdleProcesses(t *testing.T) {
 }
 
 func TestHelperDestroySpineVolumeRechecksAndCommitsInOrder(t *testing.T) {
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	imageID := "sha256:" + strings.Repeat("a", 64)
 	pinNativeArchitecture(t, "arm64")
 	image := helperImageInspect{ID: imageID, OS: "linux", Architecture: "arm64"}
@@ -234,7 +234,7 @@ func TestHelperDestroySpineVolumeRechecksAndCommitsInOrder(t *testing.T) {
 }
 
 func TestHelperDestroySpineVolumeRefusesMutableContainerTarget(t *testing.T) {
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	imageID := "sha256:" + strings.Repeat("a", 64)
 	pinNativeArchitecture(t, "arm64")
 	image := helperImageInspect{ID: imageID, OS: "linux", Architecture: "arm64"}
@@ -256,7 +256,7 @@ func TestHelperDestroySpineVolumeRefusesMutableContainerTarget(t *testing.T) {
 }
 
 func TestHelperExactRejectsAuthorityWidening(t *testing.T) {
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	m := helperManager{names: names}
 	imageID := "sha256:" + strings.Repeat("a", 64)
 	base := exactHelperFixture(names, imageID)
@@ -293,7 +293,7 @@ func TestHelperExactRejectsAuthorityWidening(t *testing.T) {
 }
 
 func TestHelperEnsureCreatesAndStartsOnlyExactEnvelope(t *testing.T) {
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	imageID := "sha256:" + strings.Repeat("a", 64)
 	pinNativeArchitecture(t, "arm64")
 	image := helperImageInspect{ID: imageID, OS: "linux", Architecture: "arm64"}
@@ -325,7 +325,7 @@ func TestHelperEnsureCreatesAndStartsOnlyExactEnvelope(t *testing.T) {
 
 func TestHelperEnsureMissingOrWrongImageMutatesNothing(t *testing.T) {
 	pinNativeArchitecture(t, "arm64")
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	for name, image := range map[string]helperImageInspect{
 		"wrong architecture on an arm64 host": {ID: "sha256:" + strings.Repeat("a", 64), OS: "linux", Architecture: "amd64"},
 		"malformed id":                        {ID: "latest", OS: "linux", Architecture: "arm64"},
@@ -350,7 +350,7 @@ func TestHelperEnsureMissingOrWrongImageMutatesNothing(t *testing.T) {
 // host is a foreign architecture here, refused with nothing mutated.
 func TestHelperEnsureAcceptsNativeAmd64Image(t *testing.T) {
 	pinNativeArchitecture(t, "amd64")
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	imageID := "sha256:" + strings.Repeat("a", 64)
 	image := helperImageInspect{ID: imageID, OS: "linux", Architecture: "amd64"}
 	volume := helperVolumeInspect{Name: names.Volume, Driver: "local"}
@@ -380,7 +380,7 @@ func TestHelperEnsureAcceptsNativeAmd64Image(t *testing.T) {
 
 func TestHelperEnsureRefusesArm64ImageOnAmd64Host(t *testing.T) {
 	pinNativeArchitecture(t, "amd64")
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	runner := &scriptedDocker{t: t, steps: []dockerStep{{
 		want: []string{"image", "inspect", "--format", "{{json .}}", productionImageRef},
 		out:  inspectBytes(t, helperImageInspect{ID: "sha256:" + strings.Repeat("a", 64), OS: "linux", Architecture: "arm64"}),
@@ -396,7 +396,7 @@ func TestHelperEnsureRefusesArm64ImageOnAmd64Host(t *testing.T) {
 }
 
 func TestHelperEnsurePreservesUnmanagedNameCollision(t *testing.T) {
-	names, _ := deployment.RuntimeNames("/Users/alice/.culler")
+	names, _ := deployment.RuntimeNames("/Users/alice/.shorizon")
 	imageID := "sha256:" + strings.Repeat("a", 64)
 	pinNativeArchitecture(t, "arm64")
 	image := helperImageInspect{ID: imageID, OS: "linux", Architecture: "arm64"}

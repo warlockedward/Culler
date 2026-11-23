@@ -13,7 +13,7 @@ import (
 
 func TestDatabaseResetRequiresStoppedUsersAndExactTarget(t *testing.T) {
 	pinNativeArchitecture(t, "arm64")
-	names, err := deployment.RuntimeNames("/Users/alice/.culler")
+	names, err := deployment.RuntimeNames("/Users/alice/.shorizon")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func TestOnboardResetRequestFollowsTheStoppedUserCheck(t *testing.T) {
 }
 
 func TestDatabaseResetRemovesOnlyManagedUsersOtherThanTheHelper(t *testing.T) {
-	names, err := deployment.RuntimeNames("/Users/alice/.culler")
+	names, err := deployment.RuntimeNames("/Users/alice/.shorizon")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +138,7 @@ func TestDatabaseResetRemovesOnlyManagedUsersOtherThanTheHelper(t *testing.T) {
 }
 
 func TestReleaseUpdateRemovesAllManagedContainersAndPreservesTheHelper(t *testing.T) {
-	names, err := deployment.RuntimeNames("/Users/alice/.culler")
+	names, err := deployment.RuntimeNames("/Users/alice/.shorizon")
 	if err != nil {
 		t.Fatal(err)
 	}

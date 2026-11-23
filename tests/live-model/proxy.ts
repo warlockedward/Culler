@@ -32,12 +32,12 @@ if (!isAbsolute(value("--home")) || !isAbsolute(binary) || !imageSelector || !co
     new Set(connections).size !== connections.length || connections.some(id => !/^[a-z0-9][a-z0-9_.-]{0,63}$/.test(id))) {
   throw new Error("Use an isolated test home, host binary, test image, and connection identifiers.");
 }
-const testRoot = await realpath(join(process.env.HOME!, ".config/culler-tests"));
+const testRoot = await realpath(join(process.env.HOME!, ".config/shorizon-tests"));
 const physicalHome = await realpath(home);
 const inside = relative(testRoot, physicalHome);
 const homeInfo = await lstat(home);
 if (!inside || inside.startsWith("..") || isAbsolute(inside) || !homeInfo.isDirectory() || homeInfo.uid !== process.getuid?.() || (homeInfo.mode & 0o777) !== 0o700) {
-  throw new Error("The test home must be a private directory below ~/.config/culler-tests/.");
+  throw new Error("The test home must be a private directory below ~/.config/shorizon-tests/.");
 }
 try { await lstat(join(home, "health/provider-acceptance.sock")); throw new Error("The isolated home already has a proxy socket."); }
 catch (error: any) { if (error.code !== "ENOENT") throw error; }
@@ -122,7 +122,7 @@ try {
   image = await resolveLiveImage(imageSelector, argv => command(argv));
   await initializeLiveSpine(mc);
   if (args.includes("--import-api-keys")) {
-    const file = value("--keys-file") || join(process.env.HOME!, ".config/culler-tests/live-model.env");
+    const file = value("--keys-file") || join(process.env.HOME!, ".config/shorizon-tests/live-model.env");
     const info = await lstat(file);
     const parentInfo = await lstat(resolve(file, ".."));
     if (!parentInfo.isDirectory() || (parentInfo.mode & 0o777) !== 0o700) throw new Error("The key directory must have mode 0700.");

@@ -73,9 +73,9 @@ test("a save selects the source by the draft origin", () => {
 });
 
 test("an explanation stays with its image inputs only", () => {
-  const before = environmentConfiguration({ base_digest: "sha256:base", dockerfile: { path: ".culler/Dockerfile", content: "FROM base\n" } });
+  const before = environmentConfiguration({ base_digest: "sha256:base", dockerfile: { path: ".shorizon/Dockerfile", content: "FROM base\n" } });
   const script = { ...before, setup: { command: "npm ci", directory: "." } };
-  const image = { ...before, dockerfile: { path: ".culler/Dockerfile", content: "FROM base\nRUN true\n" } };
+  const image = { ...before, dockerfile: { path: ".shorizon/Dockerfile", content: "FROM base\nRUN true\n" } };
   expect(environmentExplanation(before, script, "The image adds a library.")).toBe("The image adds a library.");
   expect(environmentExplanation(before, image, "The image adds a library.")).toBe("");
 });

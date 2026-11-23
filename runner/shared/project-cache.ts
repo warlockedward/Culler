@@ -20,7 +20,7 @@ export async function importLegacyNpmCache(root: string, home: string): Promise<
       if (entry.isDirectory()) {
         await copy(sourcePath, destinationPath);
       } else if (entry.isFile() && !await directoryEntry(destinationPath)) {
-        const temporary = join(to, `.culler-import-${randomUUID()}`);
+        const temporary = join(to, `.shorizon-import-${randomUUID()}`);
         try {
           await copyFile(sourcePath, temporary, constants.COPYFILE_EXCL);
           await link(temporary, destinationPath).catch(error => { if (error.code !== "EEXIST") throw error; });

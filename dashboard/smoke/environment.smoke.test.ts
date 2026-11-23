@@ -110,7 +110,7 @@ test("the Dockerfile editor records build contents and a stale draft preserves l
   await page.getByTestId("environment-base").fill(base);
   await page.getByRole("button", { name: "Add Dockerfile", exact: true }).click();
   expect(await page.getByTestId("environment-dockerfile").inputValue()).toBe(`FROM culler-project-base:${base.slice(7)}\n`);
-  expect(await page.getByTestId("environment-dockerfile-path").inputValue()).toBe(".culler/Dockerfile");
+  expect(await page.getByTestId("environment-dockerfile-path").inputValue()).toBe(".shorizon/Dockerfile");
   const dockerfile = `FROM culler-project-base:${base.slice(7)}\nRUN apt-get update && apt-get install -y libpq-dev=16.4-1\n`;
   await page.getByTestId("environment-dockerfile").fill(dockerfile);
   // The colored copy holds the same text as the text area, and the line numbers follow it.
@@ -119,7 +119,7 @@ test("the Dockerfile editor records build contents and a stale draft preserves l
   expect(await editor.locator(".code-gutter").evaluate(node => node.textContent)).toBe("1\n2\n3");
   expect(await editor.locator(".tok-keyword").allInnerTexts()).toEqual(["FROM", "RUN"]);
   await page.getByTestId("environment-add-build_files").click();
-  await page.getByLabel("Repository file path 1", { exact: true }).fill(".culler/install.sh");
+  await page.getByLabel("Repository file path 1", { exact: true }).fill(".shorizon/install.sh");
   await page.getByLabel("File contents 1", { exact: true }).fill("#!/bin/bash\nset -eu\n");
   await page.getByTestId("environment-apply").click();
   await page.getByTestId("environment-status").getByText(APPLIED, { exact: true }).waitFor();

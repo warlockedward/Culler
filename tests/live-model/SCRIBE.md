@@ -11,7 +11,7 @@ The test requires these prerequisites:
 - The fixed Go and Bun tools from `.mise.toml`.
 - A host test binary with `test_fake_routing,test_scratch_spine`.
 - The current source checkout with its shipped Scribe skills.
-- A private test home below `~/.config/culler-tests/`.
+- A private test home below `~/.config/shorizon-tests/`.
 - An absent proxy socket in that test home.
 - One enabled `codex` profile and one enabled `claude-sdk` profile.
 - A new absolute output directory outside the checkout.
@@ -26,7 +26,7 @@ Run this command from the checkout within the authorized cost limit:
 ```sh
 ./tests/live-model/scribe.sh \
   --confirm-live-spend \
-  --mc-home "$HOME/.config/culler-tests/proxy-acceptance" \
+  --mc-home "$HOME/.config/shorizon-tests/proxy-acceptance" \
   --mc-binary /private/tmp/culler-scribe-host-mc \
   --image sha256:<64-hexadecimal-digits> \
   --codex-binding <enabled-codex-profile> \
@@ -102,7 +102,7 @@ The task image supplies the fixed harness packages.
 ```sh
 mise exec -- bun tests/live-model/scribe-acceptance.ts \
   --confirm-live-spend \
-  --mc-home "$HOME/.config/culler-tests/proxy-acceptance" \
+  --mc-home "$HOME/.config/shorizon-tests/proxy-acceptance" \
   --mc-binary /private/tmp/culler-scribe-host-mc \
   --image sha256:<64-hexadecimal-digits> \
   --connections proxy-test-codex-api,proxy-test-claude-api \

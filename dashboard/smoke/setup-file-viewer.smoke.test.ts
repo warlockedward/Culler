@@ -13,13 +13,13 @@ const tools = "#!/bin/sh\n\n# **Literal build contents**\n  printf '%s\\n' '<scr
 const removed = "#!/bin/sh\nrm -rf /var/cache/tools\nexit 0\n";
 
 interface Files { dockerfile: string; build_files: { path: string; content: string }[] }
-const firstFiles: Files = { dockerfile, build_files: [{ path: ".culler/tools.sh", content: tools }] };
-const acceptedFiles: Files = { dockerfile: acceptedDockerfile, build_files: [{ path: ".culler/tools.sh", content: tools }, { path: ".culler/clean.sh", content: removed }] };
+const firstFiles: Files = { dockerfile, build_files: [{ path: ".shorizon/tools.sh", content: tools }] };
+const acceptedFiles: Files = { dockerfile: acceptedDockerfile, build_files: [{ path: ".shorizon/tools.sh", content: tools }, { path: ".shorizon/clean.sh", content: removed }] };
 
 /** A Setup Journal read with a current proposal for Image dependencies. An
  * earlier acceptance supplies the accepted version. */
 function approvalView(proposed: Files, accepted: Files | null = null): any {
-  const configuration = (files: Files) => ({ base_digest: digest, dockerfile: { path: ".culler/Dockerfile", content: files.dockerfile },
+  const configuration = (files: Files) => ({ base_digest: digest, dockerfile: { path: ".shorizon/Dockerfile", content: files.dockerfile },
     build_files: files.build_files, build_args: { TOOL_VERSION: "16" }, setup: { directory: ".", command: "npm ci" } });
   const revision = { id: "viewer-proposal", configuration: configuration(proposed), editor: "setup:viewer-setup",
     explanation: "The image supplies database tools. The Project needs them for its checks." };
@@ -129,7 +129,7 @@ test("a first proposal marks each line as added, wraps long lines, and collapses
   await installFixture(() => view);
   await ready(dockerSelector);
   const viewer = page.locator(dockerSelector);
-  expect(await viewer.locator(".file-view-head").innerText()).toContain(".culler/Dockerfile");
+  expect(await viewer.locator(".file-view-head").innerText()).toContain(".shorizon/Dockerfile");
   expect(await viewer.locator(".file-view-change").innerText()).toBe("Added");
   expect(await viewer.locator(".file-view-added").innerText()).toBe("+40");
   expect(await viewer.locator(".file-view-removed").count()).toBe(0);
@@ -194,16 +194,16 @@ test("a first proposal marks each line as added, wraps long lines, and collapses
   expect(await copyRows(dockerSelector, 1, 3)).toBe(dockerLines.slice(1, 4).join("\n"));
 
   // A required build file stays in collapsed details. Its text stays literal and runs no script.
-  const details = page.locator('[data-journal-key="viewer-proposal:file:.culler/tools.sh"]');
+  const details = page.locator('[data-journal-key="viewer-proposal:file:.shorizon/tools.sh"]');
   expect(await details.evaluate(node => (node as HTMLDetailsElement).open)).toBe(false);
-  expect(await details.locator("summary").innerText()).toBe("Added: .culler/tools.sh");
+  expect(await details.locator("summary").innerText()).toBe("Added: .shorizon/tools.sh");
   await details.locator("summary").click();
-  await ready(buildSelector(".culler/tools.sh"));
-  const build = await viewerRows(buildSelector(".culler/tools.sh"));
+  await ready(buildSelector(".shorizon/tools.sh"));
+  const build = await viewerRows(buildSelector(".shorizon/tools.sh"));
   expect(build.types).toEqual(Array(4).fill("change-addition"));
   expect(build.text).toEqual(tools.trimEnd().split("\n"));
   expect(build.scripts).toBe(0);
-  expect(await copyRows(buildSelector(".culler/tools.sh"), 0, 3)).toBe(tools.trimEnd());
+  expect(await copyRows(buildSelector(".shorizon/tools.sh"), 0, 3)).toBe(tools.trimEnd());
   expect(await page.evaluate(() => (window as { setupScriptRan?: boolean }).setupScriptRan)).toBeUndefined();
   expect(smoke.browserLog.filter(line => line.startsWith("pageerror:"))).toEqual([]);
 }, 60000);
@@ -257,19 +257,19 @@ test("a changed proposal marks only its changed lines and keeps the complete fil
     ?.querySelector("pre[data-diff]") !== null, dockerSelector);
 
   // A removed build file marks each line as removed. An unchanged build file has no marks.
-  const removedDetails = page.locator('[data-journal-key="viewer-proposal:file:.culler/clean.sh"]');
-  expect(await removedDetails.locator("summary").innerText()).toBe("Removed: .culler/clean.sh");
+  const removedDetails = page.locator('[data-journal-key="viewer-proposal:file:.shorizon/clean.sh"]');
+  expect(await removedDetails.locator("summary").innerText()).toBe("Removed: .shorizon/clean.sh");
   await removedDetails.locator("summary").click();
-  await ready(buildSelector(".culler/clean.sh"));
-  const gone = await viewerRows(buildSelector(".culler/clean.sh"));
+  await ready(buildSelector(".shorizon/clean.sh"));
+  const gone = await viewerRows(buildSelector(".shorizon/clean.sh"));
   expect(gone.types).toEqual(Array(3).fill("change-deletion"));
   expect(gone.bars).toEqual(Array(3).fill("striped"));
   expect(gone.text).toEqual(removed.trimEnd().split("\n"));
-  const sameDetails = page.locator('[data-journal-key="viewer-proposal:file:.culler/tools.sh"]');
-  expect(await sameDetails.locator("summary").innerText()).toBe("Unchanged: .culler/tools.sh");
+  const sameDetails = page.locator('[data-journal-key="viewer-proposal:file:.shorizon/tools.sh"]');
+  expect(await sameDetails.locator("summary").innerText()).toBe("Unchanged: .shorizon/tools.sh");
   await sameDetails.locator("summary").click();
-  await ready(buildSelector(".culler/tools.sh"));
-  const same = await viewerRows(buildSelector(".culler/tools.sh"));
+  await ready(buildSelector(".shorizon/tools.sh"));
+  const same = await viewerRows(buildSelector(".shorizon/tools.sh"));
   expect(same.types).toEqual(Array(4).fill("context"));
   expect(same.marks).toEqual(Array(4).fill("none"));
   expect(same.bars).toEqual(Array(4).fill("none"));
@@ -385,7 +385,7 @@ test("the approval view keeps its contrast and follows the theme", async () => {
   const { page } = smoke;
   await installFixture(() => approvalView(firstFiles, acceptedFiles));
   await ready(dockerSelector);
-  for (const path of [".culler/clean.sh", ".culler/tools.sh"]) {
+  for (const path of [".shorizon/clean.sh", ".shorizon/tools.sh"]) {
     await page.locator(`[data-journal-key="viewer-proposal:file:${path}"] summary`).click();
     await ready(buildSelector(path));
   }

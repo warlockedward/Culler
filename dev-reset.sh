@@ -3,7 +3,7 @@
 # dev-reset.sh — nuke a production-tier deployment back to a fresh brain, fast.
 #
 # TARGET: the deployment home that MC_HOME names. The script refuses to run
-# without MC_HOME, because the default home, ~/.culler, is the production
+# without MC_HOME, because the default home, ~/.shorizon, is the production
 # deployment. It needs a production build of mc on PATH, because only that
 # build has `mc __reset`. A development-tier home (install.sh --dev) is out of
 # its reach.
@@ -85,7 +85,7 @@ if [ -n "$PROJECT_ID" ] && [ -z "$WORKSPACE_ROOT" ]; then
 	echo "dev-reset: --project needs --workspace-root" >&2; exit 2
 fi
 if [ -z "${MC_HOME:-}" ]; then
-	echo "dev-reset: set MC_HOME to the deployment home to reset. The production home is ~/.culler." >&2; exit 2
+	echo "dev-reset: set MC_HOME to the deployment home to reset. The production home is ~/.shorizon." >&2; exit 2
 fi
 
 say() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
@@ -128,7 +128,7 @@ VIEWER_DIRS=(agentsview wiki)
 MC_BIN="$(command -v mc 2>/dev/null)" || die "no mc on PATH; install Culler from this checkout first with sh scripts/install-source.sh"
 docker info >/dev/null 2>&1 || die "container runtime unreachable; start Docker Desktop first"
 
-SMOKE_WORKSPACES="$(dirname "$MC_HOME")/.culler-smoke-workspaces"
+SMOKE_WORKSPACES="$(dirname "$MC_HOME")/.shorizon-smoke-workspaces"
 
 say "PLAN"
 cat <<PLAN

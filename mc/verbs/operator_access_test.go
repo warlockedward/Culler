@@ -160,7 +160,7 @@ func TestCollieApprovesTheExactEnvironmentProposal(t *testing.T) {
 	id := operatorSession(t, db, "environment-operator", MaximumCollieAgentVerbs())
 	op := environmentWork(t, db)[0]
 	configuration := environmentTestConfiguration()
-	configuration.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN echo prepare\n"}
+	configuration.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN echo prepare\n"}
 	view := environmentCall(t, db, environmentSetupID(op), "report", EnvironmentRequest{
 		OperationID: op.ID, Outcome: "proposal", Configuration: &configuration, Summary: "The Project requires an additional image command.",
 	})

@@ -122,7 +122,7 @@ func runUninstallWith(ctx context.Context, args []string, stdout, stderr io.Writ
 	if err != nil {
 		problem("resolve deployment home: %v", err)
 	}
-	candidates := unionNames([]string{configured, filepath.Join(userHome, ".culler"), filepath.Join(userHome, ".mission-control")}, plistHomes, extraHomes)
+	candidates := unionNames([]string{configured, filepath.Join(userHome, ".shorizon"), filepath.Join(userHome, ".mission-control")}, plistHomes, extraHomes)
 	var homes []string
 	for _, candidate := range candidates {
 		if candidate == "" {

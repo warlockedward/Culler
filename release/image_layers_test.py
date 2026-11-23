@@ -56,7 +56,7 @@ class ImageLayersTest(unittest.TestCase):
 
     def test_operator_state(self):
         with tempfile.TemporaryDirectory() as directory:
-            for name in ("root/.culler/state", "home/mc-model/.mission-control/spine.db",
+            for name in ("root/.shorizon/state", "home/mc-model/.mission-control/spine.db",
                          "workspace/OPERATOR-INPUTS.md", "tmp/go-build-cache/trim.txt"):
                 path = self.archive(directory, [[name]])
                 with self.assertRaises(ValueError):

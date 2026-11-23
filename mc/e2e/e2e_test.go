@@ -543,7 +543,7 @@ func setup(t *testing.T, opts ...func(*setupOptions)) *fixture {
 	// Docker-Desktop-shared path because t.TempDir() lands in /var/folders,
 	// which may not be shared; on Linux any local path binds. An empty root
 	// means the platform is unverified: skip. MC_HOME must be a scratch path,
-	// never ~/.culler.
+	// never ~/.shorizon.
 	if e2eTempRoot == "" {
 		t.Skip("no verified scratch root for bind mounts on this platform")
 	}

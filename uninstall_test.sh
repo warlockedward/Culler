@@ -25,7 +25,7 @@ printf '<%s>\n' "$@" >>"$UNINSTALL_TEST_LOG"
 case "$*" in
   *--dry-run*)
     [ "${UNINSTALL_TEST_FAIL:-}" != preview ] || exit 1
-    printf '{"dry_run":true,"host_buns":%s,"uninstalled":false}\n' "${UNINSTALL_TEST_HOST_BUNS:-[\"$HOME/.culler/bun\"]}" ;;
+    printf '{"dry_run":true,"host_buns":%s,"uninstalled":false}\n' "${UNINSTALL_TEST_HOST_BUNS:-[\"$HOME/.shorizon/bun\"]}" ;;
   *--confirm*) [ "${UNINSTALL_TEST_FAIL:-}" != remove ] || exit 1 ;;
 esac
 EOF

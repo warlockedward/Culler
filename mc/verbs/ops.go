@@ -76,7 +76,7 @@ func checkMountAllowlist(home string) error {
 // — the refusal precedes any spine open.
 
 // mcHomeDir resolves the deployment root: the MC_HOME override or
-// the ~/.culler default, always absolute.
+// the ~/.shorizon default, always absolute.
 func mcHomeDir() (string, error) {
 	home := os.Getenv("MC_HOME")
 	if home == "" {
@@ -84,7 +84,7 @@ func mcHomeDir() (string, error) {
 		if err != nil {
 			return "", Usagef("resolve default MC_HOME: %v", err)
 		}
-		home = filepath.Join(userHome, ".culler")
+		home = filepath.Join(userHome, ".shorizon")
 	}
 	if !filepath.IsAbs(home) {
 		return "", Usagef("MC_HOME must be absolute, got %q", home)

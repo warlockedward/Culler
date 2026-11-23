@@ -512,11 +512,11 @@ func TestAnswerWikiAddressRefusesAnotherService(t *testing.T) {
 }
 
 func TestAgentsViewHomeForDataInvertsTheDataFolder(t *testing.T) {
-	home := "/Users/o/.culler"
+	home := "/Users/o/.shorizon"
 	if got, ok := AgentsViewHomeForData(AgentsViewPathsFor(home).Data); !ok || got != home {
 		t.Fatalf("home = %q %v", got, ok)
 	}
-	for _, data := range []string{"", "relative/agentsview/data", "/Users/o/.culler/data", "/Users/o/.culler/agentsview/home"} {
+	for _, data := range []string{"", "relative/agentsview/data", "/Users/o/.shorizon/data", "/Users/o/.shorizon/agentsview/home"} {
 		if got, ok := AgentsViewHomeForData(data); ok {
 			t.Fatalf("%q gave home %q", data, got)
 		}

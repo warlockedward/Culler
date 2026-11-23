@@ -127,7 +127,7 @@ else:
     record_asset=release-linux-amd64.json ;;
 esac
 # Recover the exact retained release before any release discovery.
-recovery_home=${MC_HOME:-$HOME/.culler}
+recovery_home=${MC_HOME:-$HOME/.shorizon}
 recovery_home_next=false
 recovery_restore=false
 recovery_check=false
@@ -188,7 +188,7 @@ esac
 SHZ_BOOTSTRAP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/culler-install.XXXXXX")
 trap 'rm -rf "$SHZ_BOOTSTRAP_DIR"' EXIT HUP INT TERM
 export SHZ_BOOTSTRAP_DIR SHZ_REPOSITORY
-credential=${SHZ_GITHUB_TOKEN_FILE:-$HOME/.config/culler/github-token}
+credential=${SHZ_GITHUB_TOKEN_FILE:-$HOME/.config/shorizon/github-token}
 if [ -e "$credential" ] || [ -n "${SHZ_GITHUB_TOKEN_FILE:-}" ]; then
   [ -f "$credential" ] && [ ! -L "$credential" ] || fail "The GitHub token file must be a private regular file."
   [ "$(stat_identity "$credential")" = "$(id -u) 600 1" ] || \

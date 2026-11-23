@@ -33,7 +33,7 @@ func TestEnvironmentReportRequiresImageDependencyApproval(t *testing.T) {
 	op := ops[0]
 	configuration := op.Configuration
 	configuration.Dockerfile = &verbs.EnvironmentFile{
-		Path: ".culler/Dockerfile", Content: "FROM culler-project-base:" + strings.Repeat("a", 64) + "\nRUN touch /usr/local/share/image-dependency-proof\n",
+		Path: ".shorizon/Dockerfile", Content: "FROM culler-project-base:" + strings.Repeat("a", 64) + "\nRUN touch /usr/local/share/image-dependency-proof\n",
 	}
 	cases := []struct {
 		name    string

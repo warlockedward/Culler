@@ -314,7 +314,7 @@ func RestoreUpdateCheckpoint(ctx context.Context, home string, j *UpdateJournal,
 		if err := os.MkdirAll(parent, 0700); err != nil {
 			return err
 		}
-		stage := filepath.Join(parent, ".culler-restore-"+j.ID+"-"+fmt.Sprint(i))
+		stage := filepath.Join(parent, ".shorizon-restore-"+j.ID+"-"+fmt.Sprint(i))
 		retired := stage + ".old"
 		if err := os.RemoveAll(stage); err != nil {
 			return err

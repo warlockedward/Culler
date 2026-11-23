@@ -84,7 +84,7 @@ if (import.meta.main) {
   const cfg = parseConfig(await Bun.file(configPath).text());
   // Same MC_HOME resolution the resident uses, from the same launchd
   // environment: `mc __onboard supervision` sets it for the resident and dashboard units.
-  const mcHome = process.env["MC_HOME"] ?? `${process.env["HOME"]}/.culler`;
+  const mcHome = process.env["MC_HOME"] ?? `${process.env["HOME"]}/.shorizon`;
   // Owned file, not the launchd redirect — see the resident's note: launchd
   // holds StandardErrorPath open, so nothing this process does can rotate it.
   // Before this the dashboard's seam had no prefix and no timestamp at all, so

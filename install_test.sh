@@ -187,7 +187,7 @@ case "$installation_started" in ''|*[!0-9]*) fail 'launcher omitted its timestam
 grep -Fx -- "$TMP/deployment home" "$TMP/args" >/dev/null || fail 'launcher lost an argument with spaces'
 grep -Fx -- --activate "$TMP/args" >/dev/null || fail 'launcher lost the activation choice'
 grep -Fx -- --host-release-source "$TMP/args" >/dev/null || fail 'launcher lost the package host files'
-[ ! -e "$TMP/home/.culler" ] || fail 'fixture changed deployment state'
+[ ! -e "$TMP/home/.shorizon" ] || fail 'fixture changed deployment state'
 # A second install of the same version reuses the installed host Bun.
 sh "$TMP/outside/install.sh" --mc-home "$TMP/deployment home" --yes --activate >"$TMP/reuse.out" 2>&1 || { cat "$TMP/reuse.out" >&2; fail 'second install failed'; }
 [ "$(grep -c -- 'bun-v1.3.9/bun-darwin-aarch64.zip' "$TMP/curl-args")" = 1 ] || fail 'second install downloaded the Bun archive again'
@@ -316,14 +316,14 @@ printf '{"mcPath":"%s/custom bin/mc"}\n' "$TMP" >"$TMP/custom home/supervision/r
 sh "$TMP/outside/install.sh" --mc-home "$TMP/custom home" --yes --activate >"$TMP/custom.out" 2>&1 || fail 'custom executable directory failed'
 [ "$(sed -n '4p' "$TMP/env")" = "$TMP/custom bin" ] || fail 'installer lost the custom executable directory'
 if SHZ_FIXTURE_EXIT=17 sh "$TMP/outside/install.sh" --check-updates >"$TMP/exit.out" 2>&1; then fail 'launcher lost the installer failure'; else [ "$?" = 17 ] || fail 'launcher changed the installer exit code'; fi
-mkdir -p "$HOME/.config/culler"
-printf 'fixture_private_token\n' >"$HOME/.config/culler/github-token"
-chmod 600 "$HOME/.config/culler/github-token"
+mkdir -p "$HOME/.config/shorizon"
+printf 'fixture_private_token\n' >"$HOME/.config/shorizon/github-token"
+chmod 600 "$HOME/.config/shorizon/github-token"
 SHZ_FIXTURE_PRIVATE=1 sh "$TMP/outside/install.sh" --check-updates >"$TMP/private.out" 2>&1 || fail 'private download failed'
 if grep -F fixture_private_token "$TMP/curl-args" "$TMP/private.out" >/dev/null; then fail 'credential entered arguments or terminal output'; fi
-chmod 644 "$HOME/.config/culler/github-token"
+chmod 644 "$HOME/.config/shorizon/github-token"
 if sh "$TMP/outside/install.sh" --check-updates >"$TMP/permissions.out" 2>&1; then fail 'public credential file was accepted'; fi
-rm "$HOME/.config/culler/github-token"
+rm "$HOME/.config/shorizon/github-token"
 if SHZ_FIXTURE_HTTP=403 sh "$TMP/outside/install.sh" >"$TMP/access.out" 2>&1; then fail 'refused access succeeded'; fi
 contains "$TMP/access.out" 'Renew the repository and package credentials' || fail 'access error omitted repair action'
 if SHZ_FIXTURE_HTTP=404 sh "$TMP/outside/install.sh" >"$TMP/no-release.out" 2>&1; then fail 'absent release succeeded'; fi

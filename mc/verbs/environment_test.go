@@ -116,7 +116,7 @@ func TestEnvironmentProposalApprovalBuildAndContinuation(t *testing.T) {
 	db := environmentFixture(t)
 	op := environmentWork(t, db)[0]
 	c := environmentTestConfiguration()
-	c.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN apt-get update && apt-get install -y libpq-dev=16.10-0ubuntu0.24.04.1\n"}
+	c.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN apt-get update && apt-get install -y libpq-dev=16.10-0ubuntu0.24.04.1\n"}
 	view := environmentCall(t, db, environmentSetupID(op), "report", EnvironmentRequest{OperationID: op.ID, Outcome: "proposal", Configuration: &c, Summary: "The database client requires PostgreSQL development files."})
 	s := view["environment"].(EnvironmentState)
 	if s.Phase != "approval" || s.ActiveOperationID != "" {
@@ -347,7 +347,7 @@ func environmentTestMissingImageRepair(t *testing.T, rebuilt string) {
 		}
 		configuration := environmentTestConfiguration()
 		configuration.SourceCommit = environmentTestCommit
-		configuration.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
+		configuration.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
 		selected, err = saveEnvironmentRevisionTx(ctx, q, state, configuration, "Accepted tools.", "operator")
 		if err != nil {
 			return err
@@ -482,7 +482,7 @@ func TestEnvironmentRemovalRetainsExactPriorFilesThroughAcceptance(t *testing.T)
 		}
 		c := environmentTestConfiguration()
 		c.SourceCommit = environmentTestCommit
-		c.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nCOPY prerequisite.txt /opt/prerequisite.txt\n"}
+		c.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nCOPY prerequisite.txt /opt/prerequisite.txt\n"}
 		c.BuildFiles = []EnvironmentFile{{Path: "prerequisite.txt", Content: "prior content\n"}}
 		prior, err = saveEnvironmentRevisionTx(ctx, q, s, c, "Prior accepted tools.", "operator")
 		if err != nil {

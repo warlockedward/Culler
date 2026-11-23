@@ -63,8 +63,8 @@ func TestEnvironmentDecisionRestrictsInitialContinuationAndRetries(t *testing.T)
 			db := environmentFixture(t)
 			first := environmentWork(t, db)[0]
 			proposal := first.Configuration
-			proposal.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
-			proposal.BuildFiles = []EnvironmentFile{{Path: ".culler/tool.txt", Content: "proposed tools"}}
+			proposal.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
+			proposal.BuildFiles = []EnvironmentFile{{Path: ".shorizon/tool.txt", Content: "proposed tools"}}
 			environmentCall(t, db, environmentSetupID(first), "report", EnvironmentRequest{OperationID: first.ID, Outcome: "proposal", Configuration: &proposal, Summary: "The image adds the required compiler.", Details: "The current compiler is unavailable."})
 			view := environmentCall(t, db, nil, "get", EnvironmentRequest{ProjectID: first.ProjectID})
 			revision := view["draft"].(*EnvironmentRevision).ID
@@ -206,7 +206,7 @@ func TestEnvironmentEditedProposalRetainsInitialDecision(t *testing.T) {
 	db := environmentFixture(t)
 	first := environmentWork(t, db)[0]
 	proposal := first.Configuration
-	proposal.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
+	proposal.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
 	view := environmentCall(t, db, environmentSetupID(first), "report", EnvironmentRequest{OperationID: first.ID, Outcome: "proposal", Configuration: &proposal, Summary: "The image adds the required compiler."})
 	revision := view["draft"].(*EnvironmentRevision).ID
 	proposal.Dockerfile.Content += "RUN echo tool\n"
@@ -237,7 +237,7 @@ func TestEnvironmentDenialOfEditedProposalRetainsBothFileSets(t *testing.T) {
 	db := environmentFixture(t)
 	first := environmentWork(t, db)[0]
 	proposal := first.Configuration
-	proposal.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
+	proposal.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
 	proposal.BuildFiles = []EnvironmentFile{{Path: "original-tool", Content: "original proposal"}}
 	view := environmentCall(t, db, environmentSetupID(first), "report", EnvironmentRequest{OperationID: first.ID, Outcome: "proposal", Configuration: &proposal, Summary: "The image adds the required compiler."})
 	revision := view["draft"].(*EnvironmentRevision).ID

@@ -6,14 +6,14 @@ import { bootSmoke, evidencePath, gotoReady, openSetupHistory, seedProject, sele
 let smoke: Smoke;
 const project = "journal-garden";
 const digest = `sha256:${"a".repeat(64)}`;
-const dockerfile = `FROM culler-project-base:${"a".repeat(64)}\nCOPY .culler/tools.sh /tmp/tools.sh\nRUN sh /tmp/tools.sh\n`;
+const dockerfile = `FROM culler-project-base:${"a".repeat(64)}\nCOPY .shorizon/tools.sh /tmp/tools.sh\nRUN sh /tmp/tools.sh\n`;
 const buildFile = "#!/bin/sh\n# **Literal build contents**\nprintf '%s\\n' '<script>literal</script>'\n";
 const summary = "The image supplies **database tools**. The Project needs them for its checks.";
 const longExplanation = `${summary}\n\n## Check evidence\n\n- The workspace uses the declared tool versions.\n- The application check needs the database client.\n\n${"The earlier agent recorded diagnostic details for inspection. ".repeat(45)}\n\n[Unsafe](javascript:alert) <button>Literal</button>`;
 
 function fixture(phase: "active" | "approval" | "failed" | "complete" = "active"): any {
-  const configuration = { base_digest: digest, dockerfile: { path: ".culler/Dockerfile", content: dockerfile },
-    build_files: [{ path: ".culler/tools.sh", content: buildFile }], build_args: { TOOL_VERSION: "16" },
+  const configuration = { base_digest: digest, dockerfile: { path: ".shorizon/Dockerfile", content: dockerfile },
+    build_files: [{ path: ".shorizon/tools.sh", content: buildFile }], build_args: { TOOL_VERSION: "16" },
     setup: { directory: ".", command: "npm ci" } };
   const revision = { id: "journal-revision", configuration, explanation: summary, editor: "setup:journal-first" };
   const first = { id: "journal-first", project_id: project, revision_id: "journal-base", kind: "setup", status: "succeeded", attempt: 1,

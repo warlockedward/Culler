@@ -18,7 +18,7 @@ The host requires these inputs:
 
 - A current host test binary with `test_fake_routing,test_scratch_spine`.
 - A task image from `runner/image/build.sh --real`.
-- A private test home below `~/.config/culler-tests/`.
+- A private test home below `~/.config/shorizon-tests/`.
 - Dedicated account sessions or the private API key file.
 
 Build both test artifacts from the checkout root:
@@ -46,7 +46,7 @@ Cleanup removes the scratch spine.
 The evidence retains bounded diagnostic metadata.
 
 The test home uses mode `0700`.
-The key file is `~/.config/culler-tests/live-model.env`.
+The key file is `~/.config/shorizon-tests/live-model.env`.
 Its directory uses mode `0700`, and its file uses mode `0600`.
 The file contains `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` assignments.
 The test reads those assignments as data.
@@ -58,7 +58,7 @@ It preserves the source key file and dedicated account sessions.
 
 ```sh
 mise exec -- bun tests/live-model/proxy.ts --confirm-live-spend \
-  --home "$HOME/.config/culler-tests/proxy-acceptance" \
+  --home "$HOME/.config/shorizon-tests/proxy-acceptance" \
   --mc-binary /private/tmp/culler-proxy-host-mc \
   --image culler-proxy-real-test \
   --connections proxy-test-codex-api,proxy-test-claude-api \

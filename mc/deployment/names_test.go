@@ -7,14 +7,14 @@ import (
 )
 
 func TestRuntimeNamesPinDomainAndGrammar(t *testing.T) {
-	names, err := RuntimeNames("/Users/alice/.culler")
+	names, err := RuntimeNames("/Users/alice/.shorizon")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if names.Suffix != "676ccb230491" {
+	if names.Suffix != "2e262ab57590" {
 		t.Fatalf("suffix = %q, want pinned domain hash", names.Suffix)
 	}
-	if names.Volume != "mc-spine-676ccb230491" || names.Helper != "mc-helper-676ccb230491" || names.RuntimeVolume != "mc-runtime-676ccb230491" {
+	if names.Volume != "mc-spine-2e262ab57590" || names.Helper != "mc-helper-2e262ab57590" || names.RuntimeVolume != "mc-runtime-2e262ab57590" {
 		t.Fatalf("names = %#v", names)
 	}
 	if _, err := RuntimeNames("relative/home"); err == nil {
@@ -51,11 +51,11 @@ func TestCanonicalHomeMakesSymlinkAliasesOneDeployment(t *testing.T) {
 }
 
 func TestDifferentCanonicalHomesCannotShareRuntimeObjects(t *testing.T) {
-	a, err := RuntimeNames("/Users/alice/.culler")
+	a, err := RuntimeNames("/Users/alice/.shorizon")
 	if err != nil {
 		t.Fatal(err)
 	}
-	b, err := RuntimeNames("/Users/alice/.culler-two")
+	b, err := RuntimeNames("/Users/alice/.shorizon-two")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,12 +65,12 @@ func TestDifferentCanonicalHomesCannotShareRuntimeObjects(t *testing.T) {
 }
 
 func TestSmokeWorkspaceBaseIsDeterministicSiblingNotHomeDescendant(t *testing.T) {
-	home := "/Users/alice/.culler"
+	home := "/Users/alice/.shorizon"
 	base, err := SmokeWorkspaceBase(home)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if base != "/Users/alice/.culler-smoke-workspaces" {
+	if base != "/Users/alice/.shorizon-smoke-workspaces" {
 		t.Fatalf("smoke base = %q", base)
 	}
 	if base == home || filepath.Dir(base) != filepath.Dir(home) {

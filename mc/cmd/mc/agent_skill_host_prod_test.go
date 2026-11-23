@@ -33,7 +33,7 @@ func TestExternalAgentSelectsCustomInstalledHelperWithoutPrivateVariables(t *tes
 	}
 	other := installed
 	other.Image = "ghcr.io/culler/default@sha256:" + strings.Repeat("c", 64)
-	if err := distribution.Save(filepath.Join(userHome, ".culler", distribution.InstalledRecord), other); err != nil {
+	if err := distribution.Save(filepath.Join(userHome, ".shorizon", distribution.InstalledRecord), other); err != nil {
 		t.Fatal(err)
 	}
 	want, err := deployment.RuntimeNames(home)

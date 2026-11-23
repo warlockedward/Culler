@@ -12,7 +12,7 @@ import (
 func TestRuntimeVolumeInstallsOnlyAfterUsersStop(t *testing.T) {
 	for _, active := range []bool{true, false} {
 		t.Run(map[bool]string{true: "active", false: "stopped"}[active], func(t *testing.T) {
-			names, _ := RuntimeNames("/Users/test/.culler")
+			names, _ := RuntimeNames("/Users/test/.shorizon")
 			copied := false
 			var calls [][]string
 			run := func(_ context.Context, _ string, args ...string) ([]byte, error) {
@@ -44,7 +44,7 @@ func TestRuntimeVolumeInstallsOnlyAfterUsersStop(t *testing.T) {
 				}
 				return nil, errors.New("unexpected Docker operation")
 			}
-			err := InstallRuntimeVolume(context.Background(), "/Users/test/.culler", "service-image", "new-release", run)
+			err := InstallRuntimeVolume(context.Background(), "/Users/test/.shorizon", "service-image", "new-release", run)
 			if active && (err == nil || copied) {
 				t.Fatalf("active runtime changed: %v", err)
 			}
@@ -63,7 +63,7 @@ func TestRuntimeVolumeInstallsOnlyAfterUsersStop(t *testing.T) {
 // The install program reaches the runtime Node.js through standard input.
 // Every other docker command runs with closed standard input.
 func TestRuntimeVolumeInstallRunsTheEmbeddedProgram(t *testing.T) {
-	names, _ := RuntimeNames("/Users/test/.culler")
+	names, _ := RuntimeNames("/Users/test/.shorizon")
 	installs := 0
 	var installArgs []string
 	installStdin := ""
@@ -96,7 +96,7 @@ func TestRuntimeVolumeInstallRunsTheEmbeddedProgram(t *testing.T) {
 		}
 		return nil, errors.New("unexpected Docker operation")
 	}
-	if err := InstallRuntimeVolume(context.Background(), "/Users/test/.culler", "product-image", "new-release", run); err != nil {
+	if err := InstallRuntimeVolume(context.Background(), "/Users/test/.shorizon", "product-image", "new-release", run); err != nil {
 		t.Fatal(err)
 	}
 	want := []string{"run", "--rm", "--pids-limit=2048", "-i", "--label", "mc-deployment=" + names.Suffix, "--network", "none", "--user", "0:0", "--mount",
@@ -111,7 +111,7 @@ func TestRuntimeVolumeInstallRunsTheEmbeddedProgram(t *testing.T) {
 }
 
 func TestRuntimeVolumeReportsTheInstallFailure(t *testing.T) {
-	names, _ := RuntimeNames("/Users/test/.culler")
+	names, _ := RuntimeNames("/Users/test/.shorizon")
 	run := func(_ context.Context, _ string, args ...string) ([]byte, error) {
 		switch args[0] + " " + args[1] {
 		case "volume inspect":
@@ -126,7 +126,7 @@ func TestRuntimeVolumeReportsTheInstallFailure(t *testing.T) {
 		}
 		return nil, errors.New("unexpected Docker operation")
 	}
-	err := InstallRuntimeVolume(context.Background(), "/Users/test/.culler", "product-image", "new-release", run)
+	err := InstallRuntimeVolume(context.Background(), "/Users/test/.shorizon", "product-image", "new-release", run)
 	if err == nil || !strings.Contains(err.Error(), "exit status 2: runtime install: the image runtime at /opt/culler-runtime is not release new-release") {
 		t.Fatalf("the install failure lost its cause: %v", err)
 	}
@@ -139,13 +139,13 @@ func TestRuntimeVolumeRejectsForeignVolume(t *testing.T) {
 		}
 		return []byte(`{"Name":"other","Driver":"local","Labels":{}}`), nil
 	}
-	if err := InstallRuntimeVolume(context.Background(), "/Users/test/.culler", "image", "release", run); err == nil {
+	if err := InstallRuntimeVolume(context.Background(), "/Users/test/.shorizon", "image", "release", run); err == nil {
 		t.Fatal("a foreign volume received a runtime install")
 	}
 }
 
 func TestRuntimeVolumeReusesExactRelease(t *testing.T) {
-	names, _ := RuntimeNames("/Users/test/.culler")
+	names, _ := RuntimeNames("/Users/test/.shorizon")
 	run := func(_ context.Context, stdin string, args ...string) ([]byte, error) {
 		if stdin != "" {
 			t.Fatalf("a release check received standard input: %q", stdin)
@@ -159,7 +159,7 @@ func TestRuntimeVolumeReusesExactRelease(t *testing.T) {
 		}
 		return []byte("release\n"), nil
 	}
-	if err := InstallRuntimeVolume(context.Background(), "/Users/test/.culler", "image", "release", run); err != nil {
+	if err := InstallRuntimeVolume(context.Background(), "/Users/test/.shorizon", "image", "release", run); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -176,7 +176,7 @@ func TestRuntimeVolumeRepairsUnusableRelease(t *testing.T) {
 		{name: "invalid-copy", wantError: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			names, _ := RuntimeNames("/Users/test/.culler")
+			names, _ := RuntimeNames("/Users/test/.shorizon")
 			copied := false
 			run := func(_ context.Context, _ string, args ...string) ([]byte, error) {
 				switch args[0] + " " + args[1] {
@@ -199,7 +199,7 @@ func TestRuntimeVolumeRepairsUnusableRelease(t *testing.T) {
 				}
 				return nil, errors.New("unexpected Docker operation")
 			}
-			err := InstallRuntimeVolume(context.Background(), "/Users/test/.culler", "image", "release", run)
+			err := InstallRuntimeVolume(context.Background(), "/Users/test/.shorizon", "image", "release", run)
 			if (err != nil) != tc.wantError || copied == tc.active {
 				t.Fatalf("runtime repair: copied=%v, error=%v", copied, err)
 			}

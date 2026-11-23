@@ -195,7 +195,7 @@ func runCullerWith(args []string, stdin io.Reader, stdout, stderr io.Writer, dep
 		if err != nil {
 			return fail(err, 2)
 		}
-		o.home = filepath.Join(userHome, ".culler")
+		o.home = filepath.Join(userHome, ".shorizon")
 	}
 	home, err := deployment.CanonicalHome(o.home)
 	if err != nil {

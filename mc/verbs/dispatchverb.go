@@ -906,7 +906,7 @@ func resolveMCHome() (string, error) {
 		if err != nil {
 			return "", Usagef("resolve default MC_HOME for routing.md: %v (run: mc onboard routing)", err)
 		}
-		home = filepath.Join(userHome, ".culler")
+		home = filepath.Join(userHome, ".shorizon")
 	}
 	if !filepath.IsAbs(home) {
 		return "", Usagef("MC_HOME must be absolute to resolve routing.md, got %q (run: mc onboard routing)", home)

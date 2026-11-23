@@ -413,14 +413,14 @@ export function scribeHostEnv(home: string, spine?: string): Record<string, stri
   return env;
 }
 
-export async function validateScribeHome(home: string, testRoot = join(process.env.HOME!, ".config/culler-tests")) {
+export async function validateScribeHome(home: string, testRoot = join(process.env.HOME!, ".config/shorizon-tests")) {
   const root = await realpath(testRoot);
   const physical = await realpath(home);
   const inside = relative(root, physical);
   const info = await lstat(home);
   if (!inside || inside.startsWith("..") || isAbsolute(inside) || !info.isDirectory() ||
       info.uid !== process.getuid?.() || (info.mode & 0o777) !== 0o700) {
-    throw new Error("The test home must be a private directory below ~/.config/culler-tests/.");
+    throw new Error("The test home must be a private directory below ~/.config/shorizon-tests/.");
   }
 }
 

@@ -4,8 +4,8 @@ import { markdownNodes, safeMarkdownHref } from "./dom.js";
 import { parseMarkdown } from "./markdown.js";
 
 const configuration = (content = "FROM retained-base\nRUN install-tool\n") => ({
-  base_digest: "sha256:base", dockerfile: { path: ".culler/Dockerfile", content },
-  build_files: [{ path: ".culler/setup.md", content: "# Exact input\n\n**Keep these bytes.**\n" }],
+  base_digest: "sha256:base", dockerfile: { path: ".shorizon/Dockerfile", content },
+  build_files: [{ path: ".shorizon/setup.md", content: "# Exact input\n\n**Keep these bytes.**\n" }],
   build_args: { TOOL_VERSION: "1.2" }, setup: { command: "install-dependencies", directory: "." },
 });
 const operation = (id: string, extra = {}) => ({
@@ -513,12 +513,12 @@ describe("journal document", () => {
       expect(find(node, "setup-proposal").textContent).not.toContain(text);
     }
     const dockerfile = find(node, "setup-dockerfile");
-    expect(dockerfile.dataset).toMatchObject({ path: ".culler/Dockerfile", change: "Added" });
-    expect(dockerfile.all().find(child => child.className === "file-view-head")?.textContent).toBe(".culler/DockerfileAdded");
-    const build = node.all().find(child => child.getAttribute("data-journal-key") === "proposal:file:.culler/setup.md")!;
+    expect(dockerfile.dataset).toMatchObject({ path: ".shorizon/Dockerfile", change: "Added" });
+    expect(dockerfile.all().find(child => child.className === "file-view-head")?.textContent).toBe(".shorizon/DockerfileAdded");
+    const build = node.all().find(child => child.getAttribute("data-journal-key") === "proposal:file:.shorizon/setup.md")!;
     expect(build.getAttribute("open")).toBeNull();
-    expect(build.childNodes[0].textContent).toBe("Added: .culler/setup.md");
-    expect(build.all().find(child => child.dataset.path === ".culler/setup.md")?.dataset.change).toBe("Added");
+    expect(build.childNodes[0].textContent).toBe("Added: .shorizon/setup.md");
+    expect(build.all().find(child => child.dataset.path === ".shorizon/setup.md")?.dataset.change).toBe("Added");
     const details = node.all().find(child => child.getAttribute("data-journal-key") === "proposal:proposal-details")!;
     expect(details.getAttribute("open")).toBeNull();
     expect(details.textContent).toContain("Diagnostic results");

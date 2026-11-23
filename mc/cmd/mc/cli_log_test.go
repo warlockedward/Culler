@@ -28,7 +28,7 @@ func TestInvocationShapeKeepsNamesAndDropsValues(t *testing.T) {
 		// A verb whose first positional is a VALUE, not a subverb. Both of
 		// these reached the live deployment's log as a `sub` field: an
 		// absolute path and a task id.
-		{[]string{"__mount-recheck", "/Users/op/.culler/runs/7a75.mounts.json"}, "__mount-recheck", "", ""},
+		{[]string{"__mount-recheck", "/Users/op/.shorizon/runs/7a75.mounts.json"}, "__mount-recheck", "", ""},
 		{[]string{"complete", "1"}, "complete", "", ""},
 		{[]string{"task", "get", "42"}, "task", "get", ""},
 		// An unknown first token is the operator's text, so it is counted but
@@ -59,8 +59,8 @@ func TestInvocationShapeLeaksNoArgumentValue(t *testing.T) {
 		{[]string{"collie", "--flag=" + secret}, []string{secret}},
 		// First position is where the values actually leaked: each of these
 		// was written to the live deployment's log as a `sub` field.
-		{[]string{"__mount-recheck", "/Users/op/.culler/runs/7a75.mounts.json"},
-			[]string{"/Users/op/.culler/runs/7a75.mounts.json"}},
+		{[]string{"__mount-recheck", "/Users/op/.shorizon/runs/7a75.mounts.json"},
+			[]string{"/Users/op/.shorizon/runs/7a75.mounts.json"}},
 		{[]string{"land-sealed", "/var/folders/f0/T/Test123/001/landing.json"},
 			[]string{"/var/folders/f0/T/Test123/001/landing.json"}},
 		{[]string{"complete", "1"}, []string{"1"}},

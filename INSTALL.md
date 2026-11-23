@@ -28,7 +28,7 @@ sh /tmp/culler-install.sh
 ```
 
 The installer can also use an existing GitHub credential.
-It first checks `SHZ_GITHUB_TOKEN_FILE`, or `~/.config/culler/github-token` when that variable is absent.
+It first checks `SHZ_GITHUB_TOKEN_FILE`, or `~/.config/shorizon/github-token` when that variable is absent.
 Without an explicit token path or a default token file, it checks the GitHub command tool.
 A token file must contain only the token, belong to the operator, and use mode `600`.
 An invalid configured credential can stop installation even when the release is public.
@@ -46,10 +46,10 @@ Uninstall removes only the links that S-Horizon owns.
 You can also give any agent with file and command access this skill path:
 
 ```text
-~/.culler/release/host/skills/culler/SKILL.md
+~/.shorizon/release/host/skills/culler/SKILL.md
 ```
 
-For a custom deployment home, replace `~/.culler` with that home.
+For a custom deployment home, replace `~/.shorizon` with that home.
 The skill identifies the actual executable and deployment through its `installation.json` file.
 The agent discovers commands through command help and reads procedure files as needed.
 It needs no S-Horizon source checkout or development tools.
@@ -199,7 +199,7 @@ An explicit stop persists after login and computer restart.
 An explicit start or restart clears that stop choice.
 
 Use `--mc-home /absolute/path` to select another deployment for commands other than uninstall.
-The option overrides `MC_HOME`; the default deployment is `~/.culler`.
+The option overrides `MC_HOME`; the default deployment is `~/.shorizon`.
 Use `--no-color` for plain text.
 The `NO_COLOR` variable also disables color.
 Redirected output contains plain text.

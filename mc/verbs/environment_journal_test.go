@@ -6,7 +6,7 @@ func TestEnvironmentJournalRetainsReportOutcomesAndApproval(t *testing.T) {
 	db := environmentFixture(t)
 	op := environmentWork(t, db)[0]
 	c := environmentTestConfiguration()
-	c.Dockerfile = &EnvironmentFile{Path: ".culler/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
+	c.Dockerfile = &EnvironmentFile{Path: ".shorizon/Dockerfile", Content: "FROM " + environmentBaseReference(environmentTestBase) + "\nRUN true\n"}
 	view := environmentCall(t, db, environmentSetupID(op), "report", EnvironmentRequest{OperationID: op.ID, Outcome: "proposal", Configuration: &c, Summary: "The image supplies the Project tools."})
 	revision := view["draft"].(*EnvironmentRevision).ID
 	ops := view["operations"].([]EnvironmentOperation)

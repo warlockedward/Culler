@@ -197,7 +197,7 @@ run_terminal "$case_root/terminal.out" \
 expected=$(printf 'CALL\t__setup\t--bin-dir\t%s\t--workspace-root\t%s\t--runtime-bindings\tchatgpt\t--acquire-runtime-auth\t--release-source\t%s\t--host-release-source\t%s' \
   "$case_root/install bin" "$case_root/project root" "$ROOT/runner" "$ROOT")
 [ "$(cat "$case_root/forward.log")" = "$expected" ] || fail "terminal setup changed the original arguments"
-[ "$(sed -n '1p' "$case_root/environment.log")" = "$case_root/home/.culler" ] || \
+[ "$(sed -n '1p' "$case_root/environment.log")" = "$case_root/home/.shorizon" ] || \
   fail "terminal setup omitted the default production home"
 [ "$(sed -n '2p' "$case_root/environment.log")" = 1 ] || \
   fail "terminal setup lost the pinned tool environment"

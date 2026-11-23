@@ -196,7 +196,7 @@ func buildRuntimeFixture(t *testing.T, setuid bool) (image, volume string) {
 	mustWriteFile(t, filepath.Join(volume, "app/changed.txt"), "changed old\n", 0o644)
 	mustWriteFile(t, filepath.Join(volume, "app/unlisted.txt"), "unlisted\n", 0o644)
 	mustWriteFile(t, filepath.Join(volume, "app/removed.txt"), "removed\n", 0o644)
-	mustWriteFile(t, filepath.Join(volume, "app/.culler-install.changed.txt"), "stale\n", 0o644)
+	mustWriteFile(t, filepath.Join(volume, "app/.shorizon-install.changed.txt"), "stale\n", 0o644)
 	mustMkdir(t, filepath.Join(volume, "app"), 0o700)
 	mustWriteFile(t, filepath.Join(volume, "shared/x"), "shared old\n", 0o644)
 	mustLink(t, filepath.Join(volume, "shared/x"), filepath.Join(volume, "shared/y"))

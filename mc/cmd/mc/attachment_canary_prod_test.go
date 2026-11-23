@@ -48,10 +48,10 @@ func TestValidateAttachmentCanaryGateReportRefusesWidening(t *testing.T) {
 func TestAttachmentCanaryAcceptsDockerDesktopHostMntSources(t *testing.T) {
 	tree := verbs.AttachmentTreeReceipt{
 		Session:          "h-abc",
-		InboundPublished: "/Users/op/.culler/attachments/h-abc/in/published",
-		Outbound:         "/Users/op/.culler/attachments/h-abc/out",
+		InboundPublished: "/Users/op/.shorizon/attachments/h-abc/in/published",
+		Outbound:         "/Users/op/.shorizon/attachments/h-abc/out",
 	}
-	frameDir := "/Users/op/.culler/runs/attachment-canary/gen"
+	frameDir := "/Users/op/.shorizon/runs/attachment-canary/gen"
 	plain := []attachmentCanaryMount{
 		{Type: "bind", Source: tree.InboundPublished, Destination: "/mc/attachments/in"},
 		{Type: "bind", Source: tree.Outbound, Destination: "/mc/private/attachments/out", RW: true},

@@ -21,7 +21,7 @@ This repository is a fork of the upstream project `vinchenkov/Culler`; the devel
 S-Horizon is a local-first orchestration system for AI coding agents with one human operator.
 It deploys onto one Mac and runs unattended.
 The **spine** is the one SQLite database of a deployment. It is the message bus and the ground truth.
-`mc`, `spine`, and the `MC_*` environment names are internal engineering codenames and do not change. Brand identifiers that still read `culler` (the CLI command, `~/.culler`, `com.culler.*`, the worktree path) are the current reality until the R2 identifier migration lands.
+`mc`, `spine`, and the `MC_*` environment names are internal engineering codenames and do not change. Brand identifiers that still read `culler` (the CLI command, `~/.shorizon`, `com.culler.*`, the worktree path) are the current reality until the R2 identifier migration lands.
 
 - `mc/`: the Go command-line interface (CLI) `mc`. It owns dispatch, control, and the spine.
 - `resident/`: the Bun host daemon. It runs the dispatch tick and starts agent containers.
@@ -115,7 +115,7 @@ Run an opt-in lane when your change touches what the lane proves:
 
 ## Deployments
 
-`MC_HOME` names the deployment home. When `MC_HOME` is unset, S-Horizon uses `~/.culler`, the production home.
+`MC_HOME` names the deployment home. When `MC_HOME` is unset, S-Horizon uses `~/.shorizon`, the production home.
 
 | Tier | Install | Update |
 |---|---|---|
@@ -123,7 +123,7 @@ Run an opt-in lane when your change touches what the lane proves:
 | Source production | `sh scripts/install-source.sh` | `./redeploy.sh` |
 | Published | `./install.sh` (the latest GitHub release) | `culler update` |
 
-- The development tier uses the fake harness, a spine file at `MC_HOME/spine.db`, and no launchd. Never point it at `~/.culler`.
+- The development tier uses the fake harness, a spine file at `MC_HOME/spine.db`, and no launchd. Never point it at `~/.shorizon`.
 - `./redeploy.sh` builds the working tree, with uncommitted edits, and labels the release with the `HEAD` commit. It activates launchd. When the deployed spine has a different schema, it stops and keeps the spine. `--reset-database` replaces the spine with an empty spine after the operator types a confirmation.
 - `./redeploy-dashboard.sh` moves only the live dashboard to the files committed at `HEAD`. A change that needs a new `mc` verb or a new manifest file needs `./redeploy.sh`.
 - `MC_HOME=<home> ./dev-reset.sh --confirm` destroys the spine and the run data of that production-tier deployment, keeps the credentials and the configuration, and activates launchd again. It refuses to run without `MC_HOME`. `--rebuild` rebuilds the host `mc` and the image at `HEAD` as a matched pair. After a schema change, it cannot reset the spine; use `./redeploy.sh --reset-database`.

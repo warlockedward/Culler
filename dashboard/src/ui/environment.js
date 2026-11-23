@@ -420,7 +420,7 @@ export function createEnvironment({ api, host, openConfigs, onChanged, askDiagno
           el("div", { class: "environment-blank" },
             el("p", { text: "This Project uses the Culler base image without additions. The base image includes common development tools." }),
             el("button", { type: "button", class: "btn small", text: "Add Dockerfile", onclick: () => {
-              config.dockerfile = { path: ".culler/Dockerfile", content: `FROM ${environmentBaseReference(config.base_digest)}\n` }; changed(ctx); dockerEditor();
+              config.dockerfile = { path: ".shorizon/Dockerfile", content: `FROM ${environmentBaseReference(config.base_digest)}\n` }; changed(ctx); dockerEditor();
             } })),
           { hint: "Add a Dockerfile when a dependency needs system packages." }));
     }

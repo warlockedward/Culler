@@ -44,7 +44,7 @@
 #
 # Production tier only. The development tier is install.sh --dev.
 #
-# Environment: MC_HOME (the deployment home; mc's default ~/.culler when unset)
+# Environment: MC_HOME (the deployment home; mc's default ~/.shorizon when unset)
 # and MC_BIN_DIR (where mc is installed; defaults to the installed mc's
 # directory, then ~/.local/bin, the install.sh convention). COLUMNS sets the
 # width of the help and the database messages, from 40 to 80 columns.
@@ -87,7 +87,7 @@ resolve_service_os() {
 }
 os_name=$(resolve_service_os) || { printf 'redeploy.sh: MC_OS_OVERRIDE must be Darwin or Linux, or unset.\n' >&2; exit 2; }
 
-DEPLOYMENT_HOME=${MC_HOME:-$HOME/.culler}
+DEPLOYMENT_HOME=${MC_HOME:-$HOME/.shorizon}
 
 # display_home prints the deployment home, with ~ for the home directory.
 display_home() {

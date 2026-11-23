@@ -44,7 +44,7 @@ func newUninstallFixture(t *testing.T) uninstallFixture {
 	uninstallWrite(t, filepath.Join(f.project, "source.txt"), "operator work", 0o600)
 	uninstallWrite(t, filepath.Join(f.project, ".mc-artifacts", "data"), "task data", 0o600)
 	var helpers, labels []string
-	for _, name := range []string{".culler", ".mission-control"} {
+	for _, name := range []string{".shorizon", ".mission-control"} {
 		home := filepath.Join(f.user, name)
 		f.homes = append(f.homes, home)
 		for _, file := range []string{"config.toml", "deployment.uuid", "refresh-grants/fixture.json", "backups/history.db", "state/projects/fixture/home/.local/bin/tool", "state/projects/fixture/home/.config/tool.conf", "release/program", "bin/mc", "bun/1.3.12/bin/bun"} {

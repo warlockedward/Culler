@@ -16,7 +16,7 @@ const crypto = require('node:crypto');
 
 const MANIFEST = 'manifest.json';
 const RELEASE_ID = 'release-id';
-const TEMPORARY_PREFIX = '.culler-install.';
+const TEMPORARY_PREFIX = '.shorizon-install.';
 const MODE_BITS = 0o7777;
 
 const counts = { written: 0, unchanged: 0, hashed: 0, removed: 0 };

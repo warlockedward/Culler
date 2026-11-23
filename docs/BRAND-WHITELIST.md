@@ -17,13 +17,13 @@ R1 品牌文档层的验收基线：`grep -ri culler` 的全仓残留必须**逐
 | 面 | 现值（保留原因） | 终值 |
 |---|---|---|
 | CLI 命令与文档命令例 | `culler`（含 README/INSTALL/SECURITY 命令例与表格、client name `culler`） | `shz`（D20） |
-| 部署 home | `~/.culler`、`~/.config/culler/github-token` | `~/.shorizon`（`MC_HOME` 名不变） |
+| 部署 home | `~/.shorizon`、`~/.config/shorizon/github-token` | `~/.shorizon`（`MC_HOME` 名不变） |
 | skill 链接目录 | `~/.agents/skills/culler`、`~/.claude/skills/culler`、`~/.codex/skills/culler` | `~/.agents/skills/shorizon`（R2 表） |
 | launchd/systemd | `com.culler.*`（AGENTS.md 不变量段、build-prod 守卫） | `com.<域名根>.shorizon.*`（域名根=O9）；Linux 直接 `shorizon-*` |
 | Keychain | `culler.keychain-db`、`Culler-<sha256>` | fork 后端 ADR-0（A01/A02）+ 迁移 |
 | worktree 路径 | `/private/tmp/culler-worktrees`（AGENTS.md 明文规定） | `shorizon-worktrees`（A09 一行工单） |
 | token 前缀 | `culler_proxy_*`（掩码正则 trace-mask.ts） | `shz_proxy_*` 类（R2，与 P2b 交集） |
-| 交付分支与容器/refs | `culler` 分支（GIT-DELIVERY.md、failure-handling-spec.md、schema.sql RAISE 消息、README hero alt）、`culler-worktrees`、`Dockerfile.culler-project`、`.culler/` 目录 | schema 文本**必须蹭 v1 基线冻结一并改**（R2 原则：过 v1 再改=付费迁移）；其余随 A09 |
+| 交付分支与容器/refs | `culler` 分支（GIT-DELIVERY.md、failure-handling-spec.md、schema.sql RAISE 消息、README hero alt）、`culler-worktrees`、`Dockerfile.culler-project`、`.shorizon/` 目录 | schema 文本**必须蹭 v1 基线冻结一并改**（R2 原则：过 v1 再改=付费迁移）；其余随 A09 |
 | 发布通道 | 发布名 `Culler <version>`（INSTALL 发布段）、install.sh 与 README/SECURITY 指向 `github.com/warlockedward/Culler` | 资产名与源指向按 A04/O8；**GitHub 仓库更名是所有者操作，更名后同步 URL 与本文档** |
 | `config.example.toml` **整文件**（含首行注释与 `author_name = "Culler"`） | `mc/config` 的 `TestTrackedAndEmbeddedExamplesAreIdenticalAndValid` 要求该文件与 Go 内嵌副本逐字节一致——代码配对面，非纯文档。**ROADMAP R1 名义清单含此文件，与本仓测试冲突，以测试为准**：R1 不动它（A08 首改已回退，过程留证据 mc-check 记录） | 随 A09 与内嵌副本同批改 |
 | 代码内全部 `Culler` 字符串 | `mc/` `resident/` `dashboard/` `runner/` `release/` `scripts/` `tests/` `evals/` `acceptance/` `.github/workflows/`（数千处） | A09 按 R2 表逐面迁移；`openwiki/` 由 Scribe 重写（AGENTS.md 规则，人工不改） |
