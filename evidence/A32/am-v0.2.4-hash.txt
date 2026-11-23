@@ -1,0 +1,10 @@
+AM v0.2.4 双面哈希登记（轮三十三执行波收口：Q1–Q8"全按推进"落地＋runner 隔离 S0–S6 全链实证＋A06 218 演练域首证＋A34 CI 证据链闭合）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = f1ff86052f16b1844b792b890b7f716ca787fdbfcf02065b7d02b8386c586941
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = ca585e6a0348a77984c5c516a2e17c2746f3ae24551a99f961f92a9a2eb6e29d，与 am-v0.2.3-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.3 = ca585e6a0348a77984c5c516a2e17c2746f3ae24551a99f961f92a9a2eb6e29d（evidence/A32/am-v0.2.3-hash.txt 实读）；再前 v0.2.2 = 7fb971e72659109f6ea2e98563f4d0f3b5373df6d81d90c0d1ff062ed2bef496（同件记载）
+- 同轮并入 dev 的提交: 55dcfec(A34/A35 立票+A33 收窄+软门长期化+O1 件更正) / 94b9141(A34 fixture 身份+幂等清理，本机两测 PASS) / fd5bb32(隔离计划件 §2a 三处 flag 冲突更正) / f665d0f(隔离实施记录 S0–S6 收口) / ca89693+ec81e69+d7bd954(A06 密钥环+SHB1 演练+verb+5 单测+allowlist 登记+218 演练域证据)
+- 关键事实: ① 证明 run 45185186963（ci/routing-base=d7bd954）四判据全达：boundary 红集 20⇒18 行（恰 N1 父测+子测消失，机器 diff）、N3 撞名签名 0 次（签名=exit-41 T2 族）、e2e 25 行不变、硬门专用栈第三次绿（ok mc/deployment 27.833s＋ok mc/property 2.849s）⇒ A34 F1 达成=EVIDENCED（status.json 本轮翻账；ledger EVIDENCED 30→31）② runner 隔离 S0–S6 全链实证（isolation-execution-record-001.md）：三处 flag 冲突实跑证伪并更正；S3/S4 双 run 证 job 全程专用栈＋摘组后默认 socket=permission denied 且 job 仍绿；终态五计数=S0 基线逐项相等（63/60/169/32h/2u）⇒"未影响其他项目"前后差实证 ③ A06 218 演练域首证（verification-record-A06-V-001.md TM §7.1 全字段）：verdict=PASS（75 表/quick_check ok/schema+uuid 匹配）＋NC-1 指纹篡改 rc1 拒＋NC-2 删盐 rc1 拒且盐未再生＋零残留前后差为零；具名残留=DC §7.4 双事件轮换/resident 周期集成/Z5 通道（各自候裁）④ 执行侧事故如实登记：管道吞 exit code 致 dev 误推（f665d0f，不含 A06）⇒rebase 修复后再推 d7bd954；教训并入 §H 家族
+- 账: blcheck 72/0（翻账后实跑）/ worktree 仅 dev（登记支用毕即回收）/ 远端 main 仍 bba39ef 未动、releases=0/tags=0 / Mimosa scanner_enobufs 照例=按兼容策略继续，不宣称项目安全
+- 登记轮自纠: 本件首稿把 ①–⑥ 以换行体追加进 AM 单行变更史（破该文件"变更史=一个物理行"规约）+前置短语错位⇒由 HEAD 干净版重建行 4（草稿体拼为单行）后再取哈希登记；重建前文件态未进入任何提交
