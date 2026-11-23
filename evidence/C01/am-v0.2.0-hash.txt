@@ -1,0 +1,7 @@
+AM v0.2.0 双面哈希登记（轮二十八：C01 进码完成并入=EVIDENCED[L2 Provider Registry 配置链 读法N 缺省拒]；登记册计版破 0.1.x→0.2.0[非发版]；ledger 29）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 64259a7346555d2ff5f61080e25f7cbff4dfea2457b577b7294b0c61f54dc46c
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 前轮: v0.1.99 = 4763b3134d96bb105d86e9e9f8e00dc5bd1c321fc3c70bcf8e8c1f44d787bd00（evidence/A01/am-v0.1.99-hash.txt）
+- 同轮事实: 支 TC01（C01 码+测+§7.1+EVIDENCED 转正）+TR37（本登记）并入 dev；C01 读法 N=独立 runtimes.registry 命名空间，validateRegistry 三 https 闸条目化+闭集缺省拒（含 insecure*），不碰发布集成约束:1242-43；registry_test 1正+12缺省拒+端口放行+空零回归 config 绿；全道 C01_MC2_EXIT=0（首跑 gofmt 拦 map 对齐→归位重跑绿，门生效 dev 未污）；扫描 seal 351ba1e1 落改行0（改动主文件全文3 finding=阳性对照，测试文件不假称背书）；C01=EVIDENCED 限配置链票面F1全句（端到端连接属C02/C04不宣称）；ledger 29 EVIDENCED；blcheck 69/0；0.2.0=AM 内部计数非 semver 发版 VERSION 未动；worktree 仅 dev；main 远端 dd087c7 未推；外发只 warlockedward；PR#1 留探针；不宣称项目安全
+- 下批: A06 进码（复用 hostSecretStore+StageSpineCopy+恢复演练三层证据 TM§7.1）；route B 唯解法=218 自托管 runner（真 systemd/Docker，Chromium 可 apt）候所有者批装（信任边界，不擅动生产宿主）
