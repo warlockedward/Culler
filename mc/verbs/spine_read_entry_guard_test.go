@@ -26,6 +26,7 @@ var settledEntryAllowlist = map[string]int{
 	"verbs/onboard.go":                1, // inspectSpineSettled
 	"verbs/release_database.go":       2, // the settled inspector and its door
 	"deployment/update_checkpoint.go": 2, // the checkpoint verify + post-restore identity
+	"deployment/recovery_drill.go":    2, // the drill's staged-copy read and its decrypted-file read
 	"cmd/mc/setup_published_prod.go":  1, // the settled install/update gate
 }
 
