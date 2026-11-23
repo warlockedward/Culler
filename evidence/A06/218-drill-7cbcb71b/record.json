@@ -1,0 +1,18 @@
+{
+  "actual_result": "verdict=PASS integrity=ok tables=75 schema=5c56d3132ea33fb85f9204462df94396c9dfb5c4801271b9b6019ff108ba0963 uuid=ffffffffffffffffffffffffffffffff tasks=0 activity=0",
+  "attack_scenario": "recovery drill: encrypted backup of the live spine volume, decrypt, open through the snapshot read-only door, integrity check, identity and aggregate-root sampling",
+  "environment": "host=F1104 platform=linux/amd64 image=mc-prod volume=mc-spine-f2a82672eb72 docker=29.4.0",
+  "evidence_digest": "2f123e156352e646513b8d7e4202c64265a43f9865a12d213ef88f7468156d23",
+  "evidence_ref": "backup-drill/7cbcb71b8208f3790b6cb43fd4a766de",
+  "execution_id": "7cbcb71b8208f3790b6cb43fd4a766de",
+  "expected_result": "the decrypted spine opens read-only, passes quick_check, and reports the current schema, deployment uuid, and table count",
+  "reviewed_by": "executed and recorded by the implementation agent; human review pending (role conflation stated explicitly)",
+  "supersedes_verification_id": "",
+  "target_component": "spine encrypted backup and recovery drill (A06)",
+  "test_script_digest": "mc binary release=41ce8b0",
+  "tested_version": "release=41ce8b0 backup_file=/root/shz-drill/home/backups/encrypted/spine-20261123T132333Z.db.enc",
+  "verdict": "PASS",
+  "verification_id": "7cbcb71b8208f3790b6cb43fd4a766de",
+  "verified_at": "2026-11-23T13:23:33Z",
+  "z5_replication": "NOT_APPLICABLE"
+}

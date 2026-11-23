@@ -24,7 +24,13 @@
 - 第 9 步负控若意外触发真实恢复路径的副作用：演练语义=只读生产卷+只写 scratch 域，无生产副作用面。
 
 ## 3. 前态（218 实读，执行前填）
-- （待 S4 run 结束后填写：主 daemon 计数 / 专用栈计数 / 专用栈 volume 清单）
+- 主 daemon running=**60**；专用栈 running=**0**；专用栈 volumes=**0**（2026-11-23 21:22 本地实读）
 
 ## 4. 后态与残留判定（执行后填）
-- （同上三口 + scratch 域删除确认 + 主 daemon 容器清单 diff vs S0 基线）
+- 主 daemon running=**60**；专用栈 running=**0**；专用栈 volumes=**0**；`/root/shz-drill` 不存在（21:25 本地实读）⇒ **前后差为零**
+- 演练产物（销毁前已取回本机）：record.json＋keyring.json＋spine-20261123T132333Z.db.enc（evidence/A06/218-drill-7cbcb71b/ 三件）；验证记录=verification-record-A06-V-001.md
+- 负控实况：NC-1 keyring 指纹篡改=rc1 domain-rejection（"corrupt or was altered"）后 keyring 复原；NC-2 credential-salt 删除=rc1 同拒＋**盐未再生**（目录内仅剩 blobs）⇒ A02 缺盐语义在备份键路径真机成立
+
+## 5. 执行期更正（计划 vs 实况，如实登记）
+- **卷名**：本件 §1 第 5/6/10 步原写 `mc-a06-drill-spine`，实跑前发现演练动词的备份面=`RuntimeNames(MC_HOME).Volume`=**确定性派生名**（names.go:26：`mc-spine-<sha256("mc-deployment-v1\0"+canonicalHome)[:6]`）⇒ scratch home `/root/shz-drill/home` 派生 **`mc-spine-f2a82672eb72`**；误建卷 `mc-a06-drill-spine` 已删（从未被产品路径使用）。教训登记：演练域的卷名不由执行者挑选，由 home 身份派生。
+- **负控臂**：§1 第 9 步原拟"篡改 .enc 一字节重放"——实跑前发现演练动词每次**新建**备份、不读既有 .enc 件（设计如此），故生产动词面无可回放的"篡改既有件"臂；GCM 篡改拒的机制证据=本机单测 TestSHB1RoundTripAndTamperRefusal（PASS），218 面改证漂移臂（NC-1）与缺盐臂（NC-2）两臂真机成立。
