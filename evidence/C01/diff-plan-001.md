@@ -11,6 +11,15 @@
 - **仍守**：`base_url` 继续禁（不放宽，P1）；新分支只开**受控登记**，目的地仍不来自 agent/请求侧。
 - ⇒ **进码专窗据本节实施，勿再照 §1 旧"新命名空间"文**。
 
+## 0.6 ⚑ §0.5 被自己问倒 + 本件现已自相矛盾（轮二十六·读全 validateCredentialSource 后；**新的进码前置门**）
+读全 `validateCredentialSource`（config.go:1222-1248）后：§0.5"复用 inference_url"与 §1/§2/§3/§6"建 `runtimes.registry` 命名空间"**在本件内直接冲突**——且不是小事，牵 P1：
+- **读法 N（票面"命名空间隔离+三闸条目化"字面）= L2 Provider Registry 是独立目的地命名空间**：新增 `runtimes.registry.<id>`{base_url/port_allowlist/pooling}，credential/binding **引用 registry id**。⇒ 目的地与凭据解耦、每条独立过闸、可审计集合；不触碰 :1242-1243 的"发布集成"约束。
+- **读法 R（§0.5）= 目的地挂在 `CredentialSource.inference_url`**：现有 :1242-1243 强制 API-key 类 `inference_url` **必须等于发布集成固定值**；R 要为 custom 类**放宽这条**。⇒ 省面，但**可能松动 PS §1 刻意维持的"目的地独立于凭据"边界 + 削弱发布集成保证**（把目的地与 per-credential 耦合）。
+- **反转自我纠正**：§0.5 我断"复用=免第二权威"；反过来，**把目的地折进凭据字段才是 PS 想避免的耦合**。票面"**命名空间隔离**"四字更像指名读法 N。**我上一步的纠正可能本身错了** ⇒ 不拿未定解读写 P1 码（AGENTS：改变关键决策才问；不为显推进而半做/赌）。
+- **需 Authority 一句定读法**：`N`（独立 registry 命名空间）/ `R`（扩 inference_url，接受耦合权衡，我在 plan 显记弱化了 :1243）/ 或**给 v0.1 PS 原文**（本仓缺，最硬）。
+- **执行侧倾向（非裁）= 读法 N**：更贴票面字样、且不弱化既有"发布集成"不变量（P1 面"不放宽现有约束"优先）。**候此一句再进码**；§1 字段闭集（本轮 P1 已批）在 N/R 下都适用，变的只是放置与是否触 :1243。
+> 本件 §1–§6 现按读法 N 书写；若裁 R，则 §0.5 生效、§1/§2/§3/§6 需按 inference_url 方案改写。**矛盾已在此标出，不留给读者踩。**
+
 ## 0. C01 到底要什么（厘清，避免误读 routing）
 - `routing.Registry`= `map[string]string`（binding→harness 族）是**模型路由表**，**不是** PS §1 的 L2 Provider Registry。
 - PS §1 L2 = **受控 provider 端点登记**（自托管 vLLM/Ollama 等 D4 需求）：目的地**仍不得来自 agent/请求侧（P1）**，只能来自操作者登记的 registry 条目，agent 侧只引用条目 id。
