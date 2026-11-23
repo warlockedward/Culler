@@ -1,0 +1,8 @@
+AM v0.1.99 双面哈希登记（轮二十七：ADR-0 签署生效并 git mv 提升入 docs/contracts + A01→EVIDENCED[ledger 28] + C01 读法锁定 N[设计锁、码未写维持 BACKLOG]；执行侧仅誊录 Authority 原话不代签；§12.1 钉不扩权改 IG 表 B/MASTER）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 4763b3134d96bb105d86e9e9f8e00dc5bd1c321fc3c70bcf8e8c1f44d787bd00
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 前轮: v0.1.98 = 60274bc114b9c60f58f7cdc897a9621ccbb4c2c7f0de279fc391fb741d384a0d（evidence/A01/am-v0.1.98-hash.txt）
+- 同轮事实: 支 TR36 并入 dev；Authority 最终答复"C01 选 N/R 不采用/ADR-0 §12签"；ADR git mv evidence/A01/adr-0-final-draft-001.md→docs/contracts/ADR-0-credential-backend.md（SIGNED-EFFECTIVE，§12 逐字誊录 Authority 原话 2026-11-23）；A01 EVIDENCED ledger→28；C01 §0.6 标已决 N、R 作废（保留痕），仍 BACKLOG 未进码；blcheck 69/0 含新 ADR 文件不破坏解析（实测）；§12.1 显式不扩权（IG 表 B/MASTER 各独立治理事件）；本轮零 push 外发只 warlockedward；不宣称项目安全
+- 下批自主连开: C01 进码（按 N，validateRegistryEntries 三闸+闭集+缺省拒测，全道绿再并）→ A06 进码（复用 hostSecretStore+StageSpineCopy+三层演练证据）
+- 仍候用户: route B→C 取舍 ·（IG 表 B 正文/MASTER 措辞的独立治理编辑，非阻塞）

@@ -1,6 +1,6 @@
-# ADR-0 · 主机凭据后端（O1）— 定稿文本草案 #1
+# ADR-0 · 主机凭据后端（O1）— 定稿（已签）
 
-> 状态：**DRAFT-FOR-SIGNATURE**（执行侧据所有者八格批文起草的定稿文本；**尚未生效**——生效=下方"定稿批准"行由 Authority 落笔。执行侧不代签，见 §12）。
+> 状态：**SIGNED — EFFECTIVE**（§12 定稿批准已由 Authority 2026-11-23 落笔；生效后果见 §12.1。签署前为 DRAFT-FOR-SIGNATURE）。
 > 取代：`docs/contracts/IDENTITY-GOVERNANCE.md §5.1 表 B〔待:O1 ADR〕` 占位；兑现 `MASTER-ARCHITECTURE D17/D20`、`PROVIDER-SECURITY §1（L1 凭据层）`、`DATA-CONSISTENCY §7.4（密钥环归属，见件 7）`。
 > 批文沿革：八格=`全按推荐`（轮十六 D1–D11 + 轮二十一"全按推荐 a准"）；本轮补 **P1（C01 字段闭集另案，不属本 ADR 的凭据选型，见 §11）**、**P7（备份加密密钥环机制归 A06，复用本后端）**。
 
@@ -60,8 +60,14 @@ viewer 令牌**纳入同一 `hostSecretStore` 抽象后端**（与 provider 凭�
 本轮 **P1 批准的是 C01 的 L2 Provider Registry 配置字段闭集**（provider 端点登记的合法字段），属 PROVIDER-SECURITY §1 的**目的地登记**，与本 ADR（O1 的**凭据载体**）正交。本 ADR 不定义 registry 字段；C01 依其 evidence/C01/diff-plan-001.md 进码——**注意该件 §0.5 已把落点从"新建 `runtimes.registry` 命名空间"纠正为"扩现有 `CredentialSource`+`validateCredentialSource` 受控分支"**（复用目的地解析、不建第二权威；字段闭集不变）。二者共用"目的地/凭据不来自 agent"（P1 不变量）但不共用代码面。
 
 ## 12. 签发（两事件，本 ADR 生效的唯一门）
-- **所有者批文（八格 + P1/P7）**：**已落**=`全按推荐`（轮二十一）+ 本轮"P1 认草案 / P7 自定复用后端 / P6 帮我落笔"。
-- **定稿批准（Authority 对本 §1–§11 文本落笔）**：☐ **待笔**——执行侧起草止于此；此格未填 ⇒ 本 ADR 为草案、IDENTITY-GOVERNANCE 表 B 占位不销、不据此宣称"凭据后端契约已定"。落笔后：本件转 `docs/contracts/ADR-0-credential-backend.md` 入登记册，A01→EVIDENCED，AM 记独立签发事件。
-  - *Authority 可回一句批文（例："§1–§11 照批，签于 2026-11-23"），执行侧据原文逐字誊入此格、署名标 Authority——誊写≠代签，签名归属仍是你的决定。*
+- **所有者批文（八格 + P1/P7）**：**已落**=`全按推荐`（轮二十一）+ 轮二十六"P1 认草案 / P7 自定复用后端 / P6 帮我落笔"。
+- **定稿批准（Authority 对本 §1–§11 文本落笔）**：✅ **已签**（2026-11-23）。
+  - **批准文书（Authority 原话，逐字，署名归属=所有者本人）**：**"最终答复：C01 架构读法选 N。R 不采用。ADR-0 §12签"**。
+  - 含义=对 §1–§11 定稿文本落笔批准 ⇒ 本 ADR 生效；IDENTITY-GOVERNANCE §5.1 表 B〔待:O1 ADR〕占位自此销（表 B 的编辑属独立治理动作，见 §12.1，不由本 ADR 顺带改）。
+  - *（执行侧仅**誊录** Authority 上述决定，未代其作决定、未代拟批文——起草≠批准，记忆铁律"AI 不能是风险/安全 Acceptance Authority"。）*
 
-*（起草：host-agent 执行侧；**起草 ≠ 批准**。证据/实测引用见 evidence/A02/*、evidence/A01/o1b-comparison-001.md、evidence/A01/a01-decision-support-001.md。）*
+## 12.1 生效后果（已执行，登记于 AM v0.1.99）
+- 本件提升入登记册：`docs/contracts/ADR-0-credential-backend.md`（权威正文，此后以此为准）。
+- A01（ADR-0 凭据后端选型）→ **EVIDENCED**（其交付物=本 ADR，现经 Authority 签署）。
+- C01 架构读法锁定 **N**（独立 `runtimes.registry` 命名空间；R 被 Authority 明确否采）——C01 diff-plan §0.6 相应定稿。
+- **不在本 ADR 顺带改**：IDENTITY-GOVERNANCE 表 B 正文、MASTER D17/D20 措辞——契约文件的编辑各为其独立治理事件，须 Authority 单独落笔，执行侧不借"ADR 已签"扩权他改（§H"一项决定不扩成他项授权"）。

@@ -12,6 +12,7 @@
 - ⇒ **进码专窗据本节实施，勿再照 §1 旧"新命名空间"文**。
 
 ## 0.6 ⚑ §0.5 被自己问倒 + 本件现已自相矛盾（轮二十六·读全 validateCredentialSource 后；**新的进码前置门**）
+> **✅ 已决（轮二十七）**：Authority 最终答复"选 N，R 不采用"⇒ **读法 N 定稿**（独立 `runtimes.registry` 命名空间，目的地/凭据解耦，不碰 :1242-43 发布集成约束）。§1/§2/§3/§6（按 N 书写）即进码蓝本；§0.5 读法 R 作废（保留不删=推理留痕）。下列原岔口分析保留作记录。
 读全 `validateCredentialSource`（config.go:1222-1248）后：§0.5"复用 inference_url"与 §1/§2/§3/§6"建 `runtimes.registry` 命名空间"**在本件内直接冲突**——且不是小事，牵 P1：
 - **读法 N（票面"命名空间隔离+三闸条目化"字面）= L2 Provider Registry 是独立目的地命名空间**：新增 `runtimes.registry.<id>`{base_url/port_allowlist/pooling}，credential/binding **引用 registry id**。⇒ 目的地与凭据解耦、每条独立过闸、可审计集合；不触碰 :1242-1243 的"发布集成"约束。
 - **读法 R（§0.5）= 目的地挂在 `CredentialSource.inference_url`**：现有 :1242-1243 强制 API-key 类 `inference_url` **必须等于发布集成固定值**；R 要为 custom 类**放宽这条**。⇒ 省面，但**可能松动 PS §1 刻意维持的"目的地独立于凭据"边界 + 削弱发布集成保证**（把目的地与 per-credential 耦合）。
