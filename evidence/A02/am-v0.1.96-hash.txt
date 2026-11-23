@@ -1,0 +1,7 @@
+AM v0.1.96 双面哈希登记（轮二十四：route A 战果入库 = A02 真宿主 EVIDENCED + A31 真 Linux 解析推进(仍 IN_PROGRESS 不虚标)；route B 据首跑数据重估、建议转 route C；ledger 27）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = cfec7d6a80cecd3b7fde880f969ad78c685aa85c6998701e98f817e3f3bafa64
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 前轮: v0.1.95 = e461ae2460951f14b575ee7b8ebdfed55a689fab1b6e6bce6ac46d712cc7200c（evidence/A32/am-v0.1.95-hash.txt）
+- 同轮事实: 支 TR28(A02 EVIDENCED)/TR29(A31 记录)/TR30(本登记) 并入 dev；218 route A 双重隔离临时 MC_HOME+XDG_STATE，收口零残留 0 活动单元被动；A02 五铁证(proxy-tls rc0/默认后端路径/明文0/幂等/删盐重授权)→EVIDENCED→解 C01/C07/D06 ready-unmet；A31 真 Linux Docker 双侧解析(172.17.0.1 vs 无)但端口实连半环未达→维持 IN_PROGRESS；route B(build-prod 让 runner 造 mc-prod)据首跑多 job 环境红重估为低边际值→建议 route C(opt-in-lanes 收缩为轻 Linux 门，重道留 218/计划)候所有者定不擅改 P-1；blcheck 69/0；ledger 27 EVIDENCED；worktree 仅 dev；main 远端 dd087c7 未推；PR#1 留探针未关；不宣称项目安全
+- 候: route B→C 取舍(所有者点的 P-1 是否改收缩为轻门) · ADR 定稿笔 · A06 机制归属；用户定 route C 即开 C01(A02 EVIDENCED 已解锁治理门)
