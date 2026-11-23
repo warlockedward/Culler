@@ -1,0 +1,6 @@
+AM v0.2.1 双面哈希登记（轮二十九：218 自托管 runner 上线[形态B2]+opt-in-lanes 路由入 dev[dashboard 984/0 三守卫无冲突]；触发面新发现=A32 CI 证据仍需一步授权）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 14c5701d681b22ed65772b32486d57823498ed9fffb31d8e1b6d5581bf8266f1
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 前轮: v0.2.0 = 64259a7346555d2ff5f61080e25f7cbff4dfea2457b577b7294b0c61f54dc46c（evidence/C01/am-v0.2.0-hash.txt）
+- 同轮事实: 支 TA32b(路由改动 b6d6cf2)+TR38(本登记) 并入 dev；runner shz-218-amd64 online/busy=false/labels 含私有 shz-ci（围栏：仅显式请求该标签的 job 可落此机，本仓只有 opt-in-lanes 请求）；shzci 低权用户+docker 组+linger；runner v2.338.2 无内置 node 改 externals/node24(v24.22.1)（执行侧 find 深度不够致误判"缺 node"已自纠）；无公开 checksum 件=据实记"经 TLS"不假称已验；令牌经 stdin→600→shred，本地焚，未外泄（一次 .regtok 路径不一致是本人命令 bug，纠正后 config 成功）；dashboard 门 984/0 含三守卫实测不断言 runs-on/托管性质⇒无冲突未改任何断言；⚑ 触发面事实：release.yml 的 pull_request/push 皆 branches:[main] 且 PR 读 base 的 workflow ⇒ 探针 PR#2(base=ci/routing-base) 不生成 run（非 runner 故障）；生效需 W1 推 main（需新令，D5 已尽）/W2 放宽触发（列于不改项）/W3 加 workflow_dispatch（亦触发面改动）——不自行选，停候点选；可即刻替代=218 手动跑两车道补 A31/A02 证据但不代 A32；status 无改(A31/A32/A02 延付具名)；blcheck 69/0；ledger 29；外发仅 warlockedward(PR#2 base/head 双验)；main 远端 dd087c7 未推；runner 空闲可完全回退；不宣称项目安全
