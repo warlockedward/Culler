@@ -1,8 +1,20 @@
 # ADR-0 · 主机凭据后端（O1）— 定稿文本草案 #1
 
-> 状态：**DRAFT-FOR-SIGNATURE**（执行侧据所有者八格批文起草的定稿文本；**尚未生效**——生效=下方"定稿批准"行由 Authority 落笔。执行侧不代签，见 §9）。
+> 状态：**DRAFT-FOR-SIGNATURE**（执行侧据所有者八格批文起草的定稿文本；**尚未生效**——生效=下方"定稿批准"行由 Authority 落笔。执行侧不代签，见 §12）。
 > 取代：`docs/contracts/IDENTITY-GOVERNANCE.md §5.1 表 B〔待:O1 ADR〕` 占位；兑现 `MASTER-ARCHITECTURE D17/D20`、`PROVIDER-SECURITY §1（L1 凭据层）`、`DATA-CONSISTENCY §7.4（密钥环归属，见件 7）`。
-> 批文沿革：八格=`全按推荐`（轮十六 D1–D11 + 轮二十一"全按推荐 a准"）；本轮补 **P1（C01 字段闭集另案，不属本 ADR 的凭据选型，见 §8）**、**P7（备份加密密钥环机制归 A06，复用本后端）**。
+> 批文沿革：八格=`全按推荐`（轮十六 D1–D11 + 轮二十一"全按推荐 a准"）；本轮补 **P1（C01 字段闭集另案，不属本 ADR 的凭据选型，见 §11）**、**P7（备份加密密钥环机制归 A06，复用本后端）**。
+
+**八格→章节对照（供 Authority 一眼核一致性；轮二十六自查补 §8/§9/§10——原草案漏三格，已在签字前补正）**：
+| 格 | 内容（决策支持件 §3 原列） | 落在 |
+|---|---|---|
+| 1 | "同一后端"定义 | §1 抽象层同构／载体分 OS |
+| 2 | 秘密之秘密闭合点 | §2 机器密钥（HKDF+AES-GCM，信任锚=文件权限层不夸大） |
+| 3 | 重签发/恢复叙事 | §3 写死"不可解=重走凭据步" |
+| 4 | 外部 KMS 收/拒 | §4 拒（三条理由） |
+| 5 | Git 行三对象显式覆盖 | **§8（本次补）** |
+| 6 | viewer 明文 token 纳管/例外 | **§9（本次补）＝纳管** |
+| 7 | 备份加密密钥环归属 | §7（=A06 复用本后端，本轮 P7） |
+| 8 | 平台文案中性化范围 | **§10（本次补）** |
 
 ## 1. 决策
 主机凭据后端采用**抽象层同构、载体分 OS** 的模型：
@@ -32,11 +44,24 @@
 ## 7. 备份加密密钥环（件 7，本轮 P7 裁定）
 本 ADR **不定义**备份加密的密钥环机制；**归 A06** 自定，且**复用 §1–§2 的同一 `hostSecretStore` 抽象后端**（备份加密密钥本身作为一条主机凭据存取，不另起秘密存储权威）。DATA-CONSISTENCY §7.4 的"机制归 O1 ADR"据此收敛为：**O1 提供凭据存取抽象，A06 在其上实现密钥环生命周期**——两文档不再各造后端。
 
-## 8. 与 C01 的边界（本轮 P1 另案，防混淆）
-本轮 **P1 批准的是 C01 的 L2 Provider Registry 配置字段闭集**（`runtimes.registry` 端点登记 schema），属 PROVIDER-SECURITY §1 的**目的地登记**，与本 ADR（O1 的**凭据载体**）正交。本 ADR 不定义 registry 字段；C01 依其 evidence/C01/diff-plan-001.md §1 闭集进码。二者共用"目的地/凭据不来自 agent"（P1 不变量）但不共用代码面。
+## 8. Git 行三对象与 git 侧秘密（件 5）
+IDENTITY-GOVERNANCE §5.1 表 B 的 git 相关三对象——`credential.helper` / `SSH_ASKPASS` / 仓库内嵌凭据——**由既有已 EVIDENCED 的交付面机制同等覆盖，显式例外=无**：A26（`-c credential.helper=` 逐调用点清空 + 双侧行为哨兵）与 A29（`safe.directory` 逐仓绝对授权，不动 NOSYSTEM 信任边界）已覆盖"目的地/授权不由不可信仓库配置决定"。git 侧秘密不入库、不分存、不入本凭据后端（其形态是运行期 env/文件，非 provider 凭据）。
 
-## 9. 签发（两事件，本 ADR 生效的唯一门）
+## 9. viewer 明文 token（件 6）
+viewer 令牌**纳入同一 `hostSecretStore` 抽象后端**（与 provider 凭据同等存取、同等"盘上仅密文/不入容器/不入 spine"），**不登记独立明文例外、不另起明文面**。若某载体确无法覆盖，须走 §12 之外的独立 Authority 例外登记，不得默认放行。
+
+## 10. 平台文案中性化范围（件 8）
+本 ADR 批准的平台中性化文本面（执行落点在对应票，此处定范围）：
+- **A02 已落**：`host_secret.go:15` 失败常数 + `agentprofiles.go:38` CLI 闸语（去"login Keychain/macOS"专属）。
+- **A25 向导侧**：`setup_terminal_prod.go` 阶段标签/拒绝语 + `choices` 面板语（"Prepare your machine""Set up this machine""Setup complete"等，A25a 已 CODED）。
+- **深水区四语**（`:671` "Mac requirements"、`:708-728` Docker Desktop 复制+mac-install URL、`:652` "macOS refused"、`:658` "Open Docker Desktop"）随 A02/后续收，**URL 派生因网络阻断无法验真址而暂缓**（拒凭记忆硬编码，见 A02 diff-plan §3.5）。范围之外不扩（避免为改而改）。
+
+## 11. 与 C01 的边界（本轮 P1 另案，防混淆）
+本轮 **P1 批准的是 C01 的 L2 Provider Registry 配置字段闭集**（provider 端点登记的合法字段），属 PROVIDER-SECURITY §1 的**目的地登记**，与本 ADR（O1 的**凭据载体**）正交。本 ADR 不定义 registry 字段；C01 依其 evidence/C01/diff-plan-001.md 进码——**注意该件 §0.5 已把落点从"新建 `runtimes.registry` 命名空间"纠正为"扩现有 `CredentialSource`+`validateCredentialSource` 受控分支"**（复用目的地解析、不建第二权威；字段闭集不变）。二者共用"目的地/凭据不来自 agent"（P1 不变量）但不共用代码面。
+
+## 12. 签发（两事件，本 ADR 生效的唯一门）
 - **所有者批文（八格 + P1/P7）**：**已落**=`全按推荐`（轮二十一）+ 本轮"P1 认草案 / P7 自定复用后端 / P6 帮我落笔"。
-- **定稿批准（Authority 对本 §1–§8 文本落笔）**：☐ **待笔**——执行侧起草止于此；此格未填 ⇒ 本 ADR 为草案、IDENTITY-GOVERNANCE 表 B 占位不销、不据此宣称"凭据后端契约已定"。落笔后：本件转 `docs/contracts/ADR-0-credential-backend.md` 入登记册，A01→EVIDENCED，AM 记独立签发事件。
+- **定稿批准（Authority 对本 §1–§11 文本落笔）**：☐ **待笔**——执行侧起草止于此；此格未填 ⇒ 本 ADR 为草案、IDENTITY-GOVERNANCE 表 B 占位不销、不据此宣称"凭据后端契约已定"。落笔后：本件转 `docs/contracts/ADR-0-credential-backend.md` 入登记册，A01→EVIDENCED，AM 记独立签发事件。
+  - *Authority 可回一句批文（例："§1–§11 照批，签于 2026-11-23"），执行侧据原文逐字誊入此格、署名标 Authority——誊写≠代签，签名归属仍是你的决定。*
 
 *（起草：host-agent 执行侧；**起草 ≠ 批准**。证据/实测引用见 evidence/A02/*、evidence/A01/o1b-comparison-001.md、evidence/A01/a01-decision-support-001.md。）*
