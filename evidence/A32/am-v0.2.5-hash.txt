@@ -1,0 +1,10 @@
+AM v0.2.5 双面哈希登记（轮三十四：A09 R2 迁移 S1/S2 两步落地全道绿＋S2 四个自抓执行缺陷如实登记）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 49242067730ed092d46cdbec49212c524dfa6903a18170732176401e34845350
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = f1ff86052f16b1844b792b890b7f716ca787fdbfcf02065b7d02b8386c586941，与 am-v0.2.4-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.4 = f1ff86052f16b1844b792b890b7f716ca787fdbfcf02065b7d02b8386c586941（evidence/A32/am-v0.2.4-hash.txt 实读）；再前 v0.2.3 = ca585e6a0348a77984c5c516a2e17c2746f3ae24551a99f961f92a9a2eb6e29d（同件记载）
+- 同轮并入 dev 的提交: 65ee65a(S1 env 前缀改名 109 文件) / 944275a(治理文档时点事实恢复，dev 直写=纪律项) / 4321e52(A09 票面注记+ledger A09=IN_PROGRESS) / 6ae57e3(S2 home 面改名 61 文件+s2-diff-plan 含 §6 四缺陷自纠记录)
+- 关键事实: S1=`CULLER_*`→`SHZ_*`（87 env 名；env 前缀过滤列表+workflow 生产者×消费者+shell 探针协议 token 同提交成对改；范围内残留=0；mc/check.sh EXIT=0＋resident 774/0＋dashboard 984/0＋vet 五组）。S2=`.culler`→`.shorizon`（**R2 表终值=每面终值不同，home 面=.shorizon 非 .shz**；Form H+Form C；token 级边界天然排除 com.culler S3 面 143 token；有意保留=openwiki/.culler-run.json×5 Scribe 跨域约定/keychain A02 面/skill 映射链 C 类 R2 末/worktrees 收口批/culler_evals 具名残留；mc/check.sh 第 5 跑 EXIT=0——前两次跑的红=S2 自抓缺陷 b/d（lookbehind 反斜杠盲区跨面污染 S3 单元谓词 3 文件 8 行＋恢复通道只搜单反斜杠形态漏双反斜杠残留），均恢复后单门 RC=0 再全链绿；pin 测试新值 2e262ab57590 双源独立验证）。部署语义=产品默认 home 解析变为 `~/.shorizon`（D20 不建兼容层；操作者本机既有 ~/.culler 部署如有则脱离默认解析，候所有者搬/不动一言）。
+- 账: blcheck 72/0 / ledger 31 EVIDENCED 不变（A09=IN_PROGRESS，S3–S5 未收口）/ worktree=main＋dev（登记支用毕即回收；S1 worktree 漏回收已清）/ 无新外发（ci/routing-base 仍 d7bd954；S1/S2 面生产者×消费者同提交改=结构自洽，不需 CI 证明）/ Mimosa scanner_enobufs 照例=按兼容策略继续，不宣称项目安全 / 纪律项=dev 直写提交×1（944275a，流程违规内容无损，入 §H 家族第 3 次史）
+- 登记轮自纠: 首稿条目文本把点号误转汉字"点"（文件形态无转义问题应写原字面）⇒重写为精确字面版后再拼接；拼接脚本并行冗余重试 9 次全部被自身前置 assert 拦下（entry count=1 实证无双追加）
