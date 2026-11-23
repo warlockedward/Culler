@@ -141,7 +141,11 @@ jobs:
 
   opt-in-lanes:
     name: opt-in-lanes
-    runs-on: ubuntu-24.04
+    # The container lanes need a real Docker engine and a user service manager,
+    # which the hosted runners do not provide. This job runs on the operator's
+    # self-hosted runner, selected by the private `shz-ci` label so no other job
+    # in this workflow can be scheduled onto that machine.
+    runs-on: [self-hosted, shz-ci]
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
