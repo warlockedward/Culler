@@ -151,6 +151,12 @@ jobs:
     # in this workflow can be scheduled onto that machine.
     runs-on: [self-hosted, shz-ci]
     timeout-minutes: 150
+    env:
+      # The self-hosted machine's default Docker daemon is shared with other
+      # projects. Point every lane at the dedicated CI daemon (own data-root,
+      # bridge shz-br0, and socket) so the container tests never touch the
+      # shared daemon. shzci holds group access to this socket.
+      DOCKER_HOST: unix:///run/shz-ci-docker.sock
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
