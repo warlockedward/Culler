@@ -45,17 +45,19 @@ func dockerRun(t *testing.T, args ...string) (string, error) {
 }
 
 // sharedTempDir is t.TempDir's replacement for fixtures that will be used as
-// Docker BIND MOUNTPOINTS.
-//
-// t.TempDir lives under `/var/folders`, and a directory there that has served
-// as a nested bind mountpoint acquires a `com.apple.provenance` xattr from
-// Docker Desktop which makes it resist `os.RemoveAll` with EPERM — so the test
-// body passes and then the harness fails the test during teardown. Under
-// `/private/tmp` the same directory removes cleanly. Verified both ways rather
-// than assumed.
+// Docker BIND MOUNTPOINTS. The usable root is a per-platform constant in
+// temp_mount_*_test.go: on Darwin a `/var/folders` directory that has served as
+// a nested bind mountpoint acquires a `com.apple.provenance` xattr from Docker
+// Desktop and then resists `os.RemoveAll` with EPERM, so the test body passes
+// and the harness fails during teardown; `/private/tmp` removes cleanly. On
+// Linux `/private/tmp` does not exist at all, which is why the root is not
+// hardcoded here. An empty root means the platform is unverified: skip.
 func sharedTempDir(t *testing.T) string {
 	t.Helper()
-	dir, err := os.MkdirTemp("/private/tmp", "mc-boundary-")
+	if tempMountRoot == "" {
+		t.Skip("no verified bind-mount temp root on this platform")
+	}
+	dir, err := os.MkdirTemp(tempMountRoot, "mc-boundary-")
 	if err != nil {
 		t.Fatal(err)
 	}

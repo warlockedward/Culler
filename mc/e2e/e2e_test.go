@@ -92,7 +92,7 @@ func TestMain(m *testing.M) {
 // fixture owns every external resource; all cleanup is registered on t.
 type fixture struct {
 	t             *testing.T
-	base          string // temp base under /private/tmp (Docker Desktop file sharing)
+	base          string // temp base under the platform scratch root (see temp_root_*_test.go)
 	hostMC        string // darwin mc binary
 	env           []string
 	helper        string
@@ -539,10 +539,15 @@ func setup(t *testing.T, opts ...func(*setupOptions)) *fixture {
 		t.Fatalf("docker CLI not found: %v", err)
 	}
 
-	// /private/tmp is Docker-Desktop-shared by default; t.TempDir() lands in
-	// /var/folders which may not be. MC_HOME must be a scratch path, never
-	// ~/.culler.
-	base, err := os.MkdirTemp("/private/tmp", "mc-e2e-")
+	// The root is per-platform (temp_root_*_test.go): on Darwin it must be a
+	// Docker-Desktop-shared path because t.TempDir() lands in /var/folders,
+	// which may not be shared; on Linux any local path binds. An empty root
+	// means the platform is unverified: skip. MC_HOME must be a scratch path,
+	// never ~/.culler.
+	if e2eTempRoot == "" {
+		t.Skip("no verified scratch root for bind mounts on this platform")
+	}
+	base, err := os.MkdirTemp(e2eTempRoot, "mc-e2e-")
 	if err != nil {
 		t.Fatal(err)
 	}
