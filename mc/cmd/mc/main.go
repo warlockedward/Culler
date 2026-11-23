@@ -168,6 +168,9 @@ func dispatchArgs(args []string, stdin io.Reader, stdout, stderr io.Writer) int 
 	if args[0] == "__attachment-canary" || args[0] == "__attachment-canary-publish" {
 		return runLocal(args, stdin, stdout, stderr)
 	}
+	if args[0] == "__recovery-drill" {
+		return runLocal(args, stdin, stdout, stderr)
+	}
 	if args[0] == "__onboard-state" {
 		return runPrivateOnboardState(args, stdin, stdout, stderr)
 	}
@@ -661,6 +664,22 @@ func dispatchVerb(args []string, stdin io.Reader) (any, error) {
 			return nil, verbs.Usagef("resolve attachment canary MC_HOME: %v", err)
 		}
 		return runAttachmentCanary(home)
+	case "__recovery-drill":
+		if len(rest) != 0 {
+			return nil, verbs.Usagef("usage: mc __recovery-drill")
+		}
+		id, err := verbs.LoadIdentity()
+		if err != nil {
+			return nil, err
+		}
+		if err := verbs.RequireHostScope(id, "mc __recovery-drill"); err != nil {
+			return nil, err
+		}
+		home, err := configuredCanonicalHome()
+		if err != nil {
+			return nil, verbs.Usagef("resolve recovery drill MC_HOME: %v", err)
+		}
+		return runRecoveryDrill(home)
 	case "__attachment-canary-publish":
 		if len(rest) != 0 {
 			return nil, verbs.Usagef("usage: mc __attachment-canary-publish")
