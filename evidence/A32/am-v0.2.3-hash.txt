@@ -1,0 +1,10 @@
+AM v0.2.3 双面哈希登记（轮三十三：软门版工作流首跑实证＋第三跑红项全部源码级归因＋A32=EVIDENCED＋AGENTS.md fork 边界登记）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = ca585e6a0348a77984c5c516a2e17c2746f3ae24551a99f961f92a9a2eb6e29d
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 7fb971e72659109f6ea2e98563f4d0f3b5373df6d81d90c0d1ff062ed2bef496，与 am-v0.2.2-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.2 = 7fb971e72659109f6ea2e98563f4d0f3b5373df6d81d90c0d1ff062ed2bef496（evidence/A32/am-v0.2.2-hash.txt 实读）；再前 v0.2.1 = 14c5701d681b22ed65772b32486d57823498ed9fffb31d8e1b6d5581bf8266f1（同件记载）
+- 同轮并入 dev 的提交: 1dd9853（AGENTS.md fork 边界，所有者指令）/ c591c71（findings-003 归因全表）/ 本登记轮提交（AM＋status.json＋本件）
+- 关键事实: run 45153594551/job 137620872629（ci/routing-base=8bfc831，218 自托管 runner，x86_64）：软门机制三重证据实证（boundary/e2e 步 `##[error]exit code 1`＋API conclusion=success＋后续步照跑）；两道硬门首跑真绿=update_docker `ok mc/deployment 43.198s`（A27 的 218 绿第 3 次独立确认）＋property `ok mc/property 2.668s`⇒job opt-in-lanes=success；boundary 20 FAIL 行与上 run（45136188809）集合逐字同集（机器 diff）；e2e 21 顶级红=20 共享单一共同根因（resident 启动健康检查=同一 attachment canary⇒exit-41⇒90s 超时全灭；签名×22/×20 定量）＋1=TestSpineLockDomainGuard（T2 族挂载定义域，e2e_test.go:340-404 实读）；9 清单外项全部源码级闭合=T1 族×4（其中 TestClaudeAgent… 根因在**产品代码** claude.ts:37/codex.ts:30 arm64-only harness=amd64 镜像 harness 实际不可用，产品域注记）＋T2 族×2（warm canary uid 语义＋wiki export 宿主侧 chmod EPERM）＋环境残留×1（确定性容器名＋无前置幂等清理＋共享 daemon；218 实读残留 96d3ddcb068c，处置前后差 61→60）＋新类 N1×1（A13 G-B bind（413880a）×陈旧 fixture：4fa3863 --stat 实读只更 mc/cmd/mc 下 7 文件、漏 boundarydocker/attachment_canary_test.go:126⇒CI 现场镜像拒语被 "different releases" 抢先；**安全性质未失**；同家族 main 既有红=dashboard-browser 道，413880a 经 merge-base 实证为 origin/main 祖先）。**当前证据下零项构成产品回归**；N1–N3 按 O1 §3 字面义务待所有者认类
+- 账: blcheck 70/0（status.json A32=IN_PROGRESS→EVIDENCED 翻账后实跑；ledger EVIDENCED 29→30／IN_PROGRESS 6→5）/ worktree 仅 dev（登记支用毕即回收）/ 无新外发（ci/routing-base 仍指 8bfc831；本登记轮提交留本地 dev 线）/ 218 他人项目容器零触碰（仅删自家 fixture 残留 1 件）/ Mimosa scanner_enobufs 照例=按兼容策略继续，不宣称项目安全
+- 未验证项（不藏，findings-003 §5 具名）: N1"macOS 镜像旧于 413880a"=E2 反推；AgentProfile 两测精确 EOF 子机制=E2（需 218 运行时日志）；operator_transport 的 ENOEXEC 回退执行者=E2（不影响根因）
