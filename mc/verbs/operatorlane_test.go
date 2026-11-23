@@ -61,7 +61,7 @@ func TestOperatorLaneConditionReportsOnlyAStalledLaneOfTheAvailableResident(t *t
 		if condition.ID != "operator-lane:stalled" || condition.Group != "execution" || condition.State != "failed" {
 			t.Errorf("%s: condition identity = %+v", c.name, condition)
 		}
-		if !strings.Contains(condition.Condition, c.want) || !strings.Contains(condition.Condition, "culler restart resident") {
+		if !strings.Contains(condition.Condition, c.want) || !strings.Contains(condition.Condition, "shz restart resident") {
 			t.Errorf("%s: condition text = %q", c.name, condition.Condition)
 		}
 	}

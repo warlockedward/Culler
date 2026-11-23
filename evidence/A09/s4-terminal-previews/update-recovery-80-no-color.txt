@@ -1,0 +1,7 @@
+S-Horizon
+
+! The saved installer is unavailable
+  Use the installer to resume setup.
+
+curl -fsSL https://raw.githubusercontent.com/vinchenkov/Culler/main/install.sh | bash -s -- --mc-home '/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1789407183/001/deployment'
+PASS

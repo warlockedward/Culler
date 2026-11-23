@@ -40,7 +40,7 @@ Native migrations also require code that protects and verifies their affected st
 
 ## Update and recovery
 
-The operator starts an update with `culler update`.
+The operator starts an update with `shz update`.
 The warning describes interruption and any affected saved profiles before confirmation.
 The updater then stops services and containers immediately.
 It forces termination after ten seconds and verifies exit within thirty seconds.
@@ -57,8 +57,8 @@ The update follows these phases:
 7. Synchronize files, record the commit, and release maintenance to permit work.
 8. Remove obsolete software and temporary checkpoints.
 
-`culler update` retries an incomplete update with its exact candidate.
-`culler update --restore` restores the checkpoint before commit.
+`shz update` retries an incomplete update with its exact candidate.
+`shz update --restore` restores the checkpoint before commit.
 The saved installer provides the same recovery path when the command is unavailable.
 Recovery checks the retained package before execution and needs no download after checkpoint completion.
 The updater preserves the checkpoint if restoration fails.
@@ -166,11 +166,11 @@ After publication, use actual supported installers and data fixtures for this te
 
 ## Emergency recovery
 
-1. Read `culler status` and the update diagnostic.
+1. Read `shz status` and the update diagnostic.
 2. Preserve the update record and its artifact directory.
 3. Resolve the reported disk, Docker, process, or file problem.
-4. Run `culler update` to retry the exact candidate.
-5. Use `culler update --restore` for a precommit failure that requires the previous release.
+4. Run `shz update` to retry the exact candidate.
+5. Use `shz update --restore` for a precommit failure that requires the previous release.
 
 After commit, repair the installed release with current data.
 Do not copy an old spine alone over native stores or Project data.

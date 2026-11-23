@@ -6,7 +6,7 @@ culler_source_update_refusal() {
   case "$culler_guard_width" in ''|*[!0-9]*|????*) culler_guard_width=80 ;; esac
   [ "$culler_guard_width" -ge 40 ] || culler_guard_width=40
   [ "$culler_guard_width" -le 80 ] || culler_guard_width=80
-  printf '%s\n' "$1" 'Source deployment remains unchanged.' 'Use culler update to recover.' |
+  printf '%s\n' "$1" 'Source deployment remains unchanged.' 'Use shz update to recover.' |
     fold -s -w "$culler_guard_width" >&2
   return 1
 }

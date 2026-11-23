@@ -1,0 +1,37 @@
+S-Horizon
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or
+through Collie.
+
+Purpose
+  Show recent service logs.
+
+Usage
+
+shz logs [service] [--tail N]
+
+Details
+  An omitted service selects the
+    resident.
+  Show 100 recent records and exit.
+  Use --tail N for 1 through 1000
+    records.
+
+Services
+  resident
+  dashboard
+  agentsview
+
+Options
+
+  --mc-home <absolute-path>
+    Select the deployment home.
+
+  --no-color
+    Disable color.
+
+  --help
+    Show help.
+
+PASS

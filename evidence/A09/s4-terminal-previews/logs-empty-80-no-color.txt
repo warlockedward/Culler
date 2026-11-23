@@ -1,0 +1,8 @@
+S-Horizon
+
+Service logs
+  resident · stderr
+
+No log records
+
+PASS

@@ -1,0 +1,37 @@
+S-Horizon
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or through Collie.
+
+Usage
+
+shz <command> [options]
+
+Commands
+
+  status                    Show the deployment state.
+  version                   Show the release versions.
+  start [service]           Start S-Horizon services.
+  stop [service]            Stop S-Horizon services safely.
+  restart [service]         Restart S-Horizon services.
+  update [--check | --restore] Install, recover, or check for an update.
+  uninstall [options]       Remove all S-Horizon installations.
+  logs [service] [--tail N] Show recent service logs.
+  help [command]            Show command help.
+
+Services
+  resident
+  dashboard
+  agentsview
+
+Defaults
+  Start, stop, and restart select all services.
+  Logs select the resident.
+
+Options
+
+  --mc-home <absolute-path> Select the deployment home, except for uninstall.
+  --no-color                Disable color.
+  --help                    Show help.
+  --version                 Show the release versions.
+PASS

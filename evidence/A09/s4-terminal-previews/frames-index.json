@@ -1,0 +1,2059 @@
+{
+ "captured_at": "2026-11-24",
+ "capture_command": "mise exec -- go test -c -o BIN ./cmd/mc && python3 mc/onboarding/testdata/preview_culler.py BIN --output evidence/A09/s4-terminal-previews",
+ "binary_commit_state": "task/a09-s4-cli-name post-defect-9 (title face S-Horizon)",
+ "frames": [
+  {
+   "frame": "cancel-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview14647331/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "cancel-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3559732747/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "cancel-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview320524612/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "cancel-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4065895809/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview27648848/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview665452152/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1924610812/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview393185828/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-logs-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1406933072/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-logs-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1717082688/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-logs-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2118764864/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-logs-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3084545352/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-restart-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "restart",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview974217560/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-restart-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "restart",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1778329501/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-restart-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "restart",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview783762520/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-restart-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "restart",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1865661272/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-start-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "start",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4290639618/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-start-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "start",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1888791935/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-start-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "start",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1147216871/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-start-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "start",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2231351247/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-status-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3737378853/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-status-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1191230685/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-status-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4081469590/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-status-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1730243652/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-stop-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "stop",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2855237356/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-stop-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "stop",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3121816194/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-stop-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "stop",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview334465210/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-stop-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "stop",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3492526573/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-uninstall-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "uninstall"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-uninstall-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "uninstall"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-uninstall-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "uninstall"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-uninstall-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "uninstall"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-update-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "update",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview408305808/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-update-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "update",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview670833687/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-update-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "update",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview408905874/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-update-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "update",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1019867164/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-version-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview385482310/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-version-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2510783419/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-version-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview851450754/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "help-version-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "help",
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3285873185/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "incomplete-setup-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "start",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview710256802/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "incomplete-setup-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "start",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3096130899/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "incomplete-setup-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "start",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3768213466/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "incomplete-setup-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "start",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1377567475/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "logs-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview303718391/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "logs-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview847514966/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "logs-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1919876015/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "logs-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1502058716/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "logs-empty-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3355067572/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "logs-empty-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1737383089/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "logs-empty-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3244105570/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "logs-empty-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview53442920/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "restart-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4142185782/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "restart-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1823211381/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "restart-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview696055810/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "restart-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4250120257/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "restart-failure-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2732775147/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "restart-failure-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3454091620/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "restart-failure-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1071954260/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "restart-failure-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2791328525/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "service-timeout-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1071419523/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "service-timeout-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview534040741/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "service-timeout-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2964279188/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "service-timeout-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "restart",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview304741242/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "start-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "start",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4134902750/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "start-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "start",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1791038958/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "start-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "start",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2670739449/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "start-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "start",
+    "dashboard",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1971630338/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-absent-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2019518675/003/absent"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-absent-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview467328280/003/absent"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-absent-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3719620066/003/absent"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-absent-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview544905505/003/absent"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-cancel-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3204494763/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-cancel-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1917280669/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-cancel-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2824595639/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-cancel-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1658178334/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-partial-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2811623273/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-partial-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3394832840/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-partial-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1955501789/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-partial-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview480411305/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-ready-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview7269279/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-ready-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3875947875/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-ready-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview855551097/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-ready-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2123098502/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-stopped-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2111926225/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-stopped-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3751707836/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-stopped-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3511250690/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-stopped-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview18866605/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-unknown-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4061478566/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-unknown-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1958105625/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-unknown-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2656250025/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "status-unknown-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "status",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview996563871/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "stop-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview373544412/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "stop-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3265452531/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "stop-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1075286944/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "stop-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3269439051/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview826121336/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1475426738/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview784086330/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4021960337/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-cancel-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1406114120/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-cancel-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2159734932/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-cancel-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1215831406/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-cancel-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3712677776/001/deployment"
+   ],
+   "cli_exit_status": 130,
+   "expected_cli_exit_status": 130,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-wait-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4145528280/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-wait-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview672946284/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-wait-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview944357510/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-check-wait-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview118253613/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-recovery-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2240171371/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-recovery-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1622312543/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-recovery-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3977366049/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-recovery-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1789407183/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-unknown-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview159830614/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-unknown-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3971891759/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-unknown-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3604323792/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "update-unknown-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "update",
+    "--check",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3299254221/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "usage-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--tail",
+    "0",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1371572943/001/deployment"
+   ],
+   "cli_exit_status": 2,
+   "expected_cli_exit_status": 2,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "usage-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--tail",
+    "0",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3230896730/001/deployment"
+   ],
+   "cli_exit_status": 2,
+   "expected_cli_exit_status": 2,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "usage-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--tail",
+    "0",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3861096382/001/deployment"
+   ],
+   "cli_exit_status": 2,
+   "expected_cli_exit_status": 2,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "usage-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "logs",
+    "--tail",
+    "0",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1256829081/001/deployment"
+   ],
+   "cli_exit_status": 2,
+   "expected_cli_exit_status": 2,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "version-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1466785865/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "version-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3053179269/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "version-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview478380755/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "version-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview1389444481/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "version-mismatch-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview315251894/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "version-mismatch-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3101246979/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "version-mismatch-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3569244565/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "version-mismatch-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "version",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview540153512/001/deployment"
+   ],
+   "cli_exit_status": 0,
+   "expected_cli_exit_status": 0,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "wait-timeout-40-color",
+   "columns": 40,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "resident",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2632805650/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "wait-timeout-40-no-color",
+   "columns": 40,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "resident",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2533163067/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "wait-timeout-80-color",
+   "columns": 80,
+   "color": true,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "resident",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview2257553942/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  },
+  {
+   "frame": "wait-timeout-80-no-color",
+   "columns": 80,
+   "color": false,
+   "redirected": false,
+   "cli_arguments": [
+    "stop",
+    "resident",
+    "--mc-home",
+    "/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview4118828952/001/deployment"
+   ],
+   "cli_exit_status": 1,
+   "expected_cli_exit_status": 1,
+   "process_exit_status": 0,
+   "fixture_success": true
+  }
+ ]
+}

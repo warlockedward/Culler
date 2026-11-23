@@ -28,7 +28,7 @@ func setupPreviewPublished(t *testing.T, name string) setupPreviewCase {
 		preview := setupPreviewCase{wizard: w, steps: []setupPreviewStep{}}
 		if name == "setup-command-failure" {
 			preview.run = func() {
-				w.problem("Culler command requires attention", w.failureLines("Check the command", &setupFailure{cause: "A new zsh shell cannot resolve culler. Check its shell configuration.", command: cullerInstallCommand(w.home)}))
+				w.problem("Culler command requires attention", w.failureLines("Check the command", &setupFailure{cause: "A new zsh shell cannot resolve shz. Check its shell configuration.", command: cullerInstallCommand(w.home)}))
 			}
 		} else {
 			preview.steps = []setupPreviewStep{{Wait: "q exit", Send: "\x03", Name: "Cancel setup"}}

@@ -58,9 +58,9 @@ The same operator decisions and domain checks apply to Collie and the external a
 ## Setup and updates
 
 The installer prepares the runtime and guides service setup.
-The same command installs `culler` and opens the terminal user interface (TUI) for setup.
+The same command installs `shz` and opens the terminal user interface (TUI) for setup.
 The pipe supplies the script, and the terminal supplies your answers.
-Setup installs `culler` beside the runtime executable, normally in `~/.local/bin`.
+Setup installs `shz` beside the runtime executable, normally in `~/.local/bin`.
 The `--bin-dir` option selects another absolute directory.
 Setup preserves an unrelated executable with the same name and reports the conflict.
 Setup checks command access in new zsh and bash shells.
@@ -109,16 +109,16 @@ The dashboard can select another model through the profile's Edit form.
 After installation, apply the latest complete release with this command:
 
 ```sh
-culler update
+shz update
 ```
 
 Check release availability without a deployment change:
 
 ```sh
-culler update --check
+shz update --check
 ```
 
-If the `culler` command is unavailable, run the public installation command again.
+If the `shz` command is unavailable, run the public installation command again.
 Public updates require a published installation with a declared public compatibility baseline.
 An internal source installation requires a separate deployment home for the first public release.
 A saved launcher supports `sh /tmp/culler-install.sh` and `sh /tmp/culler-install.sh --check-updates` while that file exists.
@@ -151,8 +151,8 @@ An incompatible database blocks activation.
 The installer never authorizes a database reset.
 A healthy deployment of the available release requires no service restart.
 
-After an interruption, run `culler update` to retry the exact candidate.
-Use `culler update --restore` to restore the previous software and checkpoint before commit.
+After an interruption, run `shz update` to retry the exact candidate.
+Use `shz update --restore` to restore the previous software and checkpoint before commit.
 An incomplete update keeps ordinary work stopped.
 The updater verifies the candidate before it records a commit and permits work.
 After commit, cleanup removes previous software and temporary checkpoints.
@@ -169,19 +169,19 @@ Help, status, and version repeat this boundary.
 
 | Command | Result |
 | --- | --- |
-| `culler help` | Show the commands and their options. |
-| `culler status` | Show current service checks and saved stop choices. |
-| `culler version` | Show the versions of the command and the installed release. |
-| `culler start [service]` | Start the selected services. |
-| `culler stop [service]` | Stop the selected services safely. |
-| `culler restart [service]` | Restart the selected services. |
-| `culler update --check` | Check release availability. |
-| `culler update` | Open the same installer in this terminal. |
-| `culler update --restore` | Restore an incomplete update before its commit. |
-| `culler uninstall` | Preview removal of all S-Horizon installations, then ask for confirmation. |
-| `culler uninstall --keep-data` | Remove software and preserve S-Horizon data after confirmation. |
-| `culler uninstall --dry-run` | Show the removal plan without a change. |
-| `culler logs [service] --tail 100` | Show recent service diagnostics and exit. |
+| `shz help` | Show the commands and their options. |
+| `shz status` | Show current service checks and saved stop choices. |
+| `shz version` | Show the versions of the command and the installed release. |
+| `shz start [service]` | Start the selected services. |
+| `shz stop [service]` | Stop the selected services safely. |
+| `shz restart [service]` | Restart the selected services. |
+| `shz update --check` | Check release availability. |
+| `shz update` | Open the same installer in this terminal. |
+| `shz update --restore` | Restore an incomplete update before its commit. |
+| `shz uninstall` | Preview removal of all S-Horizon installations, then ask for confirmation. |
+| `shz uninstall --keep-data` | Remove software and preserve S-Horizon data after confirmation. |
+| `shz uninstall --dry-run` | Show the removal plan without a change. |
+| `shz logs [service] --tail 100` | Show recent service diagnostics and exit. |
 
 The service names are:
 
@@ -213,7 +213,7 @@ The exit codes are:
 
 ## Uninstall S-Horizon
 
-`culler uninstall` uses the installed executable and requires no checkout or Go compiler.
+`shz uninstall` uses the installed executable and requires no checkout or Go compiler.
 The command removes all detected S-Horizon installations, including old Mission Control installations.
 It shows the removal plan before confirmation.
 
@@ -253,7 +253,7 @@ The command reports each failure and returns a nonzero exit code after incomplet
 
 S-Horizon is in early access, and the major version 0 states this.
 Each release has a version in the form MAJOR.MINOR.PATCH, for example `0.1.0`.
-`culler version`, `culler update --check`, setup, and the dashboard show the version first and the short commit second.
+`shz version`, `shz update --check`, setup, and the dashboard show the version first and the short commit second.
 For example, they show `0.1.0 (1a2b3c4d5e6f)`.
 
 These rules apply before version 1.0.0:
@@ -437,7 +437,7 @@ Plain `./install.sh` selects the published release, even inside a source checkou
 
 Use `./redeploy.sh` to deploy the checkout over an existing production installation.
 That command preserves the database and stops when the database schema differs.
-Published release updates use `culler update` and retain their separate recovery procedure.
+Published release updates use `shz update` and retain their separate recovery procedure.
 
 ## Development installation
 

@@ -19,7 +19,7 @@ func cullerUninstall(ctx context.Context, o cullerOptions, stdin io.Reader, stdo
 	if !o.dryRun && !o.yes && !diagnostic.HasTerminal() {
 		diagnostic.Problem("Confirmation requires a terminal", []string{
 			"Use --dry-run to review the removal plan.",
-			"Run culler uninstall in a terminal to confirm removal.",
+			"Run shz uninstall in a terminal to confirm removal.",
 			"Use --yes only when you intend removal without a prompt.",
 		})
 		return 2
@@ -61,7 +61,7 @@ func cullerUninstall(ctx context.Context, o cullerOptions, stdin io.Reader, stdo
 		problems: func(problems []string) {
 			lines := make([]string, len(problems))
 			for i, problem := range problems {
-				lines[i] = setupSafeDiagnostic(strings.ReplaceAll(problem, "./uninstall.sh", "culler uninstall"))
+				lines[i] = setupSafeDiagnostic(strings.ReplaceAll(problem, "./uninstall.sh", "shz uninstall"))
 			}
 			diagnostic.Problem("Uninstall requires attention", lines)
 		},

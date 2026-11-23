@@ -46,7 +46,7 @@ func TestCullerUninstallOptions(t *testing.T) {
 func cullerUninstallFixture(t *testing.T) (uninstallFixture, cullerDependencies, string) {
 	t.Helper()
 	f := newUninstallFixture(t)
-	command := filepath.Join(filepath.Dir(f.binary), "culler")
+	command := filepath.Join(filepath.Dir(f.binary), "shz")
 	uninstallWrite(t, command, "Culler command fixture", 0700)
 	digest, err := deployment.CLIFileDigest(command)
 	if err != nil {
@@ -54,7 +54,7 @@ func cullerUninstallFixture(t *testing.T) (uninstallFixture, cullerDependencies,
 	}
 	names, _ := deployment.RuntimeNames(f.homes[0])
 	directory := filepath.Dir(command)
-	block := "\n# Culler command " + names.Suffix + "\ncase \":$PATH:\" in\n  *:" + cullerQuote(directory) + ":*) ;;\n  *) " + deployment.CLIPathCommand(directory) + " ;;\nesac\n# End Culler command " + names.Suffix + "\n"
+	block := "\n# shz command " + names.Suffix + "\ncase \":$PATH:\" in\n  *:" + cullerQuote(directory) + ":*) ;;\n  *) " + deployment.CLIPathCommand(directory) + " ;;\nesac\n# End shz command " + names.Suffix + "\n"
 	shell := filepath.Join(f.user, ".zshrc")
 	uninstallWrite(t, shell, "export EDITOR=vi\n"+block, 0600)
 	if err := writePublishedState(filepath.Join(f.homes[0], deployment.CLIInstallRecord), deployment.CLIInstallation{
@@ -97,7 +97,7 @@ func TestCullerUninstallModesAndPreview(t *testing.T) {
 				uninstallExists(t, filepath.Join(f.project, "source.txt"), true)
 				uninstallExists(t, filepath.Join(f.project, ".mc-artifacts/data"), preview || mode == "--keep-data")
 				shell, err := os.ReadFile(filepath.Join(f.user, ".zshrc"))
-				if err != nil || !strings.Contains(string(shell), "export EDITOR=vi") || strings.Contains(string(shell), "Culler command") != preview {
+				if err != nil || !strings.Contains(string(shell), "export EDITOR=vi") || strings.Contains(string(shell), "shz command") != preview {
 					t.Fatalf("The uninstall changed unrelated shell text or retained its entry: %s, %v", shell, err)
 				}
 				if !strings.Contains(out.String(), "all detected Culler installations") || !strings.Contains(out.String(), command) || strings.Contains(out.String(), "\x1b") {

@@ -1,0 +1,10 @@
+S-Horizon
+
+! Check the command
+  Use --tail with a number from 1 through 1000.
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or through Collie.
+
+shz help logs
+PASS

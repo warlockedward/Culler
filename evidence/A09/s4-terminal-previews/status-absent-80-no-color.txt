@@ -1,0 +1,17 @@
+S-Horizon
+
+Culler is not set up
+
+  Home
+/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview544905505/003/absent
+  Culler release   Not installed
+
+Next
+  Use the installer to complete setup.
+
+curl -fsSL https://raw.githubusercontent.com/vinchenkov/Culler/main/install.sh | bash -s -- --mc-home '/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview544905505/003/absent'
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or through Collie.
+
+PASS

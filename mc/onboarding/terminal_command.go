@@ -22,7 +22,7 @@ func NewCommandInput(in io.Reader, out io.Writer, noColor bool) *Terminal {
 }
 
 func (t *Terminal) CommandTitle() {
-	t.writeLines([]terminalLine{{"Culler", textHeading}, {}})
+	t.writeLines([]terminalLine{{"S-Horizon", textHeading}, {}})
 }
 
 func (t *Terminal) HasTerminal() bool { return t.input != nil && t.output != nil }

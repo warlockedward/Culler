@@ -18,7 +18,7 @@ func init() {
 
 func setupPreviewProgress(t *testing.T) setupPreviewCase {
 	w, _ := setupTestWizard(t)
-	command := filepath.Join(w.home, "culler")
+	command := filepath.Join(w.home, "shz")
 	if err := os.WriteFile(command, []byte("#!/bin/sh\nexit 0\n"), 0700); err != nil {
 		t.Fatal(err)
 	}
@@ -65,12 +65,12 @@ func TestSetupCommandAvailabilityShowsOneNotice(t *testing.T) {
 	if err := w.commandAvailability(); err != nil {
 		t.Fatal(err)
 	}
-	want := "\nThe culler cli is installed for lifecycle operations. Continue to the dashboard for the Culler experience."
+	want := "\nThe shz cli is installed for lifecycle operations. Continue to the dashboard for the S-Horizon experience."
 	if len(ui.panels) != 1 || ui.panels[0] != want {
 		t.Fatalf("The command notice differs: %q", ui.panels)
 	}
 	ui.panels = nil
-	if err := os.WriteFile(filepath.Join(w.home, "culler"), []byte("changed"), 0700); err != nil {
+	if err := os.WriteFile(filepath.Join(w.home, "shz"), []byte("changed"), 0700); err != nil {
 		t.Fatal(err)
 	}
 	if err := w.commandAvailability(); err == nil || len(ui.panels) != 0 {

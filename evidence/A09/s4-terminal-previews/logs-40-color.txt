@@ -1,0 +1,7 @@
+S-Horizon
+
+Service logs
+  resident · stderr
+
+2026-11-04T12:00:00Z INFO The resident started.
+PASS

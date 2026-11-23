@@ -113,7 +113,7 @@ func (t *Terminal) stageLines(index int, title string, completed []string, next 
 		lines = append(lines, terminalLine{})
 	}
 	if !t.identity {
-		lines = append(lines, t.lines("Culler", textHeading, 0)...)
+		lines = append(lines, t.lines("S-Horizon", textHeading, 0)...)
 		lines = append(lines, terminalLine{})
 		t.identity = true
 	}

@@ -1,0 +1,14 @@
+S-Horizon
+
+› Checking release availability .
+› Checking release availability · 0s elapsed ..
+! Failed: Check release availability
+  Installed        0.1.0 (aaaaaaaaaaaa)
+Release availability is unknown
+
+
+! Culler requires attention
+  The release source is unavailable. Check your connection, then retry the
+    release check.
+
+PASS

@@ -1,0 +1,66 @@
+S-Horizon
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or
+through Collie.
+
+Purpose
+  Remove all S-Horizon installations.
+
+Usage
+
+shz uninstall [options]
+
+Details
+  Remove all detected S-Horizon and old
+    Mission Control installations.
+  The default removes software and
+    permanently deletes S-Horizon data.
+  Active agents stop. Removal can
+    discard unfinished work.
+  Project repositories and shared host
+    tools remain.
+  Review the plan, then type wipe to
+    confirm.
+  Use --keep-data to preserve
+    configuration, credentials, and
+    history.
+  MC_HOME includes a deployment; it
+    does not limit removal to that
+    deployment.
+
+Options
+
+  --keep-data
+    Remove software and keep S-Horizon
+    data.
+
+  --full-wipe
+    Delete S-Horizon data. This is the
+    default.
+
+  --dry-run
+    Show the removal plan and exit.
+
+  --yes
+    Confirm removal without a prompt.
+
+  --home <absolute-path>
+    Include another deployment. Repeat
+    as needed.
+
+  --workspace <absolute-path>
+    Include another Project. Repeat as
+    needed.
+
+  --binary <absolute-path>
+    Include a runtime executable named
+    mc.
+
+  --no-color
+    Disable color.
+
+  --help
+    Show help.
+
+PASS

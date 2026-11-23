@@ -51,7 +51,7 @@ func OperatorLaneCondition(home string, now time.Time) (SystemCondition, bool) {
 		ID: "operator-lane:stalled", Group: "execution", State: "failed", Name: "Collie requests",
 		Condition: "Culler last checked for Collie requests " + age + " ago. " +
 			"Changes that Collie makes wait, and a Collie reply shows no text until it is complete. " +
-			"To resume the checks, run culler restart resident.",
+			"To resume the checks, run shz restart resident.",
 		Action: "View details",
 	}, true
 }

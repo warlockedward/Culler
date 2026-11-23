@@ -1,0 +1,8 @@
+S-Horizon
+
+You cancelled the status check
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or through Collie.
+
+PASS

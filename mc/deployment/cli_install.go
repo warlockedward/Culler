@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-const CLIInstallRecord = "state/culler-command.json"
+const CLIInstallRecord = "state/shz-command.json"
 
 type CLIShellEdit struct {
 	Path      string `json:"path"`
@@ -44,7 +44,7 @@ func CLIFileDigest(path string) (string, error) {
 	}
 	uid, links, ok := statOwner(info)
 	if !ok || int(uid) != os.Getuid() || links != 1 || !info.Mode().IsRegular() || info.Mode().Perm()&0022 != 0 || info.Mode().Perm()&0111 == 0 {
-		return "", errors.New("The Culler command requires an executable file that the operator owns.")
+		return "", errors.New("The shz command requires an executable file that the operator owns.")
 	}
 	f, err := os.Open(path)
 	if err != nil {
@@ -73,8 +73,8 @@ func ReadCLIInstallation(home string) (CLIInstallation, error) {
 	if err != nil {
 		return r, err
 	}
-	if json.Unmarshal(body, &r) != nil || !filepath.IsAbs(r.Path) || filepath.Base(r.Path) != "culler" || len(r.SHA256) != 64 {
-		return r, errors.New("The Culler command record is invalid.")
+	if json.Unmarshal(body, &r) != nil || !filepath.IsAbs(r.Path) || filepath.Base(r.Path) != "shz" || len(r.SHA256) != 64 {
+		return r, errors.New("The shz command record is invalid.")
 	}
 	for _, edit := range r.Shells {
 		directory := edit.Directory
@@ -86,7 +86,7 @@ func ReadCLIInstallation(home string) (CLIInstallation, error) {
 		}
 	}
 	for _, previous := range r.Previous {
-		if !filepath.IsAbs(previous.Path) || filepath.Base(previous.Path) != "culler" || len(previous.SHA256) != 64 {
+		if !filepath.IsAbs(previous.Path) || filepath.Base(previous.Path) != "shz" || len(previous.SHA256) != 64 {
 			return r, errors.New("The command record contains an invalid previous executable.")
 		}
 	}
@@ -119,14 +119,14 @@ func CLICommand(home, command string) string {
 	userHome, _ := os.UserHomeDir()
 	defaultHome, _ := CanonicalHome(filepath.Join(userHome, ".shorizon"))
 	if home == defaultHome && (os.Getenv("MC_HOME") == "" || os.Getenv("MC_HOME") == home) {
-		return "culler " + command
+		return "shz " + command
 	}
-	return "culler --mc-home " + shellQuote(home) + " " + command
+	return "shz --mc-home " + shellQuote(home) + " " + command
 }
 
 func cliShellBlock(home, directory string) string {
 	names, _ := RuntimeNames(home)
-	return "\n# Culler command " + names.Suffix + "\ncase \":$PATH:\" in\n  *:" + shellQuote(directory) + ":*) ;;\n  *) " + CLIPathCommand(directory) + " ;;\nesac\n# End Culler command " + names.Suffix + "\n"
+	return "\n# shz command " + names.Suffix + "\ncase \":$PATH:\" in\n  *:" + shellQuote(directory) + ":*) ;;\n  *) " + CLIPathCommand(directory) + " ;;\nesac\n# End shz command " + names.Suffix + "\n"
 }
 
 func writeCLIFile(path string, body []byte, mode os.FileMode) error {
@@ -183,7 +183,7 @@ func InstallCLIPath(home, userHome, directory, release, parentPath string) (CLII
 }
 
 func installCLIPath(home, userHome, directory, release, parentPath string, verify func(string, string, string, string, string, string) error) (CLIInstallation, error) {
-	r := CLIInstallation{Path: filepath.Join(directory, "culler"), Release: release}
+	r := CLIInstallation{Path: filepath.Join(directory, "shz"), Release: release}
 	var err error
 	r.SHA256, err = CLIFileDigest(r.Path)
 	if err != nil {
@@ -222,7 +222,7 @@ func installCLIPath(home, userHome, directory, release, parentPath string, verif
 		zdot = userHome
 	}
 	if !filepath.IsAbs(zdot) {
-		return r, errors.New("ZDOTDIR requires an absolute path for the Culler command check.")
+		return r, errors.New("ZDOTDIR requires an absolute path for the shz command check.")
 	}
 	bashProfile := filepath.Join(userHome, ".bash_profile")
 	for _, name := range []string{".bash_profile", ".bash_login", ".profile"} {
@@ -276,11 +276,11 @@ func installCLIPath(home, userHome, directory, release, parentPath string, verif
 func verifyCLIShell(shell, mode, path, userHome, zdot, parentPath string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	command := exec.CommandContext(ctx, shell, mode, "printf '\\nSHZ_COMMAND=%s\\n' \"$(command -v culler)\"")
+	command := exec.CommandContext(ctx, shell, mode, "printf '\\nSHZ_COMMAND=%s\\n' \"$(command -v shz)\"")
 	command.Env = append(os.Environ(), "HOME="+userHome, "PATH="+parentPath, "ZDOTDIR="+zdot)
 	body, err := command.Output()
 	if err != nil || !bytes.Contains(body, []byte("\nSHZ_COMMAND="+path+"\n")) {
-		return fmt.Errorf("A new %s shell cannot resolve culler. Check its shell configuration.", filepath.Base(shell))
+		return fmt.Errorf("A new %s shell cannot resolve shz. Check its shell configuration.", filepath.Base(shell))
 	}
 	return nil
 }
@@ -292,9 +292,9 @@ func CLIAvailability(home string) ([]string, error) {
 	}
 	digest, err := CLIFileDigest(r.Path)
 	if err != nil || digest != r.SHA256 || !r.Verified {
-		return nil, errors.New("The Culler command requires an availability check.")
+		return nil, errors.New("The shz command requires an availability check.")
 	}
-	return []string{"The culler cli is installed for lifecycle operations. Continue to the dashboard for the Culler experience."}, nil
+	return []string{"The shz cli is installed for lifecycle operations. Continue to the dashboard for the S-Horizon experience."}, nil
 }
 
 func RemoveCLIInstallation(home string) error {

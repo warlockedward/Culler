@@ -293,7 +293,7 @@ func (p *publishedSetup) restoreUpdate(ctx context.Context) error {
 	}
 	// The update stop removed the helper container, and the resident verification reads the spine through it.
 	if err := p.helper(p.home, p.update.Previous.Image); err != nil {
-		return fmt.Errorf("The restore could not start the helper container, so work remains stopped. Correct the cause, then run culler update --restore. Cause: %w", err)
+		return fmt.Errorf("The restore could not start the helper container, so work remains stopped. Correct the cause, then run shz update --restore. Cause: %w", err)
 	}
 	if err := p.restore(p.home, p.update.PriorServices); err != nil {
 		return err
@@ -678,7 +678,7 @@ func finishUpdateCleanup(ctx context.Context, home string, j *deployment.UpdateJ
 		return err
 	}
 	if current == nil || current.ID != j.ID || current.Phase != j.Phase {
-		return errors.New("The update record changed. Run culler update again.")
+		return errors.New("The update record changed. Run shz update again.")
 	}
 	p := &publishedSetup{home: home, update: j, maintenanceID: j.ID}
 	if err := p.releaseMaintenance(); err != nil {

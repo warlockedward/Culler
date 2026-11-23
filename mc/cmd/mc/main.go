@@ -36,7 +36,7 @@ import (
 )
 
 func main() {
-	if filepath.Base(os.Args[0]) == "culler" {
+	if filepath.Base(os.Args[0]) == "shz" {
 		os.Exit(runCuller(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
 	}
 	os.Exit(run(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))

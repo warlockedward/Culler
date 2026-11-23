@@ -1,0 +1,12 @@
+S-Horizon
+
+› Checking release availability .
+› Checking release availability · 0s elapsed ..
+✓ Check release availability
+  Installed        0.1.0 (aaaaaaaaaaaa)
+  Available        0.2.0 (bbbbbbbbbbbb)
+
+Release check
+  A newer Culler release is available.
+
+PASS

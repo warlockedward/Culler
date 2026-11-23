@@ -141,7 +141,7 @@ func loadPublishedSetup(home string, args verbs.OnboardArgs) (*publishedSetup, e
 	if journal != nil && journal.Phase != "complete" && journal.Phase != "restored" {
 		if !samePublishedRecord(journal.Candidate, r) {
 			_ = lock.Close()
-			return nil, errors.New("An incomplete update requires its retained release. Run culler update.")
+			return nil, errors.New("An incomplete update requires its retained release. Run shz update.")
 		}
 		if err := deployment.RetainUpdateCandidate(home, journal, journal.CandidateRoot); err != nil {
 			_ = lock.Close()
@@ -218,7 +218,7 @@ func (p *publishedSetup) releaseMaintenance() error {
 		ID string `json:"id"`
 	}
 	if json.Unmarshal(body, &request) != nil {
-		return errors.New("The maintenance request is unreadable. Run culler update to repair recovery.")
+		return errors.New("The maintenance request is unreadable. Run shz update to repair recovery.")
 	}
 	if request.ID != p.maintenanceID {
 		return errors.New("Another operation owns the maintenance request. Keep Culler stopped and inspect its recovery record.")
@@ -228,11 +228,11 @@ func (p *publishedSetup) releaseMaintenance() error {
 		return err
 	}
 	if p.update != nil && (journal == nil || journal.ID != p.update.ID || journal.Phase != p.update.Phase) {
-		return errors.New("The update record changed. Run culler update again.")
+		return errors.New("The update record changed. Run shz update again.")
 	}
 	if journal != nil && journal.ID == request.ID {
 		if journal.BlocksWork() {
-			return errors.New("The incomplete update must keep its maintenance request. Run culler update to recover.")
+			return errors.New("The incomplete update must keep its maintenance request. Run shz update to recover.")
 		}
 		// A visible rename can precede a failed directory sync.
 		if err := saveUpdateActivationJournal(p.home, journal); err != nil {
@@ -259,7 +259,7 @@ func (p *publishedSetup) operationContext() context.Context {
 
 func (p *publishedSetup) cancelOperation() error {
 	if p.update != nil {
-		return errors.New("The update remains stopped. Run culler update to retry or restore it.")
+		return errors.New("The update remains stopped. Run shz update to retry or restore it.")
 	}
 	if p.interrupted == nil {
 		return nil
@@ -461,7 +461,7 @@ func (p *publishedSetup) complete() error {
 		if p.images != nil {
 			problems = append(problems, p.images.Problems...)
 		}
-		err := fmt.Errorf("The update is active. Run culler update to retry cleanup: %s", strings.Join(problems, "; "))
+		err := fmt.Errorf("The update is active. Run shz update to retry cleanup: %s", strings.Join(problems, "; "))
 		return p.updateFailure(errors.Join(err, p.operation("cleanup")))
 	}
 	if err := p.operation("complete"); err != nil {

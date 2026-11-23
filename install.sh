@@ -156,7 +156,7 @@ if [ -e "$recovery_record" ] || [ -L "$recovery_record" ]; then
   case "$recovery_phase" in
     complete|restored) ;;
     stop|prepare|checkpoint|replace|verify|committed|restore)
-      [ "$recovery_check" = false ] || fail "An incomplete update requires recovery. Run culler update."
+      [ "$recovery_check" = false ] || fail "An incomplete update requires recovery. Run shz update."
       recovery_id=$(json "$recovery_record" id)
       case "$recovery_id" in ''|*[!0-9a-f]*) fail "The update identity is invalid." ;; esac
       [ "${#recovery_id}" -ge 16 ] && [ "${#recovery_id}" -le 64 ] || fail "The update identity is invalid."

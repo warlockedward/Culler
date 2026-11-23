@@ -582,7 +582,7 @@ func TestCullerRejectsPartialCommandReplacement(t *testing.T) {
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		t.Fatal(err)
 	}
-	command, program := filepath.Join(dir, "culler"), filepath.Join(dir, "mc")
+	command, program := filepath.Join(dir, "shz"), filepath.Join(dir, "mc")
 	for _, path := range []string{command, program} {
 		if err := os.WriteFile(path, []byte("verified executable"), 0755); err != nil {
 			t.Fatal(err)

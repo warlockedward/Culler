@@ -1,0 +1,14 @@
+S-Horizon
+
+› Checking release availability .
+› Checking release availability · 0s
+elapsed ..
+› Checking release availability · 0s
+elapsed ...
+› Checking release availability · 1s
+elapsed .
+! Cancelled: Check release availability
+
+You cancelled the release check
+
+PASS

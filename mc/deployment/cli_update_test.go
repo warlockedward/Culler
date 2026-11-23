@@ -23,7 +23,7 @@ func TestCLIUpdatePreservesShellFilesAndRefusesPathChanges(t *testing.T) {
 		}
 		original[name] = string(body)
 	}
-	for _, name := range []string{"mc", "culler"} {
+	for _, name := range []string{"mc", "shz"} {
 		if err := os.WriteFile(filepath.Join(directory, name), []byte("#!/bin/sh\nexit 7\n"), 0755); err != nil {
 			t.Fatal(err)
 		}

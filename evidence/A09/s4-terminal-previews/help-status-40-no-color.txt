@@ -1,0 +1,31 @@
+S-Horizon
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or
+through Collie.
+
+Purpose
+  Show the deployment state.
+
+Usage
+
+shz status
+
+Details
+  Show local service checks without
+    external network requests.
+  A deliberate stop remains distinct
+    from a service failure.
+
+Options
+
+  --mc-home <absolute-path>
+    Select the deployment home.
+
+  --no-color
+    Disable color.
+
+  --help
+    Show help.
+
+PASS

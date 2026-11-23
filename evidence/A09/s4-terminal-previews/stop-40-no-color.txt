@@ -1,0 +1,20 @@
+S-Horizon
+
+› Stopping Culler services .
+› Waiting for active agents and
+repository work · 0s elapsed ..
+✓ Stop Culler services
+The service request completed
+
+  resident
+Stopped by your choice
+  dashboard
+Stopped by your choice
+  agentsview
+Stopped by your choice
+
+Service stop
+  The stop choice remains in effect
+    after a computer restart.
+
+PASS

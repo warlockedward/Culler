@@ -6,7 +6,7 @@ Report a vulnerability in private through GitHub private vulnerability reporting
 
 1. Open the **Security** tab of this repository.
 2. Select **Report a vulnerability**.
-3. Describe the problem, the steps that show it, and the output of `culler version`.
+3. Describe the problem, the steps that show it, and the output of `shz version`.
 
 The form is also at <https://github.com/warlockedward/Culler/security/advisories/new>.
 Do not report a vulnerability in a public issue, a pull request, or a discussion.

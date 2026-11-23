@@ -1,0 +1,34 @@
+S-Horizon
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or
+through Collie.
+
+Purpose
+  Install, recover, or check for an
+    update.
+
+Usage
+
+shz update [--check | --restore]
+
+Details
+  Resume an incomplete update before
+    selecting a new release.
+  Use --restore to restore an
+    incomplete update before commit.
+  Use --check to inspect release
+    availability without an update.
+
+Options
+
+  --mc-home <absolute-path>
+    Select the deployment home.
+
+  --no-color
+    Disable color.
+
+  --help
+    Show help.
+
+PASS

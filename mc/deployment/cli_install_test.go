@@ -21,7 +21,7 @@ func cliInstallFixture(t *testing.T) (string, string, string) {
 	if err := os.MkdirAll(directory, 0700); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(directory, "culler"), []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
+	if err := os.WriteFile(filepath.Join(directory, "shz"), []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
 		t.Fatal(err)
 	}
 	return home, userHome, directory
@@ -48,10 +48,10 @@ func TestCLIPathPreservesShellTextAndRemovesOnlyOwnedFiles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(lines) != 1 || lines[0] != "The culler cli is installed for lifecycle operations. Continue to the dashboard for the Culler experience." {
+	if len(lines) != 1 || lines[0] != "The shz cli is installed for lifecycle operations. Continue to the dashboard for the S-Horizon experience." {
 		t.Fatal(lines)
 	}
-	if err := os.WriteFile(filepath.Join(directory, "culler"), []byte("replacement executable"), 0755); err != nil {
+	if err := os.WriteFile(filepath.Join(directory, "shz"), []byte("replacement executable"), 0755); err != nil {
 		t.Fatal(err)
 	}
 	if err := RemoveCLIInstallation(home); err != nil {
@@ -61,7 +61,7 @@ func TestCLIPathPreservesShellTextAndRemovesOnlyOwnedFiles(t *testing.T) {
 	if err != nil || string(body) != original {
 		t.Fatalf("%s %v", body, err)
 	}
-	body, err = os.ReadFile(filepath.Join(directory, "culler"))
+	body, err = os.ReadFile(filepath.Join(directory, "shz"))
 	if err != nil || string(body) != "replacement executable" {
 		t.Fatal("uninstall removed another executable")
 	}
@@ -87,7 +87,7 @@ func TestCLIUninstallCanRemoveCommandAfterDeploymentFiles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	command := filepath.Join(directory, "culler")
+	command := filepath.Join(directory, "shz")
 	if _, err := os.Stat(command); err != nil {
 		t.Fatal("The uninstall removed its command before file removal.")
 	}
@@ -102,7 +102,7 @@ func TestCLIUninstallCanRemoveCommandAfterDeploymentFiles(t *testing.T) {
 	}
 	for _, name := range []string{".zprofile", ".zshrc", ".bash_profile", ".bashrc"} {
 		body, err := os.ReadFile(filepath.Join(userHome, name))
-		if err != nil || strings.Contains(string(body), "culler") {
+		if err != nil || strings.Contains(string(body), "shz") {
 			t.Fatalf("The uninstall retained a shell entry: %s, %v", body, err)
 		}
 	}
@@ -110,7 +110,7 @@ func TestCLIUninstallCanRemoveCommandAfterDeploymentFiles(t *testing.T) {
 
 func TestCLIConflictPreservesUnrelatedExecutableAndSymlink(t *testing.T) {
 	home := t.TempDir()
-	path := filepath.Join(home, "culler")
+	path := filepath.Join(home, "shz")
 	if err := os.WriteFile(path, []byte("unrelated"), 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -142,7 +142,7 @@ func TestCLIPathDirectoryChangeRetainsRemovalOwnership(t *testing.T) {
 	if err := os.Mkdir(next, 0700); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(next, "culler"), []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
+	if err := os.WriteFile(filepath.Join(next, "shz"), []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := installCLIPath(home, userHome, next, "release", "/bin", verify); err != nil {
@@ -155,7 +155,7 @@ func TestCLIPathDirectoryChangeRetainsRemovalOwnership(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, dir := range []string{directory, next} {
-		if _, err := os.Stat(filepath.Join(dir, "culler")); !errors.Is(err, os.ErrNotExist) {
+		if _, err := os.Stat(filepath.Join(dir, "shz")); !errors.Is(err, os.ErrNotExist) {
 			t.Fatal(err)
 		}
 	}

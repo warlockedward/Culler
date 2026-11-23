@@ -9,8 +9,8 @@ import (
 	"mc/onboarding"
 )
 
-const cullerLifecycleGuidance = "Use culler for lifecycle operations."
-const cullerConfigurationGuidance = "Configure Culler in the dashboard or through Collie."
+const cullerLifecycleGuidance = "Use shz for lifecycle operations."
+const cullerConfigurationGuidance = "Configure S-Horizon in the dashboard or through Collie."
 const cullerInstallerURL = "https://raw.githubusercontent.com/vinchenkov/Culler/main/install.sh"
 
 type cullerOptions struct {
@@ -26,11 +26,11 @@ type cullerOptions struct {
 var cullerCommands = []struct{ name, usage, description string }{
 	{"status", "status", "Show the deployment state."},
 	{"version", "version", "Show the release versions."},
-	{"start", "start [service]", "Start Culler services."},
-	{"stop", "stop [service]", "Stop Culler services safely."},
-	{"restart", "restart [service]", "Restart Culler services."},
+	{"start", "start [service]", "Start S-Horizon services."},
+	{"stop", "stop [service]", "Stop S-Horizon services safely."},
+	{"restart", "restart [service]", "Restart S-Horizon services."},
 	{"update", "update [--check | --restore]", "Install, recover, or check for an update."},
-	{"uninstall", "uninstall [options]", "Remove all Culler installations."},
+	{"uninstall", "uninstall [options]", "Remove all S-Horizon installations."},
 	{"logs", "logs [service] [--tail N]", "Show recent service logs."},
 	{"help", "help [command]", "Show command help."},
 }
@@ -148,24 +148,24 @@ func parseCuller(args []string) (cullerOptions, error) {
 		return o, fmt.Errorf("Use resident, dashboard, or agentsview as the service.")
 	}
 	if o.check && o.command != "update" {
-		return o, fmt.Errorf("The --check option belongs to culler update.")
+		return o, fmt.Errorf("The --check option belongs to shz update.")
 	}
 	if o.restoreUpdate && (o.command != "update" || o.check) {
-		return o, fmt.Errorf("Use --restore with culler update and without --check.")
+		return o, fmt.Errorf("Use --restore with shz update and without --check.")
 	}
 	if tailSet && o.command != "logs" {
-		return o, fmt.Errorf("The --tail option belongs to culler logs.")
+		return o, fmt.Errorf("The --tail option belongs to shz logs.")
 	}
 	if o.keepData || o.fullWipe || o.dryRun || o.yes || len(o.homes)+len(o.workspaces)+len(o.binaries) > 0 {
 		if o.command != "uninstall" {
-			return o, fmt.Errorf("The removal options belong to culler uninstall.")
+			return o, fmt.Errorf("The removal options belong to shz uninstall.")
 		}
 	}
 	if o.keepData && o.fullWipe {
 		return o, fmt.Errorf("Choose --keep-data or --full-wipe.")
 	}
 	if o.command == "uninstall" && homeSet {
-		return o, fmt.Errorf("Uninstall removes all detected Culler installations. Use --home to include another deployment, instead of --mc-home.")
+		return o, fmt.Errorf("Uninstall removes all detected S-Horizon installations. Use --home to include another deployment, instead of --mc-home.")
 	}
 	return o, nil
 }
@@ -179,7 +179,7 @@ func cullerHelp(t *onboarding.Terminal, command string) {
 	cullerNotice(t)
 	if command == "help" {
 		t.Panel("Usage", nil)
-		t.Literal("culler <command> [options]")
+		t.Literal("shz <command> [options]")
 		t.Panel("Commands", nil)
 		for _, item := range cullerCommands {
 			t.CommandItem(item.usage, item.description)
@@ -191,7 +191,7 @@ func cullerHelp(t *onboarding.Terminal, command string) {
 			if item.name == command {
 				t.Panel("Purpose", []string{item.description})
 				t.Panel("Usage", nil)
-				t.Literal("culler " + item.usage)
+				t.Literal("shz " + item.usage)
 			}
 		}
 		detail := map[string][]string{
@@ -201,7 +201,7 @@ func cullerHelp(t *onboarding.Terminal, command string) {
 			"stop":      {"An omitted service selects all services.", "The resident waits up to three minutes for active work.", "A stop remains in effect after login and computer restart."},
 			"restart":   {"An omitted service selects all services.", "The resident waits for active work before it stops.", "A dashboard restart leaves the resident active."},
 			"update":    {"Resume an incomplete update before selecting a new release.", "Use --restore to restore an incomplete update before commit.", "Use --check to inspect release availability without an update."},
-			"uninstall": {"Remove all detected Culler and old Mission Control installations.", "The default removes software and permanently deletes Culler data.", "Active agents stop. Removal can discard unfinished work.", "Project repositories and shared host tools remain.", "Review the plan, then type wipe to confirm.", "Use --keep-data to preserve configuration, credentials, and history.", "MC_HOME includes a deployment; it does not limit removal to that deployment."},
+			"uninstall": {"Remove all detected S-Horizon and old Mission Control installations.", "The default removes software and permanently deletes S-Horizon data.", "Active agents stop. Removal can discard unfinished work.", "Project repositories and shared host tools remain.", "Review the plan, then type wipe to confirm.", "Use --keep-data to preserve configuration, credentials, and history.", "MC_HOME includes a deployment; it does not limit removal to that deployment."},
 			"logs":      {"An omitted service selects the resident.", "Show 100 recent records and exit.", "Use --tail N for 1 through 1000 records."},
 		}
 		t.Panel("Details", detail[command])
@@ -211,8 +211,8 @@ func cullerHelp(t *onboarding.Terminal, command string) {
 	}
 	t.Panel("Options", nil)
 	if command == "uninstall" {
-		t.CommandItem("--keep-data", "Remove software and keep Culler data.")
-		t.CommandItem("--full-wipe", "Delete Culler data. This is the default.")
+		t.CommandItem("--keep-data", "Remove software and keep S-Horizon data.")
+		t.CommandItem("--full-wipe", "Delete S-Horizon data. This is the default.")
 		t.CommandItem("--dry-run", "Show the removal plan and exit.")
 		t.CommandItem("--yes", "Confirm removal without a prompt.")
 		t.CommandItem("--home <absolute-path>", "Include another deployment. Repeat as needed.")
@@ -241,7 +241,7 @@ func cullerUsage(args []string, stdout, stderr io.Writer) (cullerOptions, bool, 
 		} else {
 			t.Guidance(cullerLifecycleGuidance)
 		}
-		help := "culler help"
+		help := "shz help"
 		if knownCullerCommand(o.command) && o.command != "help" {
 			help += " " + o.command
 		}

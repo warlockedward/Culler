@@ -105,7 +105,7 @@ export async function waitForUpdateActivation(
     const permitted = ["verify", "committed", "complete"].includes(state.phase) ? state.candidate.commit
       : ["restore", "restored"].includes(state.phase) ? state.previous?.commit : undefined;
     if (!permitted || permitted !== release) {
-      throw new Error("The update keeps this release stopped. Use culler update to recover.");
+      throw new Error("The update keeps this release stopped. Use shz update to recover.");
     }
     if (!checked) { await preflight(); checked = true; }
     await publish();

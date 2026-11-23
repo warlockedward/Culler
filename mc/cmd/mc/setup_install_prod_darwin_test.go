@@ -71,10 +71,10 @@ func TestOnboardCLIRequiresPrivateSourceDeployment(t *testing.T) {
 				return
 			}
 			record, err := deployment.ReadCLIInstallation(home)
-			if err != nil || !record.Verified || record.Path != filepath.Join(directory, "culler") {
+			if err != nil || !record.Verified || record.Path != filepath.Join(directory, "shz") {
 				t.Fatalf("record=%+v error=%v", record, err)
 			}
-			for _, name := range []string{"mc", "culler"} {
+			for _, name := range []string{"mc", "shz"} {
 				digest, err := deployment.CLIFileDigest(filepath.Join(directory, name))
 				if err != nil || digest != record.SHA256 {
 					t.Fatalf("%s differs from the verified command: %v", name, err)

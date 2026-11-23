@@ -1,0 +1,41 @@
+S-Horizon
+
+› Restart Culler services .
+! Failed: Restart Culler services
+
+! Culler requires attention
+  The service could not start.
+  dashboard restoration failed: The
+    service could not start.
+
+Needs attention
+
+  Home
+/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3454091620/001/deployment
+  Culler release   0.1.0 (aaaaaaaaaaaa)
+
+resident · Ready
+  The current service check passed.
+
+dashboard · Stopped
+  The service stopped without a saved
+    stop choice.
+
+agentsview · Ready
+  The current service check passed.
+
+Dashboard
+
+http://127.0.0.1:7333/
+
+Operation
+  Service operation: restart. Phase:
+    recovery required. A later service
+    command checks recovery first.
+
+Next
+  Repeat the interrupted service
+    request to check recovery:
+
+shz --mc-home '/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3454091620/001/deployment' restart dashboard
+PASS

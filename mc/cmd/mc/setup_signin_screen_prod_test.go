@@ -204,7 +204,7 @@ func TestTerminalSetupSignInStartsFromAccessChoice(t *testing.T) {
 					session.send("\r")
 					screen = session.wait("Connecting " + setupProgramName(harness))
 					text := strings.Join(screen, "\n")
-					for _, line := range []string{"Culler", "✓  ✓  ●  ·  ·  ·", "3 of 6  Connect an agent"} {
+					for _, line := range []string{"S-Horizon", "✓  ✓  ●  ·  ·  ·", "3 of 6  Connect an agent"} {
 						if !slices.Contains(screen, line) {
 							t.Fatalf("The progress screen lacks %q:\n%s", line, text)
 						}

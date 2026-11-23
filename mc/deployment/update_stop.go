@@ -305,5 +305,5 @@ func updateStopTimeout(processes []UpdateProcess, containers []string, service e
 	if service != nil {
 		detail = service.Error()
 	}
-	return fmt.Errorf("%s The stop exceeded thirty seconds. Replacement remains blocked. Retry culler update.", detail)
+	return fmt.Errorf("%s The stop exceeded thirty seconds. Replacement remains blocked. Retry shz update.", detail)
 }

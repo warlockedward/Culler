@@ -41,7 +41,7 @@ func TestCullerTerminalPreview(t *testing.T) {
 		releaseBuildID, releaseVersion = strings.Repeat("b", 40), "0.2.0"
 	case scenario == "version-files-mismatch":
 		args, expected = []string{"version"}, 1
-		path := filepath.Join(home, "culler")
+		path := filepath.Join(home, "shz")
 		if err := os.WriteFile(path, []byte("verified command"), 0755); err != nil {
 			t.Fatal(err)
 		}
@@ -210,7 +210,7 @@ func init() {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if err := copyPublishedFile(source, filepath.Join(bin, "culler"), 0755); err != nil {
+			if err := copyPublishedFile(source, filepath.Join(bin, "shz"), 0755); err != nil {
 				t.Fatal(err)
 			}
 			userHome := t.TempDir()

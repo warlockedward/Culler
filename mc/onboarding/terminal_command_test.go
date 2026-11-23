@@ -13,7 +13,7 @@ func TestCommandTerminalPreservesLiteralValuesAtFortyColumns(t *testing.T) {
 	var output bytes.Buffer
 	terminal := NewCommandTerminal(&output, false)
 	terminal.columns = 40
-	command := "culler --mc-home '/private/tmp/a long deployment name' restart dashboard"
+	command := "shz --mc-home '/private/tmp/a long deployment name' restart dashboard"
 	identity := strings.Repeat("a", 40)
 	terminal.Field("Release", identity)
 	terminal.Literal(command)

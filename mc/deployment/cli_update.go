@@ -17,7 +17,7 @@ func updateCLIInstallation(home, userHome, directory, release, parentPath string
 	if err != nil {
 		return record, err
 	}
-	if !record.Verified || record.Path != filepath.Join(directory, "culler") || !validProductionBuildID(release) {
+	if !record.Verified || record.Path != filepath.Join(directory, "shz") || !validProductionBuildID(release) {
 		return record, errors.New("The update requires the existing verified command directory.")
 	}
 	digest, err := CLIFileDigest(record.Path)

@@ -21,7 +21,7 @@ This repository is a fork of the upstream project `vinchenkov/Culler`; the devel
 S-Horizon is a local-first orchestration system for AI coding agents with one human operator.
 It deploys onto one Mac and runs unattended.
 The **spine** is the one SQLite database of a deployment. It is the message bus and the ground truth.
-`mc`, `spine`, and the `MC_*` environment names are internal engineering codenames and do not change. Brand identifiers that still read `culler` (the CLI command, `~/.shorizon`, `com.culler.*`, the worktree path) are the current reality until the R2 identifier migration lands.
+`mc`, `spine`, and the `MC_*` environment names are internal engineering codenames and do not change. Brand identifiers that still read `culler` (`com.culler.*` units, the worktree path, the skill chain, the Git delivery branch, the release asset names) are the current reality until the R2 identifier migration lands.
 
 - `mc/`: the Go command-line interface (CLI) `mc`. It owns dispatch, control, and the spine.
 - `resident/`: the Bun host daemon. It runs the dispatch tick and starts agent containers.
@@ -121,7 +121,7 @@ Run an opt-in lane when your change touches what the lane proves:
 |---|---|---|
 | Development | `./install.sh --dev --mc-home <scratch-path>` | None |
 | Source production | `sh scripts/install-source.sh` | `./redeploy.sh` |
-| Published | `./install.sh` (the latest GitHub release) | `culler update` |
+| Published | `./install.sh` (the latest GitHub release) | `shz update` |
 
 - The development tier uses the fake harness, a spine file at `MC_HOME/spine.db`, and no launchd. Never point it at `~/.shorizon`.
 - `./redeploy.sh` builds the working tree, with uncommitted edits, and labels the release with the `HEAD` commit. It activates launchd. When the deployed spine has a different schema, it stops and keeps the spine. `--reset-database` replaces the spine with an empty spine after the operator types a confirmation.
@@ -147,7 +147,7 @@ Run an opt-in lane when your change touches what the lane proves:
 - **What a role does, receives, or can call.** Also update the agent input: the role directive (`mc/verbs/directives/<role>.md`), the run brief (`mc/verbs/brief.go`), and the role skills (`mc/verbs/skills/<role>/`). State the new model in few words. Delete each statement that the change made false. Keep no history of the change.
 - **A shipped skill.** The folder name and the frontmatter `name` must match. An additional skill can name only commands from the command surface of its role.
 - **Terminal setup text** (`mc/onboarding/terminal_*.go`, `mc/cmd/mc/setup_*.go`). Each message or display change needs an adversarial subagent review of actual output at 80 and 40 columns, with and without color. The review covers clarity, concise text, inviting tone, specific actions, visible progress, and truthful completion states. Revise and review again until the reviewer accepts.
-- **Operator-facing text.** The operator never runs `mc`. Never tell a human to run an `mc` command. The operator uses `culler` for lifecycle operations, `install.sh` for setup and repair, and the dashboard and Collie for configuration.
+- **Operator-facing text.** The operator never runs `mc`. Never tell a human to run an `mc` command. The operator uses `shz` for lifecycle operations, `install.sh` for setup and repair, and the dashboard and Collie for configuration.
 - **A dashboard browser module.** Add it to `UI_MODULES` in `dashboard/src/server.ts` and to `hostReleaseFiles` in `mc/deployment/host_release.go`, and import it from `dashboard/src/ui/app.js` or from another module. A non-JS asset needs a route in `dashboard/src/server.ts` and a manifest entry. Only `./dashboard/smoke.sh` finds a missing `UI_MODULES` entry.
 - **A dashboard smoke.** Run smokes only through `./dashboard/smoke.sh`, which sets `MC_SMOKE_BIN`. Use `bootSmoke()` and `teardown()` from `dashboard/smoke/harness.ts`: one Chromium for each Bun process. Write screenshots through `evidencePath()`. Rename a `data-testid` hook only with the smoke that uses it.
 - **`.github/workflows/release.yml`.** `release/publish.py`, `mc/distribution/record.go`, and `install.sh` use the job IDs. `dashboard/src/release-workflow.test.ts`, `security-gate.test.ts`, and `smoke-gate.test.ts` check the workflow.

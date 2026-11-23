@@ -30,7 +30,7 @@ func TestStageDistinguishesPendingAndCompletedWork(t *testing.T) {
 	if strings.Count(completion, "✓") != 6 || strings.ContainsAny(completion, "●○·") || !strings.Contains(completion, "Setup complete") {
 		t.Fatalf("the final state remains incomplete: %q", completion)
 	}
-	if len(regexp.MustCompile(`(?m)^Culler$`).FindAllString(out.String(), -1)) != 1 || strings.Contains(out.String(), "+---") {
+	if len(regexp.MustCompile(`(?m)^S-Horizon$`).FindAllString(out.String(), -1)) != 1 || strings.Contains(out.String(), "+---") {
 		t.Fatal("the stage display repeats its identity or box borders")
 	}
 }

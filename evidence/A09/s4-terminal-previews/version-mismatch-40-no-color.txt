@@ -1,0 +1,18 @@
+S-Horizon
+
+  CLI release      0.2.0 (bbbbbbbbbbbb)
+  Culler release   0.1.0 (aaaaaaaaaaaa)
+
+Release mismatch
+  The command and installed Culler use
+    different releases.
+  Use the installer to repair the
+    release:
+
+shz --mc-home '/private/var/folders/sp/gfqf18jn7gbd4bdw9ftv4c480000gn/T/TestCullerTerminalPreview3101246979/001/deployment' update
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or
+through Collie.
+
+PASS

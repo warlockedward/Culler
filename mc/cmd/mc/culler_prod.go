@@ -175,7 +175,7 @@ func runCullerWith(args []string, stdin io.Reader, stdout, stderr io.Writer, dep
 		lines := strings.Split(setupDiagnosticAt(diagnosticHome, err.Error()), "\n")
 		var details, commands []string
 		for _, line := range lines {
-			if strings.HasPrefix(line, "culler ") || strings.HasPrefix(line, "curl ") || strings.HasPrefix(line, "sh ") || filepath.IsAbs(line) {
+			if strings.HasPrefix(line, "shz ") || strings.HasPrefix(line, "curl ") || strings.HasPrefix(line, "sh ") || filepath.IsAbs(line) {
 				commands = append(commands, line)
 			} else {
 				details = append(details, line)

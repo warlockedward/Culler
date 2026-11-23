@@ -38,7 +38,7 @@ func installSetupExecutable() (path string, retErr error) {
 		return "", errors.New("The executable directory requires an absolute path.")
 	}
 	target := filepath.Join(directory, "mc")
-	if err := deployment.CheckCLIConflict(filepath.Join(directory, "culler")); err != nil {
+	if err := deployment.CheckCLIConflict(filepath.Join(directory, "shz")); err != nil {
 		return "", err
 	}
 	if source == target {
@@ -89,7 +89,7 @@ func installSetupExecutable() (path string, retErr error) {
 }
 
 func installCullerCommand(source, directory string) error {
-	if err := copyPublishedFile(source, filepath.Join(directory, "culler"), 0755); err != nil {
+	if err := copyPublishedFile(source, filepath.Join(directory, "shz"), 0755); err != nil {
 		return err
 	}
 	home, err := configuredCanonicalHome()

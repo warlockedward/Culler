@@ -1,0 +1,22 @@
+S-Horizon
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or through Collie.
+
+Purpose
+  Show the release versions.
+
+Usage
+
+shz version
+
+Details
+  Show the versions of the command and the installed release.
+  This command works without active services.
+
+Options
+
+  --mc-home <absolute-path> Select the deployment home.
+  --no-color                Disable color.
+  --help                    Show help.
+PASS

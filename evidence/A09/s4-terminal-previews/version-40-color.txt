@@ -1,0 +1,10 @@
+S-Horizon
+
+  CLI release      0.1.0 (aaaaaaaaaaaa)
+  Culler release   0.1.0 (aaaaaaaaaaaa)
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or
+through Collie.
+
+PASS

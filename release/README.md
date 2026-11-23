@@ -48,7 +48,7 @@ The release name is `Culler test <short-commit> (<version>)`.
 
 The publisher selects the test release as the latest complete release.
 GitHub's prerelease flag stays false because the normal installer selects `/releases/latest`.
-The public install command and `culler update` use the same release files and image digests.
+The public install command and `shz update` use the same release files and image digests.
 An older saved launcher can reject the test tag. Download the current launcher through the public install command.
 
 The test build bypasses version and migration-path checks for an update to a test release.

@@ -149,7 +149,7 @@ func UpdateBlocksWork(home string) error {
 		return err
 	}
 	if j != nil && j.BlocksWork() {
-		return errors.New("An incomplete update keeps Culler stopped. Run culler update to recover.")
+		return errors.New("An incomplete update keeps Culler stopped. Run shz update to recover.")
 	}
 	if j != nil {
 		path := filepath.Join(home, "state", "install-maintenance.json")
@@ -162,7 +162,7 @@ func UpdateBlocksWork(home string) error {
 		}
 		uid, links, ok := statOwner(info)
 		if !ok || int(uid) != os.Getuid() || links != 1 || !info.Mode().IsRegular() || info.Mode().Perm() != 0600 || info.Size() > 4096 {
-			return errors.New("The update activation request is invalid. Keep Culler stopped and run culler update.")
+			return errors.New("The update activation request is invalid. Keep Culler stopped and run shz update.")
 		}
 		body, err := os.ReadFile(path)
 		if err != nil {
@@ -175,7 +175,7 @@ func UpdateBlocksWork(home string) error {
 			return errors.New("The update activation request is unreadable. Keep Culler stopped.")
 		}
 		if request.ID == j.ID {
-			return errors.New("The update has not released its activation gate. Run culler update to recover.")
+			return errors.New("The update has not released its activation gate. Run shz update to recover.")
 		}
 	}
 	return nil

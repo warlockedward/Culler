@@ -42,7 +42,7 @@ run_guard() {
 expect_refusal() {
   if run_guard >"$TMP/output" 2>&1; then fail "$1 permitted the source operation"; fi
   grep -q 'Source deployment remains unchanged.' "$TMP/output" || fail "$1 omitted the unchanged state"
-  grep -q 'Use culler update to recover.' "$TMP/output" || fail "$1 omitted the recovery action"
+  grep -q 'Use shz update to recover.' "$TMP/output" || fail "$1 omitted the recovery action"
 }
 run_guard || fail 'an absent journal refused the source operation'
 for phase in complete restored; do

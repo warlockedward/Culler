@@ -1,0 +1,27 @@
+S-Horizon
+
+Use shz for lifecycle operations.
+Configure S-Horizon in the dashboard or through Collie.
+
+Purpose
+  Start S-Horizon services.
+
+Usage
+
+shz start [service]
+
+Details
+  An omitted service selects all services.
+  A ready service remains active without a restart.
+
+Services
+  resident
+  dashboard
+  agentsview
+
+Options
+
+  --mc-home <absolute-path> Select the deployment home.
+  --no-color                Disable color.
+  --help                    Show help.
+PASS

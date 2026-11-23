@@ -168,7 +168,7 @@ func runUninstallWith(ctx context.Context, args []string, stdout, stderr io.Writ
 				continue
 			}
 			if _, err := os.Stat(home); !os.IsNotExist(err) && !lockedHomes[home] {
-				problem("The installation changed during the preview. Retry culler uninstall.")
+				problem("The installation changed during the preview. Retry shz uninstall.")
 			}
 		}
 		if len(report.Problems) > 0 {

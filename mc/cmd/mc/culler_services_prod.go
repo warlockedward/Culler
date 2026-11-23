@@ -180,9 +180,9 @@ func cullerOperationDetail(home string) string {
 	if j, err := deployment.LoadUpdateJournal(home); err != nil {
 		return "The update recovery record is unavailable. Keep Culler stopped."
 	} else if j != nil && j.BlocksWork() {
-		return "An interrupted update keeps work stopped. Run culler update to recover."
+		return "An interrupted update keeps work stopped. Run shz update to recover."
 	} else if j != nil && j.Phase == "committed" {
-		return "The update succeeded. Run culler update to complete cleanup."
+		return "The update succeeded. Run shz update to complete cleanup."
 	}
 	if op, err := readCullerOperation(home); err != nil {
 		return "The service recovery record is unavailable."
