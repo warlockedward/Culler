@@ -1,0 +1,10 @@
+AM v0.2.6 双面哈希登记（轮三十四续窗：A09 R2 迁移 S4a CLI 命令名面落地全道绿＋九自抓执行缺陷如实登记＋S4b 线认证面面核完成候裁）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = f742897cd5761cf47366465dfd88b998df3f11404de4110d4a50fa175788249c
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-24 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 49242067730ed092d46cdbec49212c524dfa6903a18170732176401e34845350，与 am-v0.2.5-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.5 = 49242067730ed092d46cdbec49212c524dfa6903a18170732176401e34845350（evidence/A32/am-v0.2.5-hash.txt 实读）；再前 v0.2.4 = f1ff86052f16b1844b792b890b7f716ca787fdbfcf02065b7d02b8386c586941（同件记载）
+- 同轮并入 dev 的提交: 59d141d(S4a CLI 命令名面 culler→shz 37 文件 120+/120-；自抓缺陷①-⑨；mc/check.sh 第 4 跑 MC_CHECK_EXIT=0＋resident 774/0＋dashboard 984/0＋预览 132 帧全契约真＋对抗审查 verdict=REVISE 两预存项 D1/D2 候裁)
+- 关键事实: S4a=argv[0] 枢纽 main.go:39＋安装产物名＋记录文件名 state/shz-command.json＋校验常量＋命令前缀串＋shell 块注释＋PATH 探针＋操作者文本×约40＋活文档命令例×24＋测试面判面×15＋屏首行 identity 标题×2；R2 表终值按面不同＝CLI 命令名 shz／home .shorizon(已 S2)/Git 分支 culler(保留=Q5)/skill 链 shorizon(R2 末)/单元 com.culler.*→com.<O9>.shorizon*(S3 候 O9)/token shz_proxy_*(S4b 候裁)/发布资产名+仓库 URL(所有者操作域)。排除面未动证明=diff 全部 +/- 行零排除面 token（唯一例外 AGENTS.md:24 有意文档行）。D1/D2 候裁项=40 列下超宽 Literal 折行（预存，改名前同形，审查者明示修订路径=裁定非新工作）；S4b 面核结论=culler_proxy_ 是线认证面（单一权威 provider-token.ts＋wire 错误类型 culler_proxy_error＋token 每次 lane 启动新签发非长期凭证⇒改名影响窗=在途容器×新 resident，本机零部署⇒今日代价零）。
+- 账: dev tip=59d141d（本登记轮提交随后）/ ledger A09=IN_PROGRESS 不变（S3 BLOCKED on O9＋S4b 候裁＋S5 候 B02 窗）/ worktrees=main＋dev＋a09s4（a09s4 用毕回收）/ 无新外发（ci/routing-base 未变）/ Mimosa 事件＝探针行固定串误报×1＋Bash 命令文本含受保护文件名字面误拦×4（均只读操作，重写避开字面）＋splicing 脚本文件写入被路径穿越误报拦截⇒改 stdin heredoc 执行同等逻辑（条目文本走独立文件，零引号碰撞）
+- 登记轮自纠: 无（首稿即精确字面版；链自检断言＋entry count=1 断言＋line-count 不变断言三重前置，脚本一次性 SPLICE_OK）
