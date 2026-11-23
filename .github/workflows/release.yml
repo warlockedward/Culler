@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Manual runs exist so the container lanes can be iterated on a branch without
+  # repeatedly advancing main. Every step that can publish or mint credentials is
+  # gated on a push to main, so a dispatch run cannot reach them.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -146,7 +150,7 @@ jobs:
     # self-hosted runner, selected by the private `shz-ci` label so no other job
     # in this workflow can be scheduled onto that machine.
     runs-on: [self-hosted, shz-ci]
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -168,10 +172,24 @@ jobs:
           npm ci --prefix runner/openwiki --ignore-scripts
           node runner/openwiki/patch-upstream.mjs runner/openwiki/node_modules/openwiki
           (cd runner/agent-runner && mise exec -- bun install --frozen-lockfile)
+      - name: Build the production image under test
+        # The lanes run mc-prod, so it must be built from this commit: a stale
+        # local image would either pass against code that is not under review or
+        # fail closed on a release identity mismatch.
+        run: ./runner/image/build-prod.sh
       - name: Run the container boundary lane
         run: (cd mc && mise exec -- go test -tags docker_boundary -count=1 ./boundarydocker/...)
       - name: Run the pipeline lane with real containers
         run: (cd mc && mise exec -- go test -tags docker_e2e -count=1 -timeout 45m ./e2e/...)
+      - name: Run the update checkpoint lane
+        run: |
+          (cd mc && mise exec -- env CGO_ENABLED=0 GOOS=linux GOARCH="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')" \
+            go build -o "$RUNNER_TEMP/mc-update-lane" ./cmd/mc)
+          (cd mc && mise exec -- env MC_UPDATE_TEST_IMAGE=mc-prod:latest \
+            MC_UPDATE_TEST_BINARY="$RUNNER_TEMP/mc-update-lane" \
+            go test -tags update_docker -count=1 -timeout 15m ./deployment/ -run '^TestUpdateCheckpointDocker')
+      - name: Run the dispatch properties
+        run: (cd mc && mise exec -- go test -tags nightly -count=1 ./property/...)
 
   application-package:
     name: application-package
