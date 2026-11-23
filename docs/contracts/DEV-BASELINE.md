@@ -34,7 +34,7 @@
 | A06 | 备份/恢复能力+**自动恢复演练**（七要素/三层证据/异地 Z5 通道预留） | A01 (密钥面) | DC §7.1-7.7（含 7.4 双事件、7.7 P1-1 三层证据） | F0a/F1：三层演练证据（DC §7.7） | 门:O3 |
 | A07 | 发布完整性基线：digest 验证器**自测** | — | MASTER R10/§4 F0a Exit；TM §4 B9-T | F0a：digest 负例集全拒 | |
 | A08 | R1 品牌文档层（S-Horizon/shz/白名单枚举/LICENSE+derived-from） | — | ROADMAP §2R R1；D14/D15 | ROADMAP 行 91：全仓 grep 残留恰∈白名单 | 无代码语义，首批 |
-| A09 | R2 标识符迁移（shz 二进制/home/systemd 名/`shz_proxy_*`+掩码正则/`shz migrate-home`/**schema 文本先于 v1 基线**） | A02,A03,A04 | ROADMAP §2R R2 表 | R2 验收：净机端到端无 Culler 残留 | →B01 前置 |
+| A09 | R2 标识符迁移（shz 二进制/home/systemd 名/`shz_proxy_*`+掩码正则/`shz migrate-home`/**schema 文本先于 v1 基线**） | A02,A03,A04 | ROADMAP §2R R2 表 | R2 验收：净机端到端无 Culler 残留 | →B01 前置；**【轮二十五·RECON 未进码，推翻执行侧上轮乐观】**实测爆炸半径=687 文件/32 命名空间/80 home/78 CULLER_env/233 测试文件(191go+42ts)/schema+delivery 7 处(改即 spine hash 变不兼容)/host_release 15；两处须用户裁:①destination_branch AS(culler) 是 Git 分支功能语义非品牌(是否随改?)②migrate-home 与 D20 不建兼容层矛盾；S1-S5 可独立全绿分步 WBS=evidence/A09/recon-decomposition-001.md，非单回合票，需分步窗口+§2/§3 澄清；status 维持 BACKLOG |
 | A10 | G-A 普通写事务 live-schema 门禁（范围声明贴码：SchemaMatch⇏BuildID） | — | DC §5 G-A；AM §4b | F0a/F1：逐入口拒绝测试正反例（AM §4b G-A） | |
 | A11 | G-D/G-E 收编（附 G-A 覆盖证明，禁预宣布自动闭合） | A10 | DC §5 合并规则 | F0a：reset/onboard 路径测试+覆盖证明（AM §4b） | |
 | A12 | G-F 逐入口覆盖测试出口（二选一取测试臂，不空转）：11 入口×强制层矩阵（E 帧等值／R ensure 对账／S schema 门，docs/facts/g-f-coverage-matrix.md）；唯一实然缺口=`__system-state` 无 ensure→已加门+seam；F1 P2 路由漂移闸（81 条=spine 写 24/读 19/host-local 38）+P3 RPC 边界正反例 | — | DC §5 G-F；IG §5.3 四分支同构；docs/facts/g-f-coverage-matrix.md | F0a/F1：SystemState 门拒绝+源守卫×2+RPC 边界四例+DoctorRuntime 五分量否定+operatorcmd 漂移闸；残余 R1-R4 声明于矩阵 §4；**非 RR 出口，无 TM §8 映射义务**（RR 臂未走） | 覆盖=机制验证层；"混合版本已排除"仍归 F0a Exit+复测包络（DC §6） |
@@ -75,7 +75,7 @@
 ### Track C · P2 Provider 与预算
 | ID | 标题 | depends | 契约锚 | 验收映射 | 备注/门 |
 |---|---|---|---|---|---|
-| C01 | L2 registry 配置链（config.go 双闸改 custom 路径、三 https 闸条目化、字段闭集+port_allowlist、命名空间隔离） | A02 | PS §1 | P2：配置链闭集测试（缺省拒） | O1 |
+| C01 | L2 registry 配置链（config.go 双闸改 custom 路径、三 https 闸条目化、字段闭集+port_allowlist、命名空间隔离） | A02 | PS §1 | P2：配置链闭集测试（缺省拒） | O1；**【轮二十五·DESIGN 未进码】**侦察厘清 routing.Registry(模型路由)≠PS L2 Provider Registry，双闸=config 563-571 禁 credentials/bindings base_url(P1)，C01=在 P1 上不放宽前提下新建 runtimes.registry 受控端点层；字段闭集草案(base_url/port_allowlist{443}/pooling{off,bound}，禁 insecure*)见 evidence/C01/diff-plan-001.md §1，**v0.1 原文不在库⇒闭集待 Authority 认**；status 维持 BACKLOG(未进码)，进码门=字段确认 |
 | C02 | DestinationPolicy 执行面（canonical host 规范化/connect 钩子/v4-mapped/重定向/pooling=off 默认） | A05 | PS §2.1-2.5；MASTER §6.3(A1 比对) | P2：执行面向量集（A2 二分含覆盖证明） | 实现=resident/src/provider-transport.ts（fetch 形单点：§2.1 规范形判定+§2.2 逐尝试 connect/字面量过滤+§2.3 SNI 钉真+agent:false+永不自动跟随重定向）；provider-proxy 默认出口已替换；A2 静态半=provider-* 原始出口枚举守卫；**运行时审计半+allow_cidrs 配置面=C09/C01（§2.7③ 不继承声明）** |
 | C03 | usage 家族解析+observation 身份生成+持久序（origin=local/去重键/version） | C02,B01 | PS §4/§4.1；PS-F1① 崩溃窗 | P2b：PS-F1① 崩溃窗恢复不双重记账 | 持久序需新建 observation 表=schema.sql 变更→必须先有 B01 迁移器基线（spine 不兼容不变量）；此边为 2026-11-20 追链补登（图上原缺） |
 | C04 | breaker 状态×事件同事务+持久 lease+fencing token | B02,C02 | PS §6/§6-PS5；IG §5.3 同构 | P2：过期 token 迟到提交=必红 | |
