@@ -60,7 +60,7 @@ type publishedSetup struct {
 }
 
 func loadPublishedSetup(home string, args verbs.OnboardArgs) (*publishedSetup, error) {
-	path, root := os.Getenv("CULLER_RELEASE_RECORD"), os.Getenv("CULLER_PACKAGE_ROOT")
+	path, root := os.Getenv("SHZ_RELEASE_RECORD"), os.Getenv("SHZ_PACKAGE_ROOT")
 	if path == "" && root == "" {
 		return nil, nil
 	}
@@ -125,7 +125,7 @@ func loadPublishedSetup(home string, args verbs.OnboardArgs) (*publishedSetup, e
 		docker: func(ctx context.Context, args ...string) ([]byte, error) {
 			return exec.CommandContext(ctx, publishedUpdateDockerProgram(home), args...).CombinedOutput()
 		},
-		states: setupServiceStates, restore: restorePublishedServices, helper: startReleaseHelper, started: publishedInstallStartedAt(os.Getenv("CULLER_INSTALL_STARTED_AT"), now), now: time.Now, sleep: time.Sleep,
+		states: setupServiceStates, restore: restorePublishedServices, helper: startReleaseHelper, started: publishedInstallStartedAt(os.Getenv("SHZ_INSTALL_STARTED_AT"), now), now: time.Now, sleep: time.Sleep,
 		drainWindow: updateDrainWindow}
 	var prior struct {
 		ID string `json:"id"`
@@ -1106,7 +1106,7 @@ func (p *publishedSetup) automaticArgs(args []string, a verbs.OnboardArgs, exist
 }
 
 func publishedSurfacesConfigured() bool {
-	if os.Getenv("CULLER_RELEASE_RECORD") == "" {
+	if os.Getenv("SHZ_RELEASE_RECORD") == "" {
 		return false
 	}
 	home, err := configuredCanonicalHome()

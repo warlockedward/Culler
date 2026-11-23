@@ -77,7 +77,7 @@ try {
     await writeFile(path, diagnosticRedactor({}, markers)(JSON.stringify({ body: contaminated })));
     check(surface, await readFile(path), false);
   }
-  console.log(JSON.stringify({ result: "CULLER_LEAK_CONTROLS_OK", marker_types: markers.length,
+  console.log(JSON.stringify({ result: "SHZ_LEAK_CONTROLS_OK", marker_types: markers.length,
     surfaces: [...surfaces], each_control_rejected_leak: true, each_control_accepted_clean: true }));
 } finally {
   await command(["docker", "rm", "--force", name]).catch(() => {});

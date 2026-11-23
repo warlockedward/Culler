@@ -23,7 +23,7 @@ func configuredProductionImage() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	path := os.Getenv("CULLER_RELEASE_RECORD")
+	path := os.Getenv("SHZ_RELEASE_RECORD")
 	if path == "" {
 		if pending, err := distribution.Load(filepath.Join(home, "state", "pending-release.json")); err == nil && pending.Commit == releaseBuildID {
 			return pending.Image, nil
@@ -31,14 +31,14 @@ func configuredProductionImage() (string, error) {
 		path = filepath.Join(home, distribution.InstalledRecord)
 	}
 	r, err := distribution.Load(path)
-	if os.IsNotExist(err) && os.Getenv("CULLER_RELEASE_RECORD") == "" {
+	if os.IsNotExist(err) && os.Getenv("SHZ_RELEASE_RECORD") == "" {
 		return productionImageRef, nil
 	}
 	if err != nil {
 		return "", err
 	}
 	// Local source deployments retain their separate image identity.
-	if r.Commit != releaseBuildID && os.Getenv("CULLER_RELEASE_RECORD") == "" {
+	if r.Commit != releaseBuildID && os.Getenv("SHZ_RELEASE_RECORD") == "" {
 		return productionImageRef, nil
 	}
 	return strings.TrimSpace(r.Image), nil
@@ -50,7 +50,7 @@ func configuredProjectImage() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	path := os.Getenv("CULLER_RELEASE_RECORD")
+	path := os.Getenv("SHZ_RELEASE_RECORD")
 	if path == "" {
 		if pending, err := distribution.Load(filepath.Join(home, "state", "pending-release.json")); err == nil && pending.Commit == releaseBuildID {
 			if pending.ProjectImage == "" {
@@ -61,13 +61,13 @@ func configuredProjectImage() (string, error) {
 		path = filepath.Join(home, distribution.InstalledRecord)
 	}
 	record, err := distribution.Load(path)
-	if os.IsNotExist(err) && os.Getenv("CULLER_RELEASE_RECORD") == "" {
+	if os.IsNotExist(err) && os.Getenv("SHZ_RELEASE_RECORD") == "" {
 		return deployment.DefaultProjectImage, nil
 	}
 	if err != nil {
 		return "", err
 	}
-	if record.Commit != releaseBuildID && os.Getenv("CULLER_RELEASE_RECORD") == "" {
+	if record.Commit != releaseBuildID && os.Getenv("SHZ_RELEASE_RECORD") == "" {
 		return deployment.DefaultProjectImage, nil
 	}
 	if record.ProjectImage == "" {

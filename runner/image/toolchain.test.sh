@@ -81,7 +81,7 @@ for extracted in ('/opt/python','"/opt/uv-${triple}"','/opt/node','/opt/go','/op
     assert 'chmod -R a+rX '+extracted in project,extracted
 
 assert re.findall(r'^FROM \S+ AS (\S+)$',runtime,re.M)==['tools','runtime','product']
-for present in ('mc-real','runner/openwiki','runner/runtime-source','CULLER_NODE_VERSION','CULLER_BUN_VERSION'):
+for present in ('mc-real','runner/openwiki','runner/runtime-source','SHZ_NODE_VERSION','SHZ_BUN_VERSION'):
     assert present in runtime,present
 
 # Each runtime version pin stands after the previous step and before the step that reads it.
@@ -96,13 +96,13 @@ def rstep_end(start):
         end+=1
     return end
 tools=rline_of(r'^FROM \S+ AS tools$')
-node_pin=rline_of(r'^ARG CULLER_NODE_VERSION=')
+node_pin=rline_of(r'^ARG SHZ_NODE_VERSION=')
 node_step=rline_of(r'nodejs\.org/dist/')
 browser_pin=rline_of(r'^ARG BROWSER_DEPS=')
 browser_step=rline_of(r'^RUN cd /opt/culler-runtime/browser')
 openwiki_step=rline_of(r'^RUN cd /opt/culler-runtime/openwiki')
 npm_removal=rline_of(r'^RUN rm -rf /opt/culler-runtime/node/lib/node_modules')
-bun_pin=rline_of(r'^ARG CULLER_BUN_VERSION=')
+bun_pin=rline_of(r'^ARG SHZ_BUN_VERSION=')
 bun_step=rline_of(r'oven-sh/bun/releases/')
 deps_pin=rline_of(r'^ARG RUNTIME_DEPS=')
 install_step=rline_of(r'bun install --production --frozen-lockfile')
@@ -115,7 +115,7 @@ sources=[rlines[number-1].split()[2] for number in copies]
 assert sources==['/opt/culler-runtime/node','/opt/culler-runtime/browser','/opt/culler-runtime/ms-playwright','/opt/culler-runtime/openwiki','/opt/culler-runtime/bun','/opt/culler-runtime/artifacts.txt','/opt/culler-runtime/app'],sources
 source_copies=[number for number,line in enumerate(rlines,1) if line.startswith('COPY --chmod=0755 ')]
 mc_real=rline_of(r'^COPY --chown=10001:10001 --chmod=6755 .*mc-real$')
-release_pin=rline_of(r'^ARG CULLER_RELEASE_ID=')
+release_pin=rline_of(r'^ARG SHZ_RELEASE_ID=')
 manifest=rline_of(r'runtime-manifest\.sh >')
 check_pin=rline_of(r'^ARG RUNTIME_DEPS=',1)
 check_step=rline_of(r'/opt/culler-runtime/bin/check; fi')

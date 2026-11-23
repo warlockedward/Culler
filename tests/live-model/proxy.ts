@@ -49,7 +49,7 @@ const source = resolve(import.meta.dir, "../..");
 const root = await mkdtemp("/tmp/culler-live-model-");
 const spineRoot = await mkdtemp(join(home, ".live-spine-"));
 const env = { ...process.env, MC_HOME: home };
-for (const name of ["MC_HELPER", "MC_SPINE", "MC_RUN_JSON", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "CODEX_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "CULLER_TEST_HOST_SECRET_DIR"]) delete env[name];
+for (const name of ["MC_HELPER", "MC_SPINE", "MC_RUN_JSON", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "CODEX_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "SHZ_TEST_HOST_SECRET_DIR"]) delete env[name];
 env.MC_SPINE = join(spineRoot, "spine.db");
 const children = new Set<ReturnType<typeof Bun.spawn>>();
 const containers = new Set<string>();
@@ -192,7 +192,7 @@ try {
           ...(spec.harness === "codex" ? ["--mode", turn ? "native" : "fresh"] : ["--channel", "claude", "--max-turns", "2"]),
           ...controls.args, ...(native ? ["--native-ref", native] : [])];
         const prompt = turn ? "Without tools, repeat the exact final reply from the previous turn."
-          : "Use the shell exactly once: printf CULLER_LIVE_TOOL_OK > result.txt\nThen reply exactly CULLER_LIVE_CONTEXT_OK.";
+          : "Use the shell exactly once: printf SHZ_LIVE_TOOL_OK > result.txt\nThen reply exactly SHZ_LIVE_CONTEXT_OK.";
         const nativeBefore = await snapshotNativeUsage(join(work, "session"));
         const result = await command(argv, new TextEncoder().encode(prompt), 180_000);
         const usage = await collectLiveUsage({ harness: spec.harness, authMode: access.authMode,
@@ -203,7 +203,7 @@ try {
         const events = result.stdout.split("\n").flatMap(line => { try { return [JSON.parse(line)]; } catch { return []; } });
         const complete = events.filter(event => event.event === "turn-complete");
         const started = events.find(event => event.event === "session-start");
-        if (result.exitCode || complete.length !== 1 || complete[0].status !== "success" || complete[0].output.trim() !== "CULLER_LIVE_CONTEXT_OK" || !started?.session_id) {
+        if (result.exitCode || complete.length !== 1 || complete[0].status !== "success" || complete[0].output.trim() !== "SHZ_LIVE_CONTEXT_OK" || !started?.session_id) {
           const codes = events.filter(event => event.event === "infrastructure-failure").map(event => ({ category: event.category, code: event.code, proxy_request_id: event.proxy_request_id }));
           evidence.push({ connection, model, turn, status: "failed", exit_code: result.exitCode, codes, usage });
           throw new Error("The native harness did not complete the bounded model turn.");
@@ -212,7 +212,7 @@ try {
         native = started.session_id;
         await scan(join(work, "session"), access.token); await scan(join(work, "workspace"), access.token);
       }
-      if ((await readFile(join(work, "workspace/result.txt"), "utf8")) !== "CULLER_LIVE_TOOL_OK") throw new Error("The model did not create the required tool artifact.");
+      if ((await readFile(join(work, "workspace/result.txt"), "utf8")) !== "SHZ_LIVE_TOOL_OK") throw new Error("The model did not create the required tool artifact.");
       requests = (await control({ op: "profile_status", run_id: name, launch_id: name })).provider_requests;
       if (!Number.isInteger(requests) || requests < 3 || requests > 3) throw new Error("The host did not prove exactly three provider requests.");
       evidence.push({ connection, harness: spec.harness, method: access.authMode, model, status: "passed", provider_requests: requests,

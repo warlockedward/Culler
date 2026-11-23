@@ -24,7 +24,7 @@ const FORBIDDEN = new Set([
   "CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST", "CODEX_ACCESS_TOKEN", "CODEX_API_KEY",
   "OPENAI_API_KEY", "MC_CREDENTIAL_REFRESH_URL", "CODEX_REFRESH_TOKEN_URL_OVERRIDE",
   "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy",
-  "NODE_TLS_REJECT_UNAUTHORIZED", "NODE_EXTRA_CA_CERTS", "SSL_CERT_FILE", "CODEX_CA_CERTIFICATE", "CULLER_PROXY_TOKEN",
+  "NODE_TLS_REJECT_UNAUTHORIZED", "NODE_EXTRA_CA_CERTS", "SSL_CERT_FILE", "CODEX_CA_CERTIFICATE", "SHZ_PROXY_TOKEN",
   "CLAUDE_CODE_CLIENT_CERT", "CLAUDE_CODE_CLIENT_KEY", "CLAUDE_CODE_CLIENT_KEY_PASSPHRASE", "CODEX_HOME",
 ]);
 export const CODEX_BIN = process.env["MC_CODEX_BIN"] ||
@@ -45,7 +45,7 @@ export function codexAdapterEnv(
   if (access.harness !== "codex" || !home || !caPath) throw new Error("The Codex proxy configuration is unavailable.");
   env.CODEX_HOME = home;
   env.CODEX_CA_CERTIFICATE = caPath;
-  env.CULLER_PROXY_TOKEN = access.token;
+  env.SHZ_PROXY_TOKEN = access.token;
   return env;
 }
 
@@ -70,7 +70,7 @@ export function codexArgv(
     // By default, Codex removes each variable with KEY, SECRET, or TOKEN in its name from a command.
     // The commands of the agent keep the variables of the container, without the Culler token.
     "--config", "shell_environment_policy.ignore_default_excludes=true",
-    "--config", 'shell_environment_policy.exclude=["CULLER_PROXY_TOKEN"]',
+    "--config", 'shell_environment_policy.exclude=["SHZ_PROXY_TOKEN"]',
     // Codex reads no env var for shell-tool output; tool_output_token_limit is
     // the config key that governs exec-output truncation (unit: tokens, about
     // four bytes each; the exit status survives a truncated output). Under the

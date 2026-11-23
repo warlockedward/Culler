@@ -599,9 +599,9 @@ def test_child_receives_private_cancellation_markers(server):
     server.start(server.defaults)
     process = server.test_processes[0]
     env = process.kwargs["env"]
-    assert env["CULLER_EVAL_CONTROL_RUN"] == server.status()["run_id"]
-    assert env["CULLER_EVAL_CONTROL_CANCEL_FILE"] == str(process.protocol.with_name("stop"))
-    assert "CULLER_EVAL_CONTROL_CANCEL_FILE" not in json.dumps(server.status())
+    assert env["SHZ_EVAL_CONTROL_RUN"] == server.status()["run_id"]
+    assert env["SHZ_EVAL_CONTROL_CANCEL_FILE"] == str(process.protocol.with_name("stop"))
+    assert "SHZ_EVAL_CONTROL_CANCEL_FILE" not in json.dumps(server.status())
 
 
 def test_cleanup_checks_exact_label_before_removing_only_owned_containers(server):

@@ -14,8 +14,8 @@ for await (const line of lines) {
       result = { tools: definitions };
     } else if (request.method === "tools/call") {
       if (!definitions.some((tool: any) => tool.name === request.params?.name)) throw new Error("The packet browser tool is unsupported.");
-      const response = await fetch(process.env.CULLER_EVAL_BROWSER_URL!, {
-        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.CULLER_EVAL_BROWSER_TOKEN}` },
+      const response = await fetch(process.env.SHZ_EVAL_BROWSER_URL!, {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.SHZ_EVAL_BROWSER_TOKEN}` },
         body: JSON.stringify(request.params),
       });
       if (!response.ok) throw new Error(`The packet browser refused the request (${response.status}).`);

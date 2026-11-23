@@ -315,7 +315,7 @@ func cullerUninstallPreview(t *testing.T, scenario string) {
 		in = strings.NewReader("wipe\n")
 	}
 	code := runCullerWith(args, in, os.Stdout, os.Stderr, deps)
-	if path := os.Getenv("CULLER_PREVIEW_RESULT"); path != "" {
+	if path := os.Getenv("SHZ_PREVIEW_RESULT"); path != "" {
 		body, _ := json.Marshal(map[string]any{"cli_arguments": args, "cli_exit_status": code, "expected_cli_exit_status": expected, "fixture_success": code == expected})
 		if err := os.WriteFile(path, body, 0600); err != nil {
 			t.Fatal(err)

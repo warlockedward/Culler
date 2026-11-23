@@ -85,7 +85,7 @@ def runner_layers():
 
 def runner_history():
     steps = ["RUN project step"] * len(project_layers()) + [
-        "RUN |2 CULLER_NODE_VERSION=24 /bin/sh -c curl node",
+        "RUN |2 SHZ_NODE_VERSION=24 /bin/sh -c curl node",
         "RUN /bin/sh -c npm ci && playwright-cli install-browser",
         "RUN /bin/sh -c npm ci openwiki",
         "RUN /bin/sh -c bun install --production",

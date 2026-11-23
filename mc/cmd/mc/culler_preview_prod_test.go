@@ -18,7 +18,7 @@ import (
 
 // TestCullerTerminalPreview renders real commands with isolated service dependencies.
 func TestCullerTerminalPreview(t *testing.T) {
-	scenario := os.Getenv("CULLER_TERMINAL_PREVIEW")
+	scenario := os.Getenv("SHZ_TERMINAL_PREVIEW")
 	if scenario == "" {
 		return
 	}
@@ -77,7 +77,7 @@ func TestCullerTerminalPreview(t *testing.T) {
 		}
 	case scenario == "incomplete-setup", scenario == "incomplete-source-setup":
 		if scenario == "incomplete-source-setup" {
-			t.Setenv("CULLER_SOURCE_INSTALLER", "/Users/operator/Culler/scripts/install-source.sh")
+			t.Setenv("SHZ_SOURCE_INSTALLER", "/Users/operator/Culler/scripts/install-source.sh")
 		}
 		args, expected = []string{"start"}, 1
 		if err := os.Remove(filepath.Join(home, "supervision", "resident.json")); err != nil {
@@ -187,7 +187,7 @@ func TestCullerTerminalPreview(t *testing.T) {
 		args = append(args, "--mc-home", home)
 	}
 	code := runCullerWith(args, os.Stdin, os.Stdout, os.Stderr, deps)
-	if path := os.Getenv("CULLER_PREVIEW_RESULT"); path != "" {
+	if path := os.Getenv("SHZ_PREVIEW_RESULT"); path != "" {
 		body, _ := json.Marshal(map[string]any{"cli_arguments": args, "cli_exit_status": code, "expected_cli_exit_status": expected, "fixture_success": code == expected})
 		if err := os.WriteFile(path, body, 0600); err != nil {
 			t.Fatal(err)
@@ -221,7 +221,7 @@ func init() {
 			if name == "cli-setup-current" {
 				parentPath = bin + ":" + parentPath
 			}
-			t.Setenv("CULLER_PARENT_PATH", parentPath)
+			t.Setenv("SHZ_PARENT_PATH", parentPath)
 			if _, err := deployment.InstallCLIPath(preview.wizard.home, userHome, bin, "development", parentPath); err != nil {
 				t.Fatal(err)
 			}

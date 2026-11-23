@@ -11,7 +11,7 @@ It changes no deployed configuration or trace file.
 It starts one temporary AgentsView process on an available loopback port.
 
 ```sh
-CULLER_AGENTSVIEW_BIN=/path/to/pinned/agentsview mise exec -- bun test ./acceptance/setup-traces.test.ts
+SHZ_AGENTSVIEW_BIN=/path/to/pinned/agentsview mise exec -- bun test ./acceptance/setup-traces.test.ts
 ```
 
 The test checks the executable digest against `mc/deployment/agentsview.json`.

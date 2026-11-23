@@ -31,7 +31,7 @@ import {
   type RunSkill, type StoreFs,
 } from "./skill-store";
 import { configuredGitEnvironment } from "./git-identity";
-import { deploymentIdentity, deploymentArguments, CULLER_RUNTIME, CONTAINER_PIDS_LIMIT, PIDS_LIMIT_ARGUMENTS, agentContainerLimits, agentLimitArguments, type AgentContainerLimits, projectExecutionArguments, runtimeArguments, openCodeArguments, projectCacheArguments, projectHomeArguments, projectSecretValues } from "./environment-lane";
+import { deploymentIdentity, deploymentArguments, SHZ_RUNTIME, CONTAINER_PIDS_LIMIT, PIDS_LIMIT_ARGUMENTS, agentContainerLimits, agentLimitArguments, type AgentContainerLimits, projectExecutionArguments, runtimeArguments, openCodeArguments, projectCacheArguments, projectHomeArguments, projectSecretValues } from "./environment-lane";
 import { prepareRepositoryRun, repositoryRunRoot, subjectFields } from "./repository";
 import {
   inspectPipelineRunContainer, pipelineContainerName, PROJECT_ID, SAFE_ID,
@@ -707,7 +707,7 @@ async function collieWake(effect: CollieWakeEffect, deps: TickDeps): Promise<boo
   const createPayload = [
     ...(config.runtimeVolume ? runtimeArguments(deps) : []),
     ...openCodeArguments(config.mcHome, runtime?.harness),
-    ...(config.runtimeVolume ? ["--entrypoint", `${CULLER_RUNTIME}/bin/bun`] : []),
+    ...(config.runtimeVolume ? ["--entrypoint", `${SHZ_RUNTIME}/bin/bun`] : []),
     "-v", `${sessionDir}:/mc/session`,
     // Collie can read the trace of each run and each Collie session.
     "-v", `${config.mcHome}/agentsview/inspection:${COLLIE_TRACE_MOUNT}:ro`,
@@ -809,7 +809,7 @@ async function collieWake(effect: CollieWakeEffect, deps: TickDeps): Promise<boo
       tmpfs: values("--tmpfs"),
       cap_drop: ["ALL"],
       cmd: config.runtimeVolume ? (config.collieCmd ?? config.agentCmd).slice(1) : config.collieCmd ?? config.agentCmd,
-      ...(config.runtimeVolume ? { entrypoint: [`${CULLER_RUNTIME}/bin/bun`] } : {}),
+      ...(config.runtimeVolume ? { entrypoint: [`${SHZ_RUNTIME}/bin/bun`] } : {}),
       container_id: containerId,
       env: values("-e"),
       image: config.image,
@@ -1527,7 +1527,7 @@ async function spawnAttempt(
 		"--label", `mc-project=${effect.project}`,
     ...(config.runtimeVolume ? runtimeArguments(deps) : []),
     ...openCodeArguments(config.mcHome, runtime?.harness),
-    ...(config.runtimeVolume ? ["--entrypoint", `${CULLER_RUNTIME}/bin/bun`] : []),
+    ...(config.runtimeVolume ? ["--entrypoint", `${SHZ_RUNTIME}/bin/bun`] : []),
     ...(environment ? projectCacheArguments(config.mcHome, effect.project, environment.image_digest) : []),
     "-v", `${sessionDir}:/mc/session`,
     "-v", `${runJsonPath}:/mc/run.json:ro`,

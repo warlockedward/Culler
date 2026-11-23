@@ -688,8 +688,8 @@ class ControlServer:
             try:
                 process = self._process_factory(argv, cwd=self.source / "evals", stdin=subprocess.DEVNULL,
                                                 stdout=log, stderr=subprocess.STDOUT, start_new_session=True,
-                                                env=os.environ | {"CULLER_EVAL_CONTROL_RUN": run_id,
-                                                    "CULLER_EVAL_CONTROL_CANCEL_FILE": str(control / "stop")})
+                                                env=os.environ | {"SHZ_EVAL_CONTROL_RUN": run_id,
+                                                    "SHZ_EVAL_CONTROL_CANCEL_FILE": str(control / "stop")})
             except (ValueError, OSError, subprocess.SubprocessError) as error:
                 log.write(("The experiment process could not start: " + type(error).__name__ + "\n").encode())
                 log.close()
@@ -756,7 +756,7 @@ class ControlServer:
             try:
                 run["process"] = self._process_factory(argv, cwd=source / "evals", stdin=subprocess.DEVNULL,
                     stdout=log, stderr=subprocess.STDOUT, start_new_session=True,
-                    env=os.environ | {"CULLER_EVAL_CONTROL_RUN": run_id, "CULLER_EVAL_CONTROL_CANCEL_FILE": str(stop)})
+                    env=os.environ | {"SHZ_EVAL_CONTROL_RUN": run_id, "SHZ_EVAL_CONTROL_CANCEL_FILE": str(stop)})
             except (ValueError, OSError, subprocess.SubprocessError):
                 log.close()
                 run["process"] = None

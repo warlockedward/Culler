@@ -54,8 +54,8 @@
 set -eu
 set +x
 umask 077
-CULLER_PARENT_PATH=${CULLER_PARENT_PATH-$PATH}
-export CULLER_PARENT_PATH
+SHZ_PARENT_PATH=${SHZ_PARENT_PATH-$PATH}
+export SHZ_PARENT_PATH
 
 say() { printf '%s\n' "$*"; }
 fail() {
@@ -103,8 +103,8 @@ show_help() {
 }
 
 REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-CULLER_SOURCE_INSTALLER="$REPO_DIR/scripts/install-source.sh"
-export CULLER_SOURCE_INSTALLER
+SHZ_SOURCE_INSTALLER="$REPO_DIR/scripts/install-source.sh"
+export SHZ_SOURCE_INSTALLER
 
 DEV=0
 ASSUME_YES=0

@@ -22,7 +22,7 @@ func projectDockerFixture(t *testing.T) string {
 	}
 	script := `#!/usr/bin/env python3
 import json, os, pathlib, sys, time
-root = pathlib.Path(os.environ['CULLER_DOCKER_FIXTURE'])
+root = pathlib.Path(os.environ['SHZ_DOCKER_FIXTURE'])
 containers = root / 'containers'
 args = sys.argv[1:]
 if args[0] == 'ps':
@@ -58,7 +58,7 @@ else:
 		t.Fatal(err)
 	}
 	t.Setenv("PATH", root+string(os.PathListSeparator)+os.Getenv("PATH"))
-	t.Setenv("CULLER_DOCKER_FIXTURE", root)
+	t.Setenv("SHZ_DOCKER_FIXTURE", root)
 	return root
 }
 

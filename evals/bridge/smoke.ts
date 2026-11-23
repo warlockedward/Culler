@@ -22,7 +22,7 @@ try {
     throw new Error("The evaluation Codex effort differs.");
   }
   const claudeEnv = claudeAdapterEnv("claude", { ANTHROPIC_AUTH_TOKEN: "fixture-token" }, `${root}/config`, { ...access, harness: "claude-sdk" }, `${root}/ca.pem`);
-  if (claudeEnv.ANTHROPIC_AUTH_TOKEN !== undefined || claudeEnv.CLAUDE_CODE_OAUTH_TOKEN !== access.token || codexEnv.CULLER_PROXY_TOKEN !== access.token) {
+  if (claudeEnv.ANTHROPIC_AUTH_TOKEN !== undefined || claudeEnv.CLAUDE_CODE_OAUTH_TOKEN !== access.token || codexEnv.SHZ_PROXY_TOKEN !== access.token) {
     throw new Error("The product environment requires only Culler provider access.");
   }
   const options = claudeOptions("fixture-model", root, claudeEnv, new NativeSessionStore(`${root}/session`));

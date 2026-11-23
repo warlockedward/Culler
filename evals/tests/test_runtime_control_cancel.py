@@ -16,8 +16,8 @@ SOURCE = Path(__file__).resolve().parents[2]
 
 def controlled_runtime(tmp_path, monkeypatch, *, executor=None):
     stop = tmp_path / "stop"
-    monkeypatch.setenv("CULLER_EVAL_CONTROL_RUN", "20261002-test-run")
-    monkeypatch.setenv("CULLER_EVAL_CONTROL_CANCEL_FILE", str(stop))
+    monkeypatch.setenv("SHZ_EVAL_CONTROL_RUN", "20261002-test-run")
+    monkeypatch.setenv("SHZ_EVAL_CONTROL_CANCEL_FILE", str(stop))
     runtime = Runtime(SOURCE, executor=executor, contracts=object(),
                       source_manifest=runtime_source_manifest(SOURCE),
                       product_manifest=product_source_manifest(SOURCE),
@@ -81,7 +81,7 @@ def test_parallel_container_failures_after_stop_prevent_retries(tmp_path, monkey
 
 @pytest.mark.parametrize("owner,stop", [("run", None), (None, "/tmp/stop"), ("invalid=run", "/tmp/stop")])
 def test_incomplete_or_invalid_owner_identity_cannot_launch(tmp_path, monkeypatch, owner, stop):
-    for name, value in (("CULLER_EVAL_CONTROL_RUN", owner), ("CULLER_EVAL_CONTROL_CANCEL_FILE", stop)):
+    for name, value in (("SHZ_EVAL_CONTROL_RUN", owner), ("SHZ_EVAL_CONTROL_CANCEL_FILE", stop)):
         if value is None:
             monkeypatch.delenv(name, raising=False)
         else:

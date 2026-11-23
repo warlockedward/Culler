@@ -31,7 +31,7 @@ class RuntimeErrorWithEvidence(RuntimeError):
 
 
 def control_cancelled() -> bool:
-    path = os.environ.get("CULLER_EVAL_CONTROL_CANCEL_FILE")
+    path = os.environ.get("SHZ_EVAL_CONTROL_CANCEL_FILE")
     return bool(path and Path(path).exists())
 
 
@@ -180,9 +180,9 @@ class Runtime:
         self.product_manifest = product_manifest
         self.snapshot_root = Path(snapshot_root) if snapshot_root else None
         self.snapshot_lock = threading.Lock()
-        self.control_run = os.environ.get("CULLER_EVAL_CONTROL_RUN")
-        self.control_cancel_path = os.environ.get("CULLER_EVAL_CONTROL_CANCEL_FILE")
-        control_action = " Clear CULLER_EVAL_CONTROL_RUN and CULLER_EVAL_CONTROL_CANCEL_FILE from the environment. Then rerun the command."
+        self.control_run = os.environ.get("SHZ_EVAL_CONTROL_RUN")
+        self.control_cancel_path = os.environ.get("SHZ_EVAL_CONTROL_CANCEL_FILE")
+        control_action = " Clear SHZ_EVAL_CONTROL_RUN and SHZ_EVAL_CONTROL_CANCEL_FILE from the environment. Then rerun the command."
         if bool(self.control_run) != bool(self.control_cancel_path):
             raise RuntimeErrorWithEvidence("The browser run requires its identifier and stop file together." + control_action)
         if self.control_run and re.fullmatch(r"[a-zA-Z0-9-]{1,80}", self.control_run) is None:
@@ -320,7 +320,7 @@ class Runtime:
                     or "PRIVATE KEY" in access["ca"] or not isinstance(access.get("url"), str)
                     or not re.fullmatch(r"https://[^/@?#]+(?::[0-9]+)?/[^?#]*|https://[^/@?#]+(?::[0-9]+)?", access["url"])):
                 raise RuntimeErrorWithEvidence("The evaluation requires scoped Culler provider access. Use a saved Culler connection.", _artifacts(execution_root))
-            protected = re.compile(r"^(?:OPENAI_|ANTHROPIC_|CODEX_|CLAUDE_|MC_PROVIDER_ACCESS_FILE$|CULLER_PROXY_TOKEN$)")
+            protected = re.compile(r"^(?:OPENAI_|ANTHROPIC_|CODEX_|CLAUDE_|MC_PROVIDER_ACCESS_FILE$|SHZ_PROXY_TOKEN$)")
             if any(protected.match(name) for name in env):
                 raise RuntimeErrorWithEvidence("The container environment cannot replace provider access.", _artifacts(execution_root))
             access_file = private / "provider-access.json"
@@ -330,10 +330,10 @@ class Runtime:
                        "MC_PROVIDER_ACCESS_FILE": "/mc/provider-access.json"}
             auth_mounts = [{"source": str(access_file), "target": "/mc/provider-access.json", "read_only": True}]
             capability_mounts = []
-            if all_env.get("CULLER_EVAL_COMMAND_URL") and all_env.get("CULLER_EVAL_COMMAND_TOKEN"):
+            if all_env.get("SHZ_EVAL_COMMAND_URL") and all_env.get("SHZ_EVAL_COMMAND_TOKEN"):
                 command_file = private / "command.json"
-                command_file.write_text(json.dumps({"url": all_env.pop("CULLER_EVAL_COMMAND_URL"),
-                                                    "token": all_env.pop("CULLER_EVAL_COMMAND_TOKEN")}))
+                command_file.write_text(json.dumps({"url": all_env.pop("SHZ_EVAL_COMMAND_URL"),
+                                                    "token": all_env.pop("SHZ_EVAL_COMMAND_TOKEN")}))
                 command_file.chmod(0o644)
                 capability_mounts.append({"source": str(command_file), "target": "/mc/eval-command.json", "read_only": True})
             env_file = private / "container.env"
@@ -507,8 +507,8 @@ class Runtime:
                                            {"source": str(envelope_path), "target": "/mc/run.json", "read_only": True},
                                            {"source": str(sources / "evals/bridge/mc"), "target": "/usr/local/bin/mc", "read_only": True},
                                            *[{"source": str(artifacts / Path(plane).name), "target": plane, "read_only": False} for plane in adapter.planes]],
-                                   env={"CULLER_EVAL_COMMAND_URL": server.url, "CULLER_EVAL_COMMAND_TOKEN": server.token,
-                                        "CULLER_EVAL_START_COMMIT": adapter.start_commit})
+                                   env={"SHZ_EVAL_COMMAND_URL": server.url, "SHZ_EVAL_COMMAND_TOKEN": server.token,
+                                        "SHZ_EVAL_START_COMMIT": adapter.start_commit})
         terminal = adapter.terminal
         if terminal:
             terminal = {**terminal, "status": terminal["kind"]}
@@ -579,7 +579,7 @@ class Runtime:
                                                {"source": case["artifacts_path"], "target": "/evidence/artifacts", "read_only": True},
                                                {"source": case["references_path"], "target": "/evidence/references", "read_only": True},
                                                {"source": str(derived), "target": "/evidence/git", "read_only": True}],
-                                       env={"CULLER_EVAL_BROWSER_URL": server.url, "CULLER_EVAL_BROWSER_TOKEN": server.token},
+                                       env={"SHZ_EVAL_BROWSER_URL": server.url, "SHZ_EVAL_BROWSER_TOKEN": server.token},
                                        output_schema=judge_output_schema(rubric))
             report = browser.report()
         report_path = root / "browser/report.json"

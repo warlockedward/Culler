@@ -44,7 +44,7 @@ async function finish(code: number) {
     const status = await repositoryCheck(["status", "--porcelain=v1", "--untracked-files=all"]);
     console.log(JSON.stringify({ event: "repository-state", preserved: startBranch?.code === 0 && branch.code === 0 &&
       branch.output === startBranch.output && head.code === 0 && status.code === 0 &&
-      head.output === process.env.CULLER_EVAL_START_COMMIT && status.output === "" }));
+      head.output === process.env.SHZ_EVAL_START_COMMIT && status.output === "" }));
   }
   await redactNativeAccess("/eval/session", access.token);
   process.exit(code);
@@ -83,7 +83,7 @@ if (spec.harness === "codex") {
     options.skills = undefined;
     options.allowedTools = ["Read", "Glob", "Grep", "mcp__packet__inspect", "mcp__packet__scroll", "mcp__packet__follow_link", "mcp__packet__click"];
     options.mcpServers = { packet: { command: "bun", args: ["/app/eval/browser-mcp.ts"],
-      env: { CULLER_EVAL_BROWSER_URL: process.env.CULLER_EVAL_BROWSER_URL!, CULLER_EVAL_BROWSER_TOKEN: process.env.CULLER_EVAL_BROWSER_TOKEN! } } };
+      env: { SHZ_EVAL_BROWSER_URL: process.env.SHZ_EVAL_BROWSER_URL!, SHZ_EVAL_BROWSER_TOKEN: process.env.SHZ_EVAL_BROWSER_TOKEN! } } };
     options.hooks = { PreToolUse: [{ matcher: "Read|Glob|Grep", hooks: [judgeFileTool] }] };
   }
   const emit = spec.output_schema ? claudeStructuredOutputEmitter(event => console.log(JSON.stringify(event))) : undefined;

@@ -109,12 +109,12 @@ test("direct acceptance checks the final files after the commit", async () => {
     const realGit = Bun.which("git");
     if (!realGit) throw new Error("Git is unavailable.");
     await writeFile(join(tools, "git"), `#!/bin/bash
-"$CULLER_TEST_GIT" "$@"
+"$SHZ_TEST_GIT" "$@"
 result=$?
 if [ "$result" -eq 0 ]; then
   for argument in "$@"; do
     if [ "$argument" = commit ]; then
-      printf 'Concurrent edit\\n' > "$CULLER_TEST_ROOT/Dockerfile"
+      printf 'Concurrent edit\\n' > "$SHZ_TEST_ROOT/Dockerfile"
       break
     fi
   done
@@ -124,7 +124,7 @@ exit "$result"
     const input = join(tools, "files.json");
     await writeFile(input, JSON.stringify({ files, removed_files: [] }));
     const child = Bun.spawn([process.execPath, join(import.meta.dir, "project-files.ts"), "accept", root, digest, source, input, "operation-one"], {
-      env: { ...process.env, PATH: `${tools}:${process.env.PATH}`, CULLER_TEST_GIT: realGit, CULLER_TEST_ROOT: root },
+      env: { ...process.env, PATH: `${tools}:${process.env.PATH}`, SHZ_TEST_GIT: realGit, SHZ_TEST_ROOT: root },
       stdin: "ignore", stdout: "pipe", stderr: "pipe",
     });
     const [stdout, stderr, code] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]);

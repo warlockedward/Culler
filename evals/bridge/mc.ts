@@ -1,5 +1,5 @@
-let url = process.env.CULLER_EVAL_COMMAND_URL;
-let token = process.env.CULLER_EVAL_COMMAND_TOKEN;
+let url = process.env.SHZ_EVAL_COMMAND_URL;
+let token = process.env.SHZ_EVAL_COMMAND_TOKEN;
 try {
   const file = Bun.file("/mc/eval-command.json");
   if (await file.exists()) {

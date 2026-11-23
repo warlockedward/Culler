@@ -50,7 +50,7 @@ export function openCodeConfiguration(access: ProviderAccess, model: string, eff
 export function openCodeEnvironment(base: Record<string, string | undefined>, config: unknown, directory: string, ca: string, record?: string) {
   const env: Record<string, string> = {};
   for (const [name, value] of Object.entries(base)) {
-    if (value === undefined || /^(OPENCODE_|CULLER_OPENCODE_|CULLER_PROXY_|XDG_|CODEX_|CLAUDE_|ANTHROPIC_|OPENAI_)/.test(name) ||
+    if (value === undefined || /^(OPENCODE_|SHZ_OPENCODE_|SHZ_PROXY_|XDG_|CODEX_|CLAUDE_|ANTHROPIC_|OPENAI_)/.test(name) ||
         /(?:API_KEY|AUTH_TOKEN|ACCESS_TOKEN|REFRESH_TOKEN)$/.test(name) ||
         /^(HTTP_PROXY|HTTPS_PROXY|ALL_PROXY|http_proxy|https_proxy|all_proxy|NODE_OPTIONS|BUN_OPTIONS|NODE_TLS_REJECT_UNAUTHORIZED|NODE_EXTRA_CA_CERTS|SSL_CERT_FILE|MC_PROVIDER_ACCESS_FILE)$/.test(name)) continue;
     env[name] = value;
@@ -102,9 +102,9 @@ async function main(): Promise<number> {
   const sessionFile = join(root, "native-session");
   await rm(sessionFile, { force: true });
   await rm(`${sessionFile}.tmp`, { force: true });
-  env.CULLER_OPENCODE_SESSION_FILE = sessionFile;
-  env.CULLER_OPENCODE_WEBSEARCH = access.opencode!.webSearch ? "1" : "0";
-  if (process.argv.includes("--openwiki")) env.CULLER_OPENCODE_OPENWIKI_TOOLS = JSON.stringify(OPENWIKI_TOOLS);
+  env.SHZ_OPENCODE_SESSION_FILE = sessionFile;
+  env.SHZ_OPENCODE_WEBSEARCH = access.opencode!.webSearch ? "1" : "0";
+  if (process.argv.includes("--openwiki")) env.SHZ_OPENCODE_OPENWIKI_TOOLS = JSON.stringify(OPENWIKI_TOOLS);
   env[access.opencode!.keyVariable] = access.token;
   env.PWD = workspace;
   const native = arg("--native-ref");

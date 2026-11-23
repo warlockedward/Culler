@@ -86,7 +86,7 @@ def main():
         raise ValueError("Docker returned an invalid image identity.")
     suffix = hashlib.sha256(("mc-deployment-v1\0" + str(home)).encode()).hexdigest()[:12]
     helper, volume = "mc-helper-" + suffix, "mc-spine-" + suffix
-    env = {key: value for key, value in os.environ.items() if not key.startswith(("MC_", "CULLER_", "GODEBUG"))}
+    env = {key: value for key, value in os.environ.items() if not key.startswith(("MC_", "SHZ_", "GODEBUG"))}
     env["MC_HOME"] = str(home)
     config = {
         "mcHome": str(home), "expectedImage": image, "helper": helper, "volume": volume,

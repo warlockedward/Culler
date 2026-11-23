@@ -42,7 +42,7 @@ def model_facts(binary, record=None):
         env = environment(root)
         if record:
             env['OPENCODE_MODELS_PATH'] = str(Path(record).resolve())
-        env['CULLER_MODEL_FACTS'] = str(root / 'facts.json')
+        env['SHZ_MODEL_FACTS'] = str(root / 'facts.json')
         env['OPENCODE_CONFIG_CONTENT'] = json.dumps({'plugins': [FACTS.as_uri()]})
         result = run(binary, root, env, ['api', '--standalone', 'GET', '/api/model'])
         if result.returncode:

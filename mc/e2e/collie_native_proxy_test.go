@@ -165,7 +165,7 @@ func startNativeProxyResident(t *testing.T, f *fixture, control string) {
 	cmd := exec.Command("mise", "exec", "--", "bun", "--preload", filepath.Join(repo, "tests/provider-proxy/collie-resident-preload.ts"),
 		"src/main.ts", "--config", f.residentConfig())
 	cmd.Dir = filepath.Join(repo, "resident")
-	cmd.Env = append(append([]string{}, f.env...), "CULLER_COLLIE_PROXY_FIXTURE="+control)
+	cmd.Env = append(append([]string{}, f.env...), "SHZ_COLLIE_PROXY_FIXTURE="+control)
 	cmd.Stdout, cmd.Stderr = file, file
 	if err := cmd.Start(); err != nil {
 		t.Fatal(err)

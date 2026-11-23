@@ -12,14 +12,14 @@ fail() {
   printf 'install.sh: %s\n' "$*" | fold -s -w "$message_width" >&2
   exit 1
 }
-[ -n "${CULLER_BOOTSTRAP_DIR:-}" ] && [ -n "${CULLER_REPOSITORY:-}" ] || fail "Run install.sh to select a complete release."
-CULLER_BOOTSTRAP_DIR=$(CDPATH= cd -- "$CULLER_BOOTSTRAP_DIR" 2>/dev/null && pwd -P) || fail "Run install.sh to select a complete release."
+[ -n "${SHZ_BOOTSTRAP_DIR:-}" ] && [ -n "${SHZ_REPOSITORY:-}" ] || fail "Run install.sh to select a complete release."
+SHZ_BOOTSTRAP_DIR=$(CDPATH= cd -- "$SHZ_BOOTSTRAP_DIR" 2>/dev/null && pwd -P) || fail "Run install.sh to select a complete release."
 case "$(uname -s):$(uname -m)" in
-  Darwin:arm64) CULLER_PLATFORM=darwin-arm64; host_bun_key=darwin-arm64 ;;
-  Linux:x86_64) CULLER_PLATFORM=linux-amd64; host_bun_key=linux-x64 ;;
+  Darwin:arm64) SHZ_PLATFORM=darwin-arm64; host_bun_key=darwin-arm64 ;;
+  Linux:x86_64) SHZ_PLATFORM=linux-amd64; host_bun_key=linux-x64 ;;
   *) fail "Culler runs on a Mac with Apple silicon or on Linux for x86_64." ;;
 esac
-case "$CULLER_PLATFORM" in
+case "$SHZ_PLATFORM" in
   darwin-arm64)
     command -v plutil >/dev/null 2>&1 || fail "The required tool plutil is absent from the PATH. Add /usr/bin to the PATH, then run install.sh again."
     command -v shasum >/dev/null 2>&1 || fail "The required tool shasum is absent from the PATH. Add /usr/bin to the PATH, then run install.sh again."
@@ -59,11 +59,11 @@ else:
     }
     sha256_of() { sha256sum "$1" | cut -d ' ' -f 1; } ;;
 esac
-package_asset=culler-$CULLER_PLATFORM.tar.gz
-record=$CULLER_BOOTSTRAP_DIR/release.json
+package_asset=culler-$SHZ_PLATFORM.tar.gz
+record=$SHZ_BOOTSTRAP_DIR/release.json
 required_json() { json "$@" || fail "The release record is incomplete. Run install.sh again after publication completes."; }
 fetch() {
-  status=$(curl -q --config "$CULLER_BOOTSTRAP_DIR/curl.conf" --silent --location \
+  status=$(curl -q --config "$SHZ_BOOTSTRAP_DIR/curl.conf" --silent --location \
     --proto '=https' --proto-redir '=https' --connect-timeout 15 --max-time 900 \
     --header 'Accept: application/octet-stream' --header 'X-GitHub-Api-Version: 2022-11-28' --header 'Cache-Control: no-cache' \
     --output "$2" --write-out '%{http_code}' "$1" 2>/dev/null) || \
@@ -77,17 +77,17 @@ fetch() {
 [ "$(json "$record" package.name)" = "$package_asset" ] || fail "The package name is invalid."
 index=0
 package_id=
-while name=$(json "$CULLER_BOOTSTRAP_DIR/github-release.json" "assets.$index.name"); do
+while name=$(json "$SHZ_BOOTSTRAP_DIR/github-release.json" "assets.$index.name"); do
   if [ "$name" = "$package_asset" ]; then
     [ -z "$package_id" ] || fail "The release contains duplicate packages."
-    package_id=$(required_json "$CULLER_BOOTSTRAP_DIR/github-release.json" "assets.$index.id")
+    package_id=$(required_json "$SHZ_BOOTSTRAP_DIR/github-release.json" "assets.$index.id")
   fi
   index=$((index+1))
 done
 case "$package_id" in ''|*[!0-9]*) fail "The release package is absent." ;; esac
 say 'Download and verify Culler...'
-archive=$CULLER_BOOTSTRAP_DIR/package.tar.gz
-fetch "https://api.github.com/repos/$CULLER_REPOSITORY/releases/assets/$package_id" "$archive"
+archive=$SHZ_BOOTSTRAP_DIR/package.tar.gz
+fetch "https://api.github.com/repos/$SHZ_REPOSITORY/releases/assets/$package_id" "$archive"
 checksum=$(required_json "$record" package.sha256)
 case "$checksum" in ''|*[!0-9a-f]*) fail "The package checksum is invalid." ;; esac
 [ "${#checksum}" = 64 ] && \
@@ -95,19 +95,19 @@ case "$checksum" in ''|*[!0-9a-f]*) fail "The package checksum is invalid." ;; e
   [ "$(wc -c <"$archive" | tr -d ' ')" = "$(json "$record" package.size)" ] || \
   fail "The package failed verification. Run install.sh again to retry."
 # Reject links and paths outside the package before extraction.
-tar -tzf "$archive" >"$CULLER_BOOTSTRAP_DIR/paths" || fail "The package archive is invalid."
+tar -tzf "$archive" >"$SHZ_BOOTSTRAP_DIR/paths" || fail "The package archive is invalid."
 awk '
   /^bin\/(mc|install.sh|agentsview)$/ || /^host\/[A-Za-z0-9_.\/-]+$/ || /^runner\/[A-Za-z0-9_.\/-]+$/ { if ($0 ~ /(^|\/)\.\.(\/|$)/ || $0 ~ /\/\//) exit 1; next }
   { exit 1 }
-' "$CULLER_BOOTSTRAP_DIR/paths" || fail "The package contains an invalid path."
-tar -tvzf "$archive" >"$CULLER_BOOTSTRAP_DIR/entries" || fail "The package archive is invalid."
-awk 'substr($0,1,1) != "-" {exit 1}' "$CULLER_BOOTSTRAP_DIR/entries" || fail "The package contains a file link or special file."
-CULLER_PACKAGE_ROOT=$CULLER_BOOTSTRAP_DIR/package
-mkdir "$CULLER_PACKAGE_ROOT"
-tar -xzf "$archive" -C "$CULLER_PACKAGE_ROOT" || fail "The installer could not unpack the package. Run install.sh again."
-[ -x "$CULLER_PACKAGE_ROOT/bin/mc" ] || fail "The package has no executable setup program."
-CULLER_RELEASE_RECORD=$record
-export CULLER_PACKAGE_ROOT CULLER_RELEASE_RECORD
+' "$SHZ_BOOTSTRAP_DIR/paths" || fail "The package contains an invalid path."
+tar -tvzf "$archive" >"$SHZ_BOOTSTRAP_DIR/entries" || fail "The package archive is invalid."
+awk 'substr($0,1,1) != "-" {exit 1}' "$SHZ_BOOTSTRAP_DIR/entries" || fail "The package contains a file link or special file."
+SHZ_PACKAGE_ROOT=$SHZ_BOOTSTRAP_DIR/package
+mkdir "$SHZ_PACKAGE_ROOT"
+tar -xzf "$archive" -C "$SHZ_PACKAGE_ROOT" || fail "The installer could not unpack the package. Run install.sh again."
+[ -x "$SHZ_PACKAGE_ROOT/bin/mc" ] || fail "The package has no executable setup program."
+SHZ_RELEASE_RECORD=$record
+export SHZ_PACKAGE_ROOT SHZ_RELEASE_RECORD
 say 'Culler passed the download checks.'
 
 check_updates=0
@@ -130,11 +130,11 @@ if [ -n "$selected_bin" ]; then
   case "$selected_bin" in /*) MC_BIN_DIR=$selected_bin; export MC_BIN_DIR ;; *) fail "The executable directory requires an absolute path." ;; esac
 fi
 if [ "$check_updates" = 1 ]; then
-  MC_HOME="$selected_home" "$CULLER_PACKAGE_ROOT/bin/mc" __release status-terminal
+  MC_HOME="$selected_home" "$SHZ_PACKAGE_ROOT/bin/mc" __release status-terminal
   exit $?
 fi
 
-if [ "$CULLER_PLATFORM" = darwin-arm64 ]; then
+if [ "$SHZ_PLATFORM" = darwin-arm64 ]; then
   if ! xcode-select -p >/dev/null 2>&1; then
     say 'Install the Apple developer tools.'
     say 'Complete the Apple prompts, then run install.sh again.'
@@ -213,5 +213,5 @@ fi
 say 'Open Culler setup.'
 PATH="$bun_home/bin:$PATH"
 export PATH
-"$CULLER_PACKAGE_ROOT/bin/mc" __setup "$@" \
-  --release-source "$CULLER_PACKAGE_ROOT/runner" --host-release-source "$CULLER_PACKAGE_ROOT/host"
+"$SHZ_PACKAGE_ROOT/bin/mc" __setup "$@" \
+  --release-source "$SHZ_PACKAGE_ROOT/runner" --host-release-source "$SHZ_PACKAGE_ROOT/host"

@@ -25,8 +25,8 @@ await Bun.write(`/eval/session/${id}.jsonl`, JSON.stringify({ type: "session_met
   JSON.stringify({ type: "turn_context", payload: { model: "fixture-model", effort: "high" } }) + "\n");
 console.log(JSON.stringify({ type: "thread.started", thread_id: id }));
 const shellEnv = Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.includes("TOKEN")));
-delete shellEnv.CULLER_EVAL_COMMAND_URL;
-console.log(JSON.stringify({ type: "evaluation.command_environment", token_present: "CULLER_EVAL_COMMAND_TOKEN" in shellEnv,
+delete shellEnv.SHZ_EVAL_COMMAND_URL;
+console.log(JSON.stringify({ type: "evaluation.command_environment", token_present: "SHZ_EVAL_COMMAND_TOKEN" in shellEnv,
   private_file_present: await Bun.file("/mc/eval-command.json").exists() }));
 const command = Bun.spawn(["mc", "complete", String(run.subject), "--run", run.run_id, "--status", "packaged", "--outputs", packet,
   "--thesis", "The fixture changes."], { env: shellEnv, stdout: "pipe", stderr: "pipe" });

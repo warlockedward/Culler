@@ -165,15 +165,15 @@ export async function prepareProjectEnvironment(
   secrets: Record<string, string> = {},
   deps: WorkflowDependencies = workflowDependencies,
 ): Promise<{ stop(): Promise<void>; agentEnvironment: Record<string, string | undefined> }> {
-  if (base.CULLER_CACHE_LIMIT_BYTES) {
+  if (base.SHZ_CACHE_LIMIT_BYTES) {
     if (!base.HOME) throw new Error("The Project requires a persistent home.");
     await importLegacyNpmCache("/cache", base.HOME);
-    await limitProjectCache("/cache", Number(base.CULLER_CACHE_LIMIT_BYTES));
+    await limitProjectCache("/cache", Number(base.SHZ_CACHE_LIMIT_BYTES));
   }
   const services: Array<{ stop(): Promise<void>; exited(): boolean }> = [];
   const stop = async () => {
     await Promise.all(services.map((service) => service.stop()));
-    if (base.CULLER_CACHE_LIMIT_BYTES) await limitProjectCache("/cache", Number(base.CULLER_CACHE_LIMIT_BYTES));
+    if (base.SHZ_CACHE_LIMIT_BYTES) await limitProjectCache("/cache", Number(base.SHZ_CACHE_LIMIT_BYTES));
   };
   const setupEnvironment = workflowEnvironment(configuration, "setup", base, secrets);
   const agentEnvironment = workflowEnvironment(configuration, "agent", base, secrets);

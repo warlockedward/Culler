@@ -6,16 +6,16 @@ FROM ${PROJECT_BASE} AS tools
 ARG TARGETARCH
 
 # The private Node.js. Its npm serves only this stage.
-ARG CULLER_NODE_VERSION=24.18.0
-ARG CULLER_NODE_LINUX_ARM64_SHA256=58c9520501f6ae2b52d5b210444e24b9d0c029a58c5011b797bc1fe7105886f6
-ARG CULLER_NODE_LINUX_AMD64_SHA256=55aa7153f9d88f28d765fcdad5ae6945b5c0f98a36881703817e4c450fa76742
+ARG SHZ_NODE_VERSION=24.18.0
+ARG SHZ_NODE_LINUX_ARM64_SHA256=58c9520501f6ae2b52d5b210444e24b9d0c029a58c5011b797bc1fe7105886f6
+ARG SHZ_NODE_LINUX_AMD64_SHA256=55aa7153f9d88f28d765fcdad5ae6945b5c0f98a36881703817e4c450fa76742
 RUN install -d /opt/culler-runtime/node \
  && case "$TARGETARCH" in \
-      arm64) name=linux-arm64; want=$CULLER_NODE_LINUX_ARM64_SHA256 ;; \
-      amd64) name=linux-x64; want=$CULLER_NODE_LINUX_AMD64_SHA256 ;; \
+      arm64) name=linux-arm64; want=$SHZ_NODE_LINUX_ARM64_SHA256 ;; \
+      amd64) name=linux-x64; want=$SHZ_NODE_LINUX_AMD64_SHA256 ;; \
       *) printf 'unsupported target architecture %s\n' "$TARGETARCH" >&2; exit 2 ;; \
     esac \
- && curl -fsSL "https://nodejs.org/dist/v${CULLER_NODE_VERSION}/node-v${CULLER_NODE_VERSION}-${name}.tar.xz" -o /tmp/culler-node.tar.xz \
+ && curl -fsSL "https://nodejs.org/dist/v${SHZ_NODE_VERSION}/node-v${SHZ_NODE_VERSION}-${name}.tar.xz" -o /tmp/culler-node.tar.xz \
  && echo "${want}  /tmp/culler-node.tar.xz" | sha256sum -c - \
  && tar -xJf /tmp/culler-node.tar.xz -C /opt/culler-runtime/node --strip-components=1 \
  && printf '%s\n' "$want" >/tmp/culler-node.sha \
@@ -47,19 +47,19 @@ RUN cd /opt/culler-runtime/openwiki \
 RUN rm -rf /opt/culler-runtime/node/lib/node_modules /opt/culler-runtime/node/bin/npm /opt/culler-runtime/node/bin/npx /opt/culler-runtime/node/bin/corepack
 
 # The private Bun.
-ARG CULLER_BUN_VERSION=1.3.12
-ARG CULLER_BUN_LINUX_ARM64_SHA256=c40bc0ebca11bde7d75af497a654a874d0c7fd8d6a8d6031c173c10c9064297b
-ARG CULLER_BUN_LINUX_AMD64_SHA256=11dc3ee11bc1695e149737c6ca3d5619302cf4346e6b8a6ec7988967ef01ddc5
+ARG SHZ_BUN_VERSION=1.3.12
+ARG SHZ_BUN_LINUX_ARM64_SHA256=c40bc0ebca11bde7d75af497a654a874d0c7fd8d6a8d6031c173c10c9064297b
+ARG SHZ_BUN_LINUX_AMD64_SHA256=11dc3ee11bc1695e149737c6ca3d5619302cf4346e6b8a6ec7988967ef01ddc5
 RUN case "$TARGETARCH" in \
-      arm64) name=linux-aarch64; want=$CULLER_BUN_LINUX_ARM64_SHA256 ;; \
-      amd64) name=linux-x64; want=$CULLER_BUN_LINUX_AMD64_SHA256 ;; \
+      arm64) name=linux-aarch64; want=$SHZ_BUN_LINUX_ARM64_SHA256 ;; \
+      amd64) name=linux-x64; want=$SHZ_BUN_LINUX_AMD64_SHA256 ;; \
       *) printf 'unsupported target architecture %s\n' "$TARGETARCH" >&2; exit 2 ;; \
     esac \
- && curl -fsSL "https://github.com/oven-sh/bun/releases/download/bun-v${CULLER_BUN_VERSION}/bun-${name}.zip" -o /tmp/culler-bun.zip \
+ && curl -fsSL "https://github.com/oven-sh/bun/releases/download/bun-v${SHZ_BUN_VERSION}/bun-${name}.zip" -o /tmp/culler-bun.zip \
  && echo "${want}  /tmp/culler-bun.zip" | sha256sum -c - \
  && unzip -q /tmp/culler-bun.zip -d /tmp/culler-bun \
  && install -D "/tmp/culler-bun/bun-${name}/bun" /opt/culler-runtime/bun/bin/bun \
- && printf 'node %s %s\nbun %s %s\n' "$CULLER_NODE_VERSION" "$(cat /tmp/culler-node.sha)" "$CULLER_BUN_VERSION" "$want" >/opt/culler-runtime/artifacts.txt \
+ && printf 'node %s %s\nbun %s %s\n' "$SHZ_NODE_VERSION" "$(cat /tmp/culler-node.sha)" "$SHZ_BUN_VERSION" "$want" >/opt/culler-runtime/artifacts.txt \
  && rm -rf /tmp/culler-bun.zip /tmp/culler-bun /tmp/culler-node.sha
 
 # The harness packages: the Claude Agent SDK and Codex with their Linux program
@@ -112,9 +112,9 @@ COPY --chmod=0755 runner/image/runtime-check.sh /opt/culler-runtime/bin/check
 # 6. The files that change at each release.
 ARG MC_BIN=mc
 COPY --chown=10001:10001 --chmod=6755 runner/image/${MC_BIN} /opt/culler-runtime/libexec/mc-real
-ARG CULLER_RELEASE_ID=development
+ARG SHZ_RELEASE_ID=development
 RUN --mount=type=bind,source=runner/image/runtime-manifest.sh,target=/tmp/runtime-manifest.sh \
-    printf '%s\n' "$CULLER_RELEASE_ID" >/opt/culler-runtime/release-id \
+    printf '%s\n' "$SHZ_RELEASE_ID" >/opt/culler-runtime/release-id \
  && /bin/sh /tmp/runtime-manifest.sh >/opt/culler-runtime/manifest.json
 
 # The runtime check reads the image as the agent account and writes no file.

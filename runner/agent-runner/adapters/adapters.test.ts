@@ -60,7 +60,7 @@ describe("Codex production adapter", () => {
       "--config", 'approval_policy="never"',
       "--config", 'sandbox_mode="danger-full-access"',
       "--config", "shell_environment_policy.ignore_default_excludes=true",
-      "--config", 'shell_environment_policy.exclude=["CULLER_PROXY_TOKEN"]',
+      "--config", 'shell_environment_policy.exclude=["SHZ_PROXY_TOKEN"]',
       "--config", "tool_output_token_limit=100000",
       "--config", "memories.generate_memories=false",
       "--config", "memories.use_memories=false",
@@ -71,7 +71,7 @@ describe("Codex production adapter", () => {
       "--config", 'approval_policy="never"',
       "--config", 'sandbox_mode="danger-full-access"',
       "--config", "shell_environment_policy.ignore_default_excludes=true",
-      "--config", 'shell_environment_policy.exclude=["CULLER_PROXY_TOKEN"]',
+      "--config", 'shell_environment_policy.exclude=["SHZ_PROXY_TOKEN"]',
       "--config", "tool_output_token_limit=100000",
       "--config", "memories.generate_memories=false",
       "--config", "memories.use_memories=false",
@@ -93,7 +93,7 @@ describe("Codex production adapter", () => {
       expect(argv).not.toContain("--dangerously-bypass-approvals-and-sandbox");
       // The broker URL is the only in-container string that outlives the
       // access token it sits beside; it must be scrubbed from spawned shells.
-      expect(argv).toContain('shell_environment_policy.exclude=["CULLER_PROXY_TOKEN"]');
+      expect(argv).toContain('shell_environment_policy.exclude=["SHZ_PROXY_TOKEN"]');
     }
   });
 
@@ -139,7 +139,7 @@ describe("Codex production adapter", () => {
     expect(env.HOME).toBe("/home/agent");
     expect(env.PATH).toBe("/home/agent/.local/bin:/bin");
     expect(env.CODEX_HOME).toBe("/tmp/private");
-    expect(env.CULLER_PROXY_TOKEN).toBe(proxyAccess.token);
+    expect(env.SHZ_PROXY_TOKEN).toBe(proxyAccess.token);
     expect(env.CODEX_CA_CERTIFICATE).toBe("/tmp/private/ca.pem");
     expect(env.CODEX_REFRESH_TOKEN_URL_OVERRIDE).toBeUndefined();
     expect(env.OPENAI_API_KEY).toBeUndefined();

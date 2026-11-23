@@ -276,10 +276,10 @@ func installCLIPath(home, userHome, directory, release, parentPath string, verif
 func verifyCLIShell(shell, mode, path, userHome, zdot, parentPath string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	command := exec.CommandContext(ctx, shell, mode, "printf '\\nCULLER_COMMAND=%s\\n' \"$(command -v culler)\"")
+	command := exec.CommandContext(ctx, shell, mode, "printf '\\nSHZ_COMMAND=%s\\n' \"$(command -v culler)\"")
 	command.Env = append(os.Environ(), "HOME="+userHome, "PATH="+parentPath, "ZDOTDIR="+zdot)
 	body, err := command.Output()
-	if err != nil || !bytes.Contains(body, []byte("\nCULLER_COMMAND="+path+"\n")) {
+	if err != nil || !bytes.Contains(body, []byte("\nSHZ_COMMAND="+path+"\n")) {
 		return fmt.Errorf("A new %s shell cannot resolve culler. Check its shell configuration.", filepath.Base(shell))
 	}
 	return nil

@@ -544,7 +544,7 @@ def execute(args):
         raise ExperimentError("The benchmark requires mise and Docker.")
     mise, docker = str(Path(mise).resolve()), str(Path(docker).resolve())
     env = {key: value for key, value in os.environ.items()
-           if not key.startswith(("MC_", "CULLER_")) and key != "GODEBUG"}
+           if not key.startswith(("MC_", "SHZ_")) and key != "GODEBUG"}
     env["MC_HOME"] = config["mcHome"]
     bun = str(absolute_file(command_output([mise, "which", "bun"], cwd, env), "Bun", True))
     image = image_identity(docker, config["expectedImage"], cwd, env)

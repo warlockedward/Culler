@@ -50,7 +50,7 @@ export default {
           }),
         };
       });
-      fs.writeFileSync(process.env.CULLER_MODEL_FACTS, JSON.stringify(providers));
+      fs.writeFileSync(process.env.SHZ_MODEL_FACTS, JSON.stringify(providers));
     });
   },
 };

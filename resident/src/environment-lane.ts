@@ -10,7 +10,7 @@ import type { ProjectEnvironment } from "../../runner/shared/project-environment
 import { configuredGitEnvironment } from "./git-identity";
 import { composeRunSkills, ensureProjectSkillStore, readOperatorSkills } from "./skill-store";
 
-export const CULLER_RUNTIME = "/opt/culler-runtime";
+export const SHZ_RUNTIME = "/opt/culler-runtime";
 export const PROJECT_HOME = "/home/agent";
 const DIGEST = /^sha256:[0-9a-f]{64}$/;
 const REGISTRY_DIGEST = /^[a-zA-Z0-9._:/-]+@sha256:[0-9a-f]{64}$/;
@@ -150,14 +150,14 @@ export function runtimeArguments(deps: Pick<Dependencies, "config">): string[] {
   if (!volume || !/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(volume)) {
     throw new Error("The Culler runtime volume is unavailable.");
   }
-  return ["-v", `${volume}:${CULLER_RUNTIME}:ro`,
-    "-e", `PATH=${CULLER_RUNTIME}/commands:/usr/local/bin:/usr/bin:/bin`,
-    "-e", `MC_PRIVATE_BUN=${CULLER_RUNTIME}/bin/bun`,
-    "-e", `MC_PRIVATE_NODE=${CULLER_RUNTIME}/bin/node`,
+  return ["-v", `${volume}:${SHZ_RUNTIME}:ro`,
+    "-e", `PATH=${SHZ_RUNTIME}/commands:/usr/local/bin:/usr/bin:/bin`,
+    "-e", `MC_PRIVATE_BUN=${SHZ_RUNTIME}/bin/bun`,
+    "-e", `MC_PRIVATE_NODE=${SHZ_RUNTIME}/bin/node`,
     "-e", "LD_PRELOAD=", "-e", "LD_LIBRARY_PATH=", "-e", "NODE_OPTIONS=", "-e", "BUN_OPTIONS=",
-    "-e", `MC_CODEX_ADAPTER=${CULLER_RUNTIME}/app/src/agent-runner/adapters/codex.ts`,
-    "-e", `MC_CLAUDE_ADAPTER=${CULLER_RUNTIME}/app/src/agent-runner/adapters/claude.ts`,
-    "-e", `MC_HARNESS_CLI=${CULLER_RUNTIME}/app/src/fake-harness/cli.ts`];
+    "-e", `MC_CODEX_ADAPTER=${SHZ_RUNTIME}/app/src/agent-runner/adapters/codex.ts`,
+    "-e", `MC_CLAUDE_ADAPTER=${SHZ_RUNTIME}/app/src/agent-runner/adapters/claude.ts`,
+    "-e", `MC_HARNESS_CLI=${SHZ_RUNTIME}/app/src/fake-harness/cli.ts`];
 }
 
 export function deploymentIdentity(home: string): string {
@@ -196,7 +196,7 @@ export function projectCacheArguments(home: string, project: string, image: stri
   const key = createHash("sha256").update(`${project}\nlinux/arm64\nnpm-content-v2-sha512`).digest("hex").slice(0, 24);
   const volume = `mc-cache-${namespace(home)}-${key}`;
   return ["--mount", `type=volume,src=${volume},dst=/cache`,
-    "-e", "CULLER_CACHE_LIMIT_BYTES=2147483648"];
+    "-e", "SHZ_CACHE_LIMIT_BYTES=2147483648"];
 }
 
 export function projectHomeArguments(source: string, runState = true, tmpfsMb = 0): string[] {
@@ -396,16 +396,16 @@ async function performRuntimeCompatibility(image: string, operation: Environment
     const fs = await import('node:fs/promises');
     const { constants } = await import('node:fs');
     if (process.getuid() !== 10002 || process.getgid() !== 10002) throw new Error('Invalid runtime user.');
-    await fs.access('${CULLER_RUNTIME}/commands/mc', constants.X_OK);
+    await fs.access('${SHZ_RUNTIME}/commands/mc', constants.X_OK);
     let writable = false;
-    try { await fs.access('${CULLER_RUNTIME}/commands/mc', constants.W_OK); writable = true; } catch {}
+    try { await fs.access('${SHZ_RUNTIME}/commands/mc', constants.W_OK); writable = true; } catch {}
     if (writable) throw new Error('The runtime permits file changes.');
-    const node = Bun.spawnSync(['${CULLER_RUNTIME}/bin/node', '--version']);
+    const node = Bun.spawnSync(['${SHZ_RUNTIME}/bin/node', '--version']);
     if (node.exitCode !== 0) throw new Error('The private Node runtime failed.');
-    await import('${CULLER_RUNTIME}/app/src/agent-runner/adapters/claude.ts');
-    await import('${CULLER_RUNTIME}/app/src/agent-runner/adapters/codex.ts');
-    const wiki = Bun.spawnSync(['${CULLER_RUNTIME}/bin/node', '--input-type=module', '-e',
-      'await import("${CULLER_RUNTIME}/openwiki/node_modules/openwiki/dist/integrations/core/session-manager.js")']);
+    await import('${SHZ_RUNTIME}/app/src/agent-runner/adapters/claude.ts');
+    await import('${SHZ_RUNTIME}/app/src/agent-runner/adapters/codex.ts');
+    const wiki = Bun.spawnSync(['${SHZ_RUNTIME}/bin/node', '--input-type=module', '-e',
+      'await import("${SHZ_RUNTIME}/openwiki/node_modules/openwiki/dist/integrations/core/session-manager.js")']);
     if (wiki.exitCode !== 0) throw new Error('The private OpenWiki runtime failed.');
     for (const path of ['/workspace', '/mc']) {
       const entry = await fs.lstat(path);
@@ -422,7 +422,7 @@ async function performRuntimeCompatibility(image: string, operation: Environment
   await succeeded(deps.docker(["run", "--rm", "--name", name, "--network", "none", "--read-only",
     "--label", "mc-managed=true", ...deploymentArguments(deps.config.mcHome), "--label", `mc-project=${operation.project_id}`,
     "--user", "10002:10002", "--cap-drop", "ALL", "--security-opt", "no-new-privileges=true",
-    ...PIDS_LIMIT_ARGUMENTS, "--entrypoint", `${CULLER_RUNTIME}/bin/bun`,
+    ...PIDS_LIMIT_ARGUMENTS, "--entrypoint", `${SHZ_RUNTIME}/bin/bun`,
     ...runtimeArguments(deps), ...openCodeMount, image, "-e", script]), "The image cannot use the Culler runtime");
 }
 
@@ -433,12 +433,12 @@ async function measureEnvironment(project: string, image: string, deps: Dependen
   const result = await succeeded(deps.docker(["run", "--rm", "--network", "none", "--user", "10002:10002",
     "--label", "mc-managed=true", ...deploymentArguments(deps.config.mcHome), "--label", `mc-project=${project}`,
     "--cap-drop", "ALL", "--security-opt", "no-new-privileges=true", ...PIDS_LIMIT_ARGUMENTS,
-    "--entrypoint", `${CULLER_RUNTIME}/bin/bun`, ...runtimeArguments(deps),
+    "--entrypoint", `${SHZ_RUNTIME}/bin/bun`, ...runtimeArguments(deps),
     ...projectCacheArguments(deps.config.mcHome, project, image), ...projectHomeArguments(home, false), image, "-e",
-    `const {projectHomeUsage,${clear ? "clearProjectCache" : "projectCacheUsage"}}=await import('${CULLER_RUNTIME}/app/src/shared/project-cache.ts');` +
+    `const {projectHomeUsage,${clear ? "clearProjectCache" : "projectCacheUsage"}}=await import('${SHZ_RUNTIME}/app/src/shared/project-cache.ts');` +
       `const cache=${clear ? "{bytes:await clearProjectCache('/cache')}" : "await projectCacheUsage()"};` +
       "const home=await projectHomeUsage();" +
-      `const {collectProjectImageInventory}=await import('${CULLER_RUNTIME}/app/src/shared/project-evidence.ts');` +
+      `const {collectProjectImageInventory}=await import('${SHZ_RUNTIME}/app/src/shared/project-evidence.ts');` +
       "const inventory=await collectProjectImageInventory();" +
       "console.log(JSON.stringify({cache_bytes:cache.bytes,home_bytes:home.bytes,inventory}));"]), "Project disk use is unavailable");
   const measured = JSON.parse(result.stdout);
@@ -584,11 +584,11 @@ async function acceptFiles(operation: EnvironmentOperation, deps: Dependencies):
       "--cap-drop", "ALL", "--security-opt", "no-new-privileges=true", ...PIDS_LIMIT_ARGUMENTS,
       "--label", "mc-managed=true", ...deploymentArguments(deps.config.mcHome), "--label", "mc-tier=setup", "--label", `mc-project=${operation.project_id}`,
       "--label", `com.culler.environment.operation=${operation.id}`, "--label", `com.culler.environment.inputs=${operation.inputs_digest}`,
-      "--entrypoint", `${CULLER_RUNTIME}/bin/bun`, ...runtimeArguments(deps),
+      "--entrypoint", `${SHZ_RUNTIME}/bin/bun`, ...runtimeArguments(deps),
       ...configuredGitEnvironment(deps.config.gitAuthorName, deps.config.gitAuthorEmail),
       ...(filesPath ? ["--mount", `type=bind,src=${filesPath},dst=/mc/build-files.json,readonly`] : []),
       "--mount", `type=bind,src=${workspace},dst=/workspace/source`, operation.configuration.base_digest,
-      `${CULLER_RUNTIME}/app/src/shared/project-files.ts`, "accept", "/workspace/source", digest,
+      `${SHZ_RUNTIME}/app/src/shared/project-files.ts`, "accept", "/workspace/source", digest,
       ...(source || filesPath ? [source ?? ""] : []), ...(filesPath ? ["/mc/build-files.json", operation.id] : [])]),
     "The source acceptance container could not be created");
     await succeeded(deps.docker(["start", name]), "Source acceptance could not start");
@@ -820,7 +820,7 @@ async function agentOperation(operation: EnvironmentOperation, deps: Dependencie
     "--label", `mc-project=${operation.project_id}`, "--label", `com.culler.environment.operation=${operation.id}`,
     "--label", `com.culler.environment.inputs=${operation.inputs_digest}`,
     ...projectExecutionArguments(runtime.harness === "fake", setupLimits, deps.hostZone()),
-    "--entrypoint", `${CULLER_RUNTIME}/bin/bun`,
+    "--entrypoint", `${SHZ_RUNTIME}/bin/bun`,
     ...runtimeArguments(deps), ...openCodeArguments(deps.config.mcHome, runtime?.harness), ...projectCacheArguments(deps.config.mcHome, operation.project_id, operation.image_digest),
     ...projectHomeArguments(home, true, setupLimits.tmpfs_mb),
     "--mount", `type=bind,src=${workspace},dst=/workspace/source`,
@@ -833,7 +833,7 @@ async function agentOperation(operation: EnvironmentOperation, deps: Dependencie
     "-e", `MC_SPINE=${deps.config.spineDbPath}`,
     ...access,
     ...configuredGitEnvironment(deps.config.gitAuthorName, deps.config.gitAuthorEmail),
-    operation.image_digest, `${CULLER_RUNTIME}/app/src/setup-runner/main.ts`]), "The setup container could not be created");
+    operation.image_digest, `${SHZ_RUNTIME}/app/src/setup-runner/main.ts`]), "The setup container could not be created");
   await startSetupContainer(operation, deps, secrets);
 }
 

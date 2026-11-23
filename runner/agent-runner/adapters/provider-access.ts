@@ -72,7 +72,7 @@ export function codexProviderArgs(access: ProviderAccess): string[] {
     "--config", 'model_providers.culler.name="Culler"',
     "--config", `model_providers.culler.base_url=${JSON.stringify(access.url)}`,
     "--config", 'model_providers.culler.wire_api="responses"',
-    "--config", 'model_providers.culler.env_key="CULLER_PROXY_TOKEN"',
+    "--config", 'model_providers.culler.env_key="SHZ_PROXY_TOKEN"',
     "--config", "model_providers.culler.requires_openai_auth=false",
     "--config", "model_providers.culler.supports_websockets=false",
     "--config", "model_providers.culler.request_max_retries=0",

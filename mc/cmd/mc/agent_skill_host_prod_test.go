@@ -21,7 +21,7 @@ func TestExternalAgentSelectsCustomInstalledHelperWithoutPrivateVariables(t *tes
 	t.Setenv("HOME", userHome)
 	t.Setenv("MC_HELPER", "")
 	t.Setenv("MC_SPINE", "")
-	t.Setenv("CULLER_RELEASE_RECORD", "")
+	t.Setenv("SHZ_RELEASE_RECORD", "")
 	previousRelease := releaseBuildID
 	releaseBuildID = strings.Repeat("a", 40)
 	t.Cleanup(func() { releaseBuildID = previousRelease })

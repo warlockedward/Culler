@@ -5,8 +5,8 @@ import { createFailureRepairFixture, saveSyntheticAccount, type ProviderFault } 
 import { runNativeHarness } from "./native-harness";
 import { dashboardState, installFixtureRunner, recordFixtureAvailability, refreshDashboard, retainDashboardEvidence, testAndSaveProfileInDashboard } from "./dashboard-assertions";
 
-const image = process.env.CULLER_PROXY_TEST_IMAGE ?? process.env.MC_BOUNDARY_IMAGE;
-if (!image) throw new Error("Set CULLER_PROXY_TEST_IMAGE to the image with the pinned release harnesses.");
+const image = process.env.SHZ_PROXY_TEST_IMAGE ?? process.env.MC_BOUNDARY_IMAGE;
+if (!image) throw new Error("Set SHZ_PROXY_TEST_IMAGE to the image with the pinned release harnesses.");
 const connections = [
   { id: "synthetic-codex-account", harness: "codex" as const, template: "chatgpt" },
   { id: "synthetic-claude-account", harness: "claude-sdk" as const, template: "claude" },
@@ -14,8 +14,8 @@ const connections = [
 let smoke: Smoke;
 let fixture: Awaited<ReturnType<typeof createFailureRepairFixture>>;
 const profiles = new Map<string, { id: string; name: string; revision: string }>();
-const previousStore = process.env.CULLER_TEST_HOST_SECRET_DIR;
-const previousImage = process.env.CULLER_TEST_PROVIDER_IMAGE;
+const previousStore = process.env.SHZ_TEST_HOST_SECRET_DIR;
+const previousImage = process.env.SHZ_TEST_PROVIDER_IMAGE;
 
 async function modelPanel() {
   await smoke.page.getByTestId("tab-pipeline").click();
@@ -35,10 +35,10 @@ async function retrySelectedModel() {
 }
 
 beforeAll(async () => {
-  process.env.CULLER_TEST_PROVIDER_IMAGE = image;
+  process.env.SHZ_TEST_PROVIDER_IMAGE = image;
   smoke = await bootSmoke();
   await installFixtureRunner(smoke);
-  process.env.CULLER_TEST_HOST_SECRET_DIR = join(smoke.stateScratch, "host-secrets");
+  process.env.SHZ_TEST_HOST_SECRET_DIR = join(smoke.stateScratch, "host-secrets");
   await seedProject(smoke, "provider-origin", { title: "Provider origin" });
   for (const connection of connections) {
     await saveSyntheticAccount({ home: smoke.home, runMc: (argv, input) => mc(argv, {}, input) }, connection);
@@ -63,10 +63,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await fixture?.stop();
-  if (previousStore === undefined) delete process.env.CULLER_TEST_HOST_SECRET_DIR;
-  else process.env.CULLER_TEST_HOST_SECRET_DIR = previousStore;
-  if (previousImage === undefined) delete process.env.CULLER_TEST_PROVIDER_IMAGE;
-  else process.env.CULLER_TEST_PROVIDER_IMAGE = previousImage;
+  if (previousStore === undefined) delete process.env.SHZ_TEST_HOST_SECRET_DIR;
+  else process.env.SHZ_TEST_HOST_SECRET_DIR = previousStore;
+  if (previousImage === undefined) delete process.env.SHZ_TEST_PROVIDER_IMAGE;
+  else process.env.SHZ_TEST_PROVIDER_IMAGE = previousImage;
   await teardown(smoke);
 }, 30000);
 

@@ -60,7 +60,7 @@ def test_launch_preserves_branch_after_the_harness_exits(tmp_path, detached, cha
         launch = launch.replace(original, replacement)
     (fixture / "launch.ts").write_text(launch)
     env = os.environ.copy()
-    env["CULLER_EVAL_START_COMMIT"] = start_commit
+    env["SHZ_EVAL_START_COMMIT"] = start_commit
     result = subprocess.run(["mise", "exec", "--", "bun", str(fixture / "launch.ts")],
                             cwd=SOURCE, input="", text=True, capture_output=True, env=env, check=True)
     events = [json.loads(line) for line in result.stdout.splitlines()]

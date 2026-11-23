@@ -100,7 +100,7 @@ func installCullerCommand(source, directory string) error {
 	if err != nil {
 		return err
 	}
-	parentPath, ok := os.LookupEnv("CULLER_PARENT_PATH")
+	parentPath, ok := os.LookupEnv("SHZ_PARENT_PATH")
 	if !ok {
 		parentPath = os.Getenv("PATH")
 	}

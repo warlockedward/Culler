@@ -38,7 +38,7 @@ type setupRelease struct {
 }
 
 func inspectSetupRelease(home string, args verbs.OnboardArgs, docker onboarding.DockerStatus) setupRelease {
-	if path := os.Getenv("CULLER_RELEASE_RECORD"); path != "" {
+	if path := os.Getenv("SHZ_RELEASE_RECORD"); path != "" {
 		return inspectPublishedSetupRelease(home, args, docker, path)
 	}
 	r := setupRelease{Installed: "unknown", Proposed: releaseBuildID, SourceState: "unknown"}

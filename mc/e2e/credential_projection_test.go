@@ -76,7 +76,7 @@ const access = JSON.parse(readFileSync(path, "utf8"));
 if (Object.keys(access).sort().join(",") !== "authMode,ca,harness,token,url,version") fail();
 if (!/^culler_proxy_[A-Za-z0-9_-]{43}$/.test(access.token) || !access.url.startsWith("https://")) fail();
 if (access.ca.includes("PRIVATE KEY") || !access.ca.includes("BEGIN CERTIFICATE")) fail();
-for (const key of ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "MC_CREDENTIAL_REFRESH_URL", "CODEX_REFRESH_TOKEN_URL_OVERRIDE", "CULLER_TEST_HOST_SECRET_DIR"]) {
+for (const key of ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "MC_CREDENTIAL_REFRESH_URL", "CODEX_REFRESH_TOKEN_URL_OVERRIDE", "SHZ_TEST_HOST_SECRET_DIR"]) {
   if (process.env[key]) fail();
 }
 for (const file of ["/mc/codex/auth.json", "/home/agent/.codex/auth.json", "/home/agent/.claude/.credentials.json"]) {
@@ -91,7 +91,7 @@ const response = await fetch(access.url + (access.harness === "codex" ? "/respon
 if (response.status !== (deniedToken ? 401 : 403)) fail();
 const answer = await response.text();
 if (answer.includes(access.token) || !response.headers.get("x-culler-request-id")) fail();
-console.log("CULLER_CONTAINER_PROVIDER_BOUNDARY_OK");
+console.log("SHZ_CONTAINER_PROVIDER_BOUNDARY_OK");
 `
 	if err := os.WriteFile(filepath.Join(f.base, "behaviors", "provider-probe.ts"), []byte(probe), 0o644); err != nil {
 		t.Fatal(err)

@@ -117,7 +117,7 @@ func TestPublishedReleaseStatusRetainsIdentityAfterCredentialRefusal(t *testing.
 	if err := os.Chmod(credential, 0644); err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("CULLER_GITHUB_TOKEN_FILE", credential)
+	t.Setenv("SHZ_GITHUB_TOKEN_FILE", credential)
 	status := readPublishedReleaseStatus(context.Background(), home)
 	if status.State != "unknown" || status.Installed != installed.Commit || status.Available != "" {
 		t.Fatalf("Credential refusal lost the installed identity: %+v", status)
@@ -140,7 +140,7 @@ func TestReleaseStatusPresentation(t *testing.T) {
 		if !strings.Contains(output.String(), "Installed release:") || strings.Contains(output.String(), "mc __") {
 			t.Fatalf("Invalid operator output: %s", output.String())
 		}
-		if os.Getenv("CULLER_RELEASE_PREVIEW") == "1" {
+		if os.Getenv("SHZ_RELEASE_PREVIEW") == "1" {
 			renderReleaseStatus(onboarding.NewTerminal(os.Stdin, os.Stdout), sample)
 		}
 	}
@@ -158,7 +158,7 @@ func TestReleaseStatusPresentation(t *testing.T) {
 			strings.Contains(text, "no complete release") || strings.Contains(text, "state is unknown")) {
 			t.Fatalf("A completed workflow received the wrong status: %s", output.String())
 		}
-		if os.Getenv("CULLER_RELEASE_PREVIEW") == "1" {
+		if os.Getenv("SHZ_RELEASE_PREVIEW") == "1" {
 			renderReleaseStatus(onboarding.NewTerminal(os.Stdin, os.Stdout), sample)
 		}
 	}
@@ -172,7 +172,7 @@ func TestReleaseStatusPresentation(t *testing.T) {
 		strings.Contains(text, "preparing") {
 		t.Fatalf("Wrong release labels or a workflow line without a version: %s", output.String())
 	}
-	if os.Getenv("CULLER_RELEASE_PREVIEW") == "1" {
+	if os.Getenv("SHZ_RELEASE_PREVIEW") == "1" {
 		renderReleaseStatus(onboarding.NewTerminal(os.Stdin, os.Stdout), sample)
 	}
 	t.Setenv("COLUMNS", "40")

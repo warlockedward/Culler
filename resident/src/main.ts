@@ -319,7 +319,7 @@ async function startProjector(mcPath: string, mcHome: string, log: Logger,
   // globalThis.fetch and names its directory here. Forward it through the
   // projector's existing fetch seam so it lands on the real proxy egress path.
   // Without that variable the option stays undefined and egress is unchanged.
-  const fixtureFetch = process.env.CULLER_COLLIE_PROXY_FIXTURE ? globalThis.fetch : undefined;
+  const fixtureFetch = process.env.SHZ_COLLIE_PROXY_FIXTURE ? globalThis.fetch : undefined;
   const handle = startCredentialProjector({ credentials, tls, hostname: proxyHost, refreshConnection, observe,
     fetch: fixtureFetch,
     isLaunchCurrent: (run, launch, signal) => providerLaunchState(runMc, run, launch, signal) }, catalog);

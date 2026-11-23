@@ -14,7 +14,7 @@ export async function harnessVersions(): Promise<Record<string, string>> {
 }
 const event = (type: string, value: object) => `event: ${type}\ndata: ${JSON.stringify({ type, ...value })}\n\n`;
 
-export function syntheticFinalResponse(harness: string, body: unknown, text = "CULLER_REPAIR_OK", phase?: "commentary" | "final"): Response {
+export function syntheticFinalResponse(harness: string, body: unknown, text = "SHZ_REPAIR_OK", phase?: "commentary" | "final"): Response {
   const model = (body as any)?.model;
   if (typeof model !== "string" || !model) throw new Error("The synthetic response requires the requested model.");
   const id = randomUUID();

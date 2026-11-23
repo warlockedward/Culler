@@ -23,10 +23,10 @@ done
 cp "$ROOT/install.sh" "$TMP/package/bin/install.sh"
 cat >"$TMP/package/bin/mc" <<'MC'
 #!/bin/sh
-printf '%s\n' "$@" >"$CULLER_FIXTURE_LOG"
-printf '%s\n' "${MC_HOME:-}" "${CULLER_RELEASE_RECORD:-}" "${CULLER_PACKAGE_ROOT:-}" "${MC_BIN_DIR:-}" "${CULLER_INSTALL_STARTED_AT:-}" "${PATH%%:*}" >"$CULLER_FIXTURE_ENV"
-if [ -x "${CULLER_PACKAGE_ROOT:-}/bin/agentsview" ]; then printf 'agentsview\n' >>"$CULLER_FIXTURE_ENV"; fi
-exit "${CULLER_FIXTURE_EXIT:-0}"
+printf '%s\n' "$@" >"$SHZ_FIXTURE_LOG"
+printf '%s\n' "${MC_HOME:-}" "${SHZ_RELEASE_RECORD:-}" "${SHZ_PACKAGE_ROOT:-}" "${MC_BIN_DIR:-}" "${SHZ_INSTALL_STARTED_AT:-}" "${PATH%%:*}" >"$SHZ_FIXTURE_ENV"
+if [ -x "${SHZ_PACKAGE_ROOT:-}/bin/agentsview" ]; then printf 'agentsview\n' >>"$SHZ_FIXTURE_ENV"; fi
+exit "${SHZ_FIXTURE_EXIT:-0}"
 MC
 chmod 755 "$TMP/package/bin/mc"
 printf '#!/bin/sh\nexit 0\n' >"$TMP/package/bin/agentsview"
@@ -35,7 +35,7 @@ printf 'host file\n' >"$TMP/package/host/file"
 printf 'runner file\n' >"$TMP/package/runner/file"
 cat >"$TMP/bin/uname" <<'CMD'
 #!/bin/sh
-case "$1" in -s) printf '%s\n' "${CULLER_FIXTURE_OS:-Darwin}" ;; -m) printf '%s\n' "${CULLER_FIXTURE_ARCH:-arm64}" ;; esac
+case "$1" in -s) printf '%s\n' "${SHZ_FIXTURE_OS:-Darwin}" ;; -m) printf '%s\n' "${SHZ_FIXTURE_ARCH:-arm64}" ;; esac
 CMD
 cat >"$TMP/bin/xcode-select" <<'CMD'
 #!/bin/sh
@@ -59,7 +59,7 @@ CMD
 # The published installer never calls mise. Any call fails the install.
 cat >"$TMP/bin/mise" <<'CMD'
 #!/bin/sh
-printf '%s\n' "$*" >>"$CULLER_FIXTURE_MISE"
+printf '%s\n' "$*" >>"$SHZ_FIXTURE_MISE"
 exit 97
 CMD
 cat >"$TMP/bin/curl" <<'CMD'
@@ -67,20 +67,20 @@ cat >"$TMP/bin/curl" <<'CMD'
 output=
 url=
 config=
-printf '%s\n' "${CULLER_INSTALL_STARTED_AT:-}" >>"$CULLER_FIXTURE_STARTED_AT"
-for argument do printf '%s\n' "$argument" >>"$CULLER_FIXTURE_CURL"; done
+printf '%s\n' "${SHZ_INSTALL_STARTED_AT:-}" >>"$SHZ_FIXTURE_STARTED_AT"
+for argument do printf '%s\n' "$argument" >>"$SHZ_FIXTURE_CURL"; done
 while [ "$#" -gt 0 ]; do
  case "$1" in --output) output=$2; shift ;; --config) config=$2; shift ;; https://*) url=$1 ;; esac
  shift
 done
-if [ -n "${CULLER_FIXTURE_HTTP:-}" ]; then
+if [ -n "${SHZ_FIXTURE_HTTP:-}" ]; then
   case "$url" in
-    */repos/vinchenkov/Culler) printf '{}' >"$output"; printf '%s' "${CULLER_FIXTURE_REPO_STATUS:-200}" ;;
-    *) printf '%s' "$CULLER_FIXTURE_HTTP" ;;
+    */repos/vinchenkov/Culler) printf '{}' >"$output"; printf '%s' "${SHZ_FIXTURE_REPO_STATUS:-200}" ;;
+    *) printf '%s' "$SHZ_FIXTURE_HTTP" ;;
   esac
   exit 0
 fi
-if [ "${CULLER_FIXTURE_PRIVATE:-0}" = 1 ]; then
+if [ "${SHZ_FIXTURE_PRIVATE:-0}" = 1 ]; then
  grep -F 'Authorization: Bearer fixture_private_token' "$config" >/dev/null || { printf 401; exit 0; }
 fi
 case "$url" in
@@ -92,9 +92,9 @@ case "$url" in
  */releases/download/bun-v1.3.9/bun-linux-x64.zip) source=bun-x64.zip ;;
  *) exit 93 ;;
 esac
-cp "$CULLER_FIXTURE_DIR/$source" "$output"
-if [ "$source" = installer.sh ] && [ "${CULLER_FIXTURE_CORRUPT:-0}" = 1 ]; then printf '# bad bytes\n' >>"$output"; fi
-if [ "$source" = bun.zip ] && [ "${CULLER_FIXTURE_BUN_CORRUPT:-0}" = 1 ]; then printf 'bad bytes\n' >>"$output"; fi
+cp "$SHZ_FIXTURE_DIR/$source" "$output"
+if [ "$source" = installer.sh ] && [ "${SHZ_FIXTURE_CORRUPT:-0}" = 1 ]; then printf '# bad bytes\n' >>"$output"; fi
+if [ "$source" = bun.zip ] && [ "${SHZ_FIXTURE_BUN_CORRUPT:-0}" = 1 ]; then printf 'bad bytes\n' >>"$output"; fi
 printf 200
 CMD
 if [ "$(uname -s)" = Linux ]; then
@@ -122,12 +122,12 @@ if [ ! -x /usr/bin/python3 ] && [ ! -x /bin/python3 ]; then
 fi
 export PATH="$TMP/bin:/usr/bin:/bin"
 export HOME="$TMP/home"
-export CULLER_FIXTURE_DIR="$TMP/fixtures"
-export CULLER_FIXTURE_LOG="$TMP/args"
-export CULLER_FIXTURE_ENV="$TMP/env"
-export CULLER_FIXTURE_CURL="$TMP/curl-args"
-export CULLER_FIXTURE_STARTED_AT="$TMP/download-starts"
-export CULLER_FIXTURE_MISE="$TMP/mise-args"
+export SHZ_FIXTURE_DIR="$TMP/fixtures"
+export SHZ_FIXTURE_LOG="$TMP/args"
+export SHZ_FIXTURE_ENV="$TMP/env"
+export SHZ_FIXTURE_CURL="$TMP/curl-args"
+export SHZ_FIXTURE_STARTED_AT="$TMP/download-starts"
+export SHZ_FIXTURE_MISE="$TMP/mise-args"
 # The Bun archive fixture holds a program that reports the pinned version.
 mkdir -p "$TMP/bun-fixture/bun-darwin-aarch64"
 cat >"$TMP/bun-fixture/bun-darwin-aarch64/bun" <<'CMD'
@@ -137,7 +137,7 @@ printf '1.3.9\n'
 CMD
 chmod 755 "$TMP/bun-fixture/bun-darwin-aarch64/bun"
 (cd "$TMP/bun-fixture" && zip -q -r "$TMP/fixtures/bun.zip" bun-darwin-aarch64)
-unset MC_HOME CULLER_GITHUB_TOKEN_FILE CULLER_BOOTSTRAP_DIR CULLER_PACKAGE_ROOT CULLER_RELEASE_RECORD
+unset MC_HOME SHZ_GITHUB_TOKEN_FILE SHZ_BOOTSTRAP_DIR SHZ_PACKAGE_ROOT SHZ_RELEASE_RECORD
 cp "$ROOT/release/installer.sh" "$TMP/fixtures/installer.sh"
 tar -czf "$TMP/fixtures/package.tar.gz" -C "$TMP/package" bin/mc bin/install.sh bin/agentsview host/file runner/file
 # macOS supplies plutil. The JSON fixture writer remains a test dependency.
@@ -161,7 +161,7 @@ invocation_started=$(date +%s)
 mkdir "$TMP/download temp"
 ln -s "$TMP/download temp" "$TMP/download-alias"
 download_root=$(CDPATH= cd -- "$TMP/download temp" && pwd -P)
-TMPDIR="$TMP/download-alias/" CULLER_INSTALL_STARTED_AT=1 sh "$TMP/outside/install.sh" --mc-home "$TMP/deployment home" --yes --activate >"$TMP/install.out" 2>&1 || { cat "$TMP/install.out" >&2; fail 'saved launcher failed'; }
+TMPDIR="$TMP/download-alias/" SHZ_INSTALL_STARTED_AT=1 sh "$TMP/outside/install.sh" --mc-home "$TMP/deployment home" --yes --activate >"$TMP/install.out" 2>&1 || { cat "$TMP/install.out" >&2; fail 'saved launcher failed'; }
 package_root=$(sed -n '3p' "$TMP/env")
 case "$package_root" in
   "$download_root"/culler-install.*/package) ;;
@@ -202,18 +202,18 @@ mkdir "$TMP/plutil-stdout"
 cat >"$TMP/plutil-stdout/plutil" <<'CMD'
 #!/bin/sh
 if [ "$1" = -extract ] && [ "$2" = test_release ]; then
-  if value=$("$CULLER_FIXTURE_PLUTIL" "$@"); then
+  if value=$("$SHZ_FIXTURE_PLUTIL" "$@"); then
     printf '%s\n' "$value"
   else
     printf 'Could not extract value, error: No value at that key path\n'
     exit 1
   fi
 else
-  exec "$CULLER_FIXTURE_PLUTIL" "$@"
+  exec "$SHZ_FIXTURE_PLUTIL" "$@"
 fi
 CMD
 chmod 755 "$TMP/plutil-stdout/plutil"
-CULLER_FIXTURE_PLUTIL=$(command -v plutil) PATH="$TMP/plutil-stdout:$PATH" \
+SHZ_FIXTURE_PLUTIL=$(command -v plutil) PATH="$TMP/plutil-stdout:$PATH" \
   sh "$TMP/outside/install.sh" --check-updates >"$TMP/optional-release.out" 2>&1 || {
     cat "$TMP/optional-release.out" >&2
     fail 'public release rejected an absent test_release field'
@@ -256,24 +256,24 @@ mv "$TMP/public-release.json" "$TMP/fixtures/release.json"
 mv "$TMP/public-github-release.json" "$TMP/fixtures/github-release.json"
 # A Bun archive with another checksum stops the install before setup and leaves no Bun.
 rm -f "$TMP/args"
-if CULLER_FIXTURE_BUN_CORRUPT=1 sh "$TMP/outside/install.sh" --mc-home "$TMP/corrupt home" --yes --activate >"$TMP/bun-hash.out" 2>&1; then fail 'corrupt Bun archive succeeded'; fi
+if SHZ_FIXTURE_BUN_CORRUPT=1 sh "$TMP/outside/install.sh" --mc-home "$TMP/corrupt home" --yes --activate >"$TMP/bun-hash.out" 2>&1; then fail 'corrupt Bun archive succeeded'; fi
 contains "$TMP/bun-hash.out" 'Bun 1.3.9 failed the download checks.' || fail 'Bun checksum refusal was absent'
 [ ! -e "$TMP/args" ] || fail 'corrupt Bun archive started setup'
 [ -z "$(ls -A "$TMP/corrupt home/bun" 2>/dev/null)" ] || fail 'corrupt Bun download left files'
-if [ -n "${CULLER_TEST_ARTIFACT_DIR:-}" ]; then
-  mkdir -p "$CULLER_TEST_ARTIFACT_DIR"
+if [ -n "${SHZ_TEST_ARTIFACT_DIR:-}" ]; then
+  mkdir -p "$SHZ_TEST_ARTIFACT_DIR"
   cat >"$TMP/preview-launcher" <<'PREVIEW'
 #!/bin/sh
 stty cols "$COLUMNS"
-exec sh "$CULLER_PREVIEW_LAUNCHER" "$@"
+exec sh "$SHZ_PREVIEW_LAUNCHER" "$@"
 PREVIEW
-  export CULLER_PREVIEW_LAUNCHER="$TMP/outside/install.sh"
+  export SHZ_PREVIEW_LAUNCHER="$TMP/outside/install.sh"
   for width in 80 40; do
     for mode in color plain; do
       no_color=
       [ "$mode" = color ] || no_color=1
       COLUMNS="$width" TERM=xterm-256color NO_COLOR="$no_color" \
-        script -q "$CULLER_TEST_ARTIFACT_DIR/launcher-$width-$mode.txt" \
+        script -q "$SHZ_TEST_ARTIFACT_DIR/launcher-$width-$mode.txt" \
         sh "$TMP/preview-launcher" --check-updates </dev/null >/dev/null 2>&1
       for scenario in auth no-release checksum bun-checksum bun-install bun-reuse; do
         http_status=
@@ -289,8 +289,8 @@ PREVIEW
           bun-reuse) set -- --mc-home "$TMP/preview bun $width $mode" --yes --activate ;;
         esac
         COLUMNS="$width" TERM=xterm-256color NO_COLOR="$no_color" \
-          CULLER_FIXTURE_HTTP="$http_status" CULLER_FIXTURE_CORRUPT="$corrupt" CULLER_FIXTURE_BUN_CORRUPT="$bun_corrupt" \
-          script -q "$CULLER_TEST_ARTIFACT_DIR/launcher-$scenario-$width-$mode.txt" \
+          SHZ_FIXTURE_HTTP="$http_status" SHZ_FIXTURE_CORRUPT="$corrupt" SHZ_FIXTURE_BUN_CORRUPT="$bun_corrupt" \
+          script -q "$SHZ_TEST_ARTIFACT_DIR/launcher-$scenario-$width-$mode.txt" \
           sh "$TMP/preview-launcher" "$@" </dev/null >/dev/null 2>&1 || true
       done
     done
@@ -308,33 +308,33 @@ mkdir -p "$TMP/saved home/bin" "$TMP/saved home/state"
 cp "$ROOT/install.sh" "$TMP/saved home/bin/install.sh"
 printf '{}\n' >"$TMP/saved home/state/published-release.json"
 invocation_started=$(date +%s)
-CULLER_INSTALL_STARTED_AT=2 sh "$TMP/saved home/bin/install.sh" --check-updates >"$TMP/saved.out" 2>&1 || fail 'installed launcher failed'
+SHZ_INSTALL_STARTED_AT=2 sh "$TMP/saved home/bin/install.sh" --check-updates >"$TMP/saved.out" 2>&1 || fail 'installed launcher failed'
 [ "$(sed -n '5p' "$TMP/env")" -ge "$invocation_started" ] || fail 'installed launcher reused an inherited timestamp'
 [ "$(sed -n '1p' "$TMP/env")" = "$(CDPATH= cd -- "$TMP/saved home" && pwd)" ] || fail 'installed launcher lost its deployment home'
 mkdir -p "$TMP/custom home/supervision"
 printf '{"mcPath":"%s/custom bin/mc"}\n' "$TMP" >"$TMP/custom home/supervision/resident.json"
 sh "$TMP/outside/install.sh" --mc-home "$TMP/custom home" --yes --activate >"$TMP/custom.out" 2>&1 || fail 'custom executable directory failed'
 [ "$(sed -n '4p' "$TMP/env")" = "$TMP/custom bin" ] || fail 'installer lost the custom executable directory'
-if CULLER_FIXTURE_EXIT=17 sh "$TMP/outside/install.sh" --check-updates >"$TMP/exit.out" 2>&1; then fail 'launcher lost the installer failure'; else [ "$?" = 17 ] || fail 'launcher changed the installer exit code'; fi
+if SHZ_FIXTURE_EXIT=17 sh "$TMP/outside/install.sh" --check-updates >"$TMP/exit.out" 2>&1; then fail 'launcher lost the installer failure'; else [ "$?" = 17 ] || fail 'launcher changed the installer exit code'; fi
 mkdir -p "$HOME/.config/culler"
 printf 'fixture_private_token\n' >"$HOME/.config/culler/github-token"
 chmod 600 "$HOME/.config/culler/github-token"
-CULLER_FIXTURE_PRIVATE=1 sh "$TMP/outside/install.sh" --check-updates >"$TMP/private.out" 2>&1 || fail 'private download failed'
+SHZ_FIXTURE_PRIVATE=1 sh "$TMP/outside/install.sh" --check-updates >"$TMP/private.out" 2>&1 || fail 'private download failed'
 if grep -F fixture_private_token "$TMP/curl-args" "$TMP/private.out" >/dev/null; then fail 'credential entered arguments or terminal output'; fi
 chmod 644 "$HOME/.config/culler/github-token"
 if sh "$TMP/outside/install.sh" --check-updates >"$TMP/permissions.out" 2>&1; then fail 'public credential file was accepted'; fi
 rm "$HOME/.config/culler/github-token"
-if CULLER_FIXTURE_HTTP=403 sh "$TMP/outside/install.sh" >"$TMP/access.out" 2>&1; then fail 'refused access succeeded'; fi
+if SHZ_FIXTURE_HTTP=403 sh "$TMP/outside/install.sh" >"$TMP/access.out" 2>&1; then fail 'refused access succeeded'; fi
 contains "$TMP/access.out" 'Renew the repository and package credentials' || fail 'access error omitted repair action'
-if CULLER_FIXTURE_HTTP=404 sh "$TMP/outside/install.sh" >"$TMP/no-release.out" 2>&1; then fail 'absent release succeeded'; fi
+if SHZ_FIXTURE_HTTP=404 sh "$TMP/outside/install.sh" >"$TMP/no-release.out" 2>&1; then fail 'absent release succeeded'; fi
 contains "$TMP/no-release.out" 'No complete release is available' || fail 'release absence was unclear'
-if CULLER_FIXTURE_HTTP=404 CULLER_FIXTURE_REPO_STATUS=404 sh "$TMP/outside/install.sh" >"$TMP/private-absence.out" 2>&1; then fail 'private absence succeeded'; fi
+if SHZ_FIXTURE_HTTP=404 SHZ_FIXTURE_REPO_STATUS=404 sh "$TMP/outside/install.sh" >"$TMP/private-absence.out" 2>&1; then fail 'private absence succeeded'; fi
 contains "$TMP/private-absence.out" 'repository access is absent' || fail 'private repository absence was unclear'
 # The same saved launcher must select a later published installer.
 for file in installer.sh release.json github-release.json; do cp "$TMP/fixtures/$file" "$TMP/$file.original"; done
 cat >"$TMP/fixtures/installer.sh" <<'NEWINSTALLER'
 #!/bin/sh
-printf 'new installer\n' >"$CULLER_FIXTURE_NEW"
+printf 'new installer\n' >"$SHZ_FIXTURE_NEW"
 NEWINSTALLER
 python3 - "$TMP/fixtures" <<'PYFIXTURE'
 import hashlib,json,sys
@@ -348,7 +348,7 @@ for asset in github['assets']:
     if asset['name']=='installer.sh': asset['size']=record['installer']['size']
 (root/'github-release.json').write_text(json.dumps(github))
 PYFIXTURE
-CULLER_FIXTURE_NEW="$TMP/new-installer" sh "$TMP/outside/install.sh" --check-updates >"$TMP/new.out" 2>&1 || fail 'saved launcher rejected the newer release'
+SHZ_FIXTURE_NEW="$TMP/new-installer" sh "$TMP/outside/install.sh" --check-updates >"$TMP/new.out" 2>&1 || fail 'saved launcher rejected the newer release'
 [ -f "$TMP/new-installer" ] || fail 'saved launcher reused its old installer'
 for file in installer.sh release.json github-release.json; do cp "$TMP/$file.original" "$TMP/fixtures/$file"; done
 for field in tag version; do
@@ -432,9 +432,9 @@ PYFIXTURE
 if sh "$TMP/outside/install.sh" >"$TMP/archive-link.out" 2>&1; then fail 'package symbolic link succeeded'; fi
 contains "$TMP/archive-link.out" 'file link or special file' || fail 'archive link refusal was absent'
 [ ! -e "$TMP/args" ] || fail 'archive symbolic link executed code'
-if CULLER_FIXTURE_OS=Linux CULLER_FIXTURE_ARCH=aarch64 sh "$TMP/outside/install.sh" >"$TMP/platform.out" 2>&1; then fail 'unsupported platform succeeded'; fi
+if SHZ_FIXTURE_OS=Linux SHZ_FIXTURE_ARCH=aarch64 sh "$TMP/outside/install.sh" >"$TMP/platform.out" 2>&1; then fail 'unsupported platform succeeded'; fi
 contains "$TMP/platform.out" 'Mac with Apple silicon or on Linux for x86_64' || fail 'the platform refusal did not name both targets'
-if CULLER_FIXTURE_OS=Darwin CULLER_FIXTURE_ARCH=x86_64 sh "$TMP/outside/install.sh" >"$TMP/platform-intel.out" 2>&1; then fail 'an Intel Mac succeeded; only Apple silicon is supported on macOS'; fi
+if SHZ_FIXTURE_OS=Darwin SHZ_FIXTURE_ARCH=x86_64 sh "$TMP/outside/install.sh" >"$TMP/platform-intel.out" 2>&1; then fail 'an Intel Mac succeeded; only Apple silicon is supported on macOS'; fi
 # A Linux production host takes the same front door with its own record,
 # package, and host Bun, parsed through the python3 reader instead of plutil.
 linux_fixtures=$TMP/fixtures-linux
@@ -482,7 +482,7 @@ assets=[{'id':1,'name':'release-linux-amd64.json','size':(linux/'release-linux-a
 (linux/'github-release.json').write_text(json.dumps({'tag_name':'v0.1.0','draft':False,'prerelease':False,'assets':assets}))
 PYFIXTURE
 rm -f "$TMP/args"
-CULLER_FIXTURE_OS=Linux CULLER_FIXTURE_ARCH=x86_64 CULLER_FIXTURE_DIR="$linux_fixtures" \
+SHZ_FIXTURE_OS=Linux SHZ_FIXTURE_ARCH=x86_64 SHZ_FIXTURE_DIR="$linux_fixtures" \
   sh "$TMP/outside/install.sh" --mc-home "$TMP/linux home" --yes --activate >"$TMP/linux.out" 2>&1 || { cat "$TMP/linux.out" >&2; fail 'a Linux production host could not install'; }
 [ "$(sed -n '1p' "$TMP/args")" = __setup ] || fail 'the Linux install did not start setup'
 [ -x "$TMP/linux home/bun/1.3.9/bin/bun" ] || fail 'the Linux install did not place the host Bun'
@@ -490,10 +490,10 @@ CULLER_FIXTURE_OS=Linux CULLER_FIXTURE_ARCH=x86_64 CULLER_FIXTURE_DIR="$linux_fi
 contains "$TMP/linux.out" 'Download and verify Bun 1.3.9' || fail 'the Linux install omitted the Bun step'
 # A darwin client must not read this release, and a Linux client must not
 # read the darwin record: each record only answers for its own platform.
-if CULLER_FIXTURE_DIR="$linux_fixtures" sh "$TMP/outside/install.sh" >"$TMP/linux-as-darwin.out" 2>&1; then
+if SHZ_FIXTURE_DIR="$linux_fixtures" sh "$TMP/outside/install.sh" >"$TMP/linux-as-darwin.out" 2>&1; then
   fail 'the darwin front door read the Linux release'
 fi
-if CULLER_FIXTURE_OS=Linux CULLER_FIXTURE_ARCH=x86_64 CULLER_FIXTURE_DIR="$TMP/fixtures" \
+if SHZ_FIXTURE_OS=Linux SHZ_FIXTURE_ARCH=x86_64 SHZ_FIXTURE_DIR="$TMP/fixtures" \
   sh "$TMP/outside/install.sh" >"$TMP/darwin-as-linux.out" 2>&1; then
   fail 'the Linux front door read the darwin release'
 fi
@@ -514,7 +514,7 @@ path=home/'updates/transaction.json'
 path.write_text(json.dumps(record));path.chmod(0o600)
 PYRECOVERY
 rm -f "$TMP/curl-args" "$TMP/args"
-CULLER_FIXTURE_HTTP=503 sh "$TMP/outside/install.sh" --mc-home "$recovery_home" --restore >"$TMP/recovery.out" 2>&1 || { cat "$TMP/recovery.out" >&2; fail 'offline retained recovery failed'; }
+SHZ_FIXTURE_HTTP=503 sh "$TMP/outside/install.sh" --mc-home "$recovery_home" --restore >"$TMP/recovery.out" 2>&1 || { cat "$TMP/recovery.out" >&2; fail 'offline retained recovery failed'; }
 [ ! -e "$TMP/curl-args" ] || fail 'recovery queried a newer release'
 grep -Fx -- --restore "$TMP/args" >/dev/null || fail 'recovery lost the restore choice'
 [ "$(sed -n '3p' "$TMP/env")" = "$recovery_root" ] || fail 'recovery selected another package'

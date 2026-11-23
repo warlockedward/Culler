@@ -35,7 +35,7 @@ func checkProxyHarness(t *testing.T, harness string) {
 				"--image", prodImage, "--harness", harness, "--auth-mode", method)
 			cmd.Dir = source
 			out, err := cmd.CombinedOutput()
-			if err != nil || !strings.Contains(string(out), `"result":"CULLER_HARNESS_PROXY_OK"`) {
+			if err != nil || !strings.Contains(string(out), `"result":"SHZ_HARNESS_PROXY_OK"`) {
 				t.Fatalf("The synthetic proxy harness check failed: %v\n%s", err, out)
 			}
 			t.Log(strings.TrimSpace(string(out)))
@@ -57,7 +57,7 @@ func TestCredentialLeakDetectorPositiveControlsDockerBoundary(t *testing.T) {
 	cmd := exec.CommandContext(ctx, "mise", "exec", "--", "bun", "tests/provider-proxy/leak-controls.ts", "--image", prodImage)
 	cmd.Dir = "../.."
 	out, err := cmd.CombinedOutput()
-	if err != nil || !strings.Contains(string(out), `"result":"CULLER_LEAK_CONTROLS_OK"`) {
+	if err != nil || !strings.Contains(string(out), `"result":"SHZ_LEAK_CONTROLS_OK"`) {
 		t.Fatalf("The credential leak controls failed: %v\n%s", err, out)
 	}
 	t.Log(strings.TrimSpace(string(out)))

@@ -112,7 +112,7 @@ DOCKER_BUILDKIT=1 docker build --platform "linux/${TARGET_ARCH}" --target produc
   --label "org.opencontainers.image.revision=$MC_RELEASE_BUILD_ID" \
   --build-arg MC_BIN=mc-prod-bin \
   --build-arg PROJECT_BASE=mc-project \
-  --build-arg "CULLER_RELEASE_ID=$MC_RELEASE_BUILD_ID" \
+  --build-arg "SHZ_RELEASE_ID=$MC_RELEASE_BUILD_ID" \
   --build-arg RUNTIME_DEPS=1 \
   -t mc-prod ../..
 

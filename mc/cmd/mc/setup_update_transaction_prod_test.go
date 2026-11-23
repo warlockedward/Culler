@@ -127,7 +127,7 @@ func TestRetainedUpdateRunsExactCandidateOffline(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(root, "bin"), 0700); err != nil {
 		t.Fatal(err)
 	}
-	body := "#!/bin/sh\nprintf '%s\\n' \"$CULLER_PACKAGE_ROOT\" \"$CULLER_RELEASE_RECORD\" \"$@\"\n"
+	body := "#!/bin/sh\nprintf '%s\\n' \"$SHZ_PACKAGE_ROOT\" \"$SHZ_RELEASE_RECORD\" \"$@\"\n"
 	if err := os.WriteFile(filepath.Join(root, "bin", "mc"), []byte(body), 0700); err != nil {
 		t.Fatal(err)
 	}

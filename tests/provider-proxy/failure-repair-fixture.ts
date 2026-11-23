@@ -144,7 +144,7 @@ export async function createFailureRepairFixture(options: FailureRepairOptions) 
       const body = JSON.parse(Buffer.from(request?.body as Uint8Array).toString());
       const response = JSON.stringify(body).includes("mc-live-provider-tool.txt")
         ? syntheticModelTestResponse(connections.get(connection)!, body)
-        : syntheticFinalResponse(connections.get(connection)!, body, "CULLER_REPAIR_OK", held.has(connection) ? "commentary" : undefined);
+        : syntheticFinalResponse(connections.get(connection)!, body, "SHZ_REPAIR_OK", held.has(connection) ? "commentary" : undefined);
       const wait = held.get(connection);
       if (!wait) return response;
       held.delete(connection);

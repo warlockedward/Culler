@@ -485,10 +485,10 @@ func runRetainedUpdate(ctx context.Context, home string, restore, noColor bool, 
 	command.Cancel = func() error { return command.Process.Signal(os.Interrupt) }
 	command.Stdin, command.Stdout, command.Stderr = in, out, diagnostic
 	environment := os.Environ()
-	for _, prefix := range []string{"MC_HOME=", "MC_BIN_DIR=", "CULLER_PACKAGE_ROOT=", "CULLER_RELEASE_RECORD=", "NO_COLOR="} {
+	for _, prefix := range []string{"MC_HOME=", "MC_BIN_DIR=", "SHZ_PACKAGE_ROOT=", "SHZ_RELEASE_RECORD=", "NO_COLOR="} {
 		environment = slices.DeleteFunc(environment, func(v string) bool { return strings.HasPrefix(v, prefix) })
 	}
-	command.Env = append(environment, "MC_HOME="+home, "MC_BIN_DIR="+j.BinDir, "CULLER_PACKAGE_ROOT="+j.CandidateRoot, "CULLER_RELEASE_RECORD="+filepath.Join(j.CandidateRoot, "release.json"))
+	command.Env = append(environment, "MC_HOME="+home, "MC_BIN_DIR="+j.BinDir, "SHZ_PACKAGE_ROOT="+j.CandidateRoot, "SHZ_RELEASE_RECORD="+filepath.Join(j.CandidateRoot, "release.json"))
 	if noColor {
 		command.Env = append(command.Env, "NO_COLOR=1")
 	}

@@ -24,8 +24,8 @@ const home = join(root, "home"), source = join(root, "source"), fixtures = join(
 const containers = new Set<string>(), volumes = new Set([runtimeVolume, spineVolume]);
 const mcBinary = join(root, "mc");
 const mcEnvironment = { ...process.env, MC_HOME: home, MC_RUN_JSON: join(root, "absent.json"), MC_SPINE: undefined, MC_HELPER: undefined };
-const fixtureRuntime = process.env.CULLER_ACCEPT_RUNTIME_IMAGE ?? "mc-prod";
-const fixtureImage = process.env.CULLER_ACCEPT_PROJECT_IMAGE ?? "mc-project";
+const fixtureRuntime = process.env.SHZ_ACCEPT_RUNTIME_IMAGE ?? "mc-prod";
+const fixtureImage = process.env.SHZ_ACCEPT_PROJECT_IMAGE ?? "mc-project";
 const project = "review", first = "setup-first", review = "setup-review";
 const traceReference = randomUUID();
 const results: any[] = [];

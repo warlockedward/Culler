@@ -25,8 +25,8 @@ async function command(args: string[]) {
   return out;
 }
 const event = (type: string, value: object) => `event: ${type}\ndata: ${JSON.stringify({ type, ...value })}\n\n`;
-const finalText = "CULLER_PROXY_REPLY_OK";
-const preliminary = "CULLER_PROXY_PRELIMINARY";
+const finalText = "SHZ_PROXY_REPLY_OK";
+const preliminary = "SHZ_PROXY_PRELIMINARY";
 // The name holds TOKEN. A harness can remove such a variable from the environment of a command.
 const variable = { name: "PROJECT_ACCESS_TOKEN", value: "project-access-value" };
 interface Scenario {
@@ -87,7 +87,7 @@ try {
       const tool = harness === "codex" ? body.tools.find((item: any) => ["exec_command", "shell", "shell_command"].includes(item.name))
         : body.tools.find((item: any) => item.name === "Bash");
       if (!final && !tool) throw new Error("The harness supplied no shell tool.");
-      const shell = `printf 'CULLER_TOOL_OK' > culler-tool.txt; printf '%s' "$${variable.name}" > culler-variable.txt; printf '%s' "$CULLER_PROXY_TOKEN" > culler-token-variable.txt; cat /mc/provider-access.json`;
+      const shell = `printf 'SHZ_TOOL_OK' > culler-tool.txt; printf '%s' "$${variable.name}" > culler-variable.txt; printf '%s' "$SHZ_PROXY_TOKEN" > culler-token-variable.txt; cat /mc/provider-access.json`;
       const properties = tool?.parameters?.properties ?? {};
       const arguments_ = properties.cmd ? { cmd: shell, max_output_tokens: 100 }
         : properties.command?.type === "array" ? { command: ["sh", "-c", shell] } : { command: shell };
@@ -181,7 +181,7 @@ try {
       return native;
     }
     if (!native || !state.preliminaryObserved || state.requests !== 2) throw new Error("The first turn lacks native or incremental response evidence.");
-    if (await readFile(join(work, "workspace/culler-tool.txt"), "utf8") !== "CULLER_TOOL_OK") throw new Error("The agent action failed.");
+    if (await readFile(join(work, "workspace/culler-tool.txt"), "utf8") !== "SHZ_TOOL_OK") throw new Error("The agent action failed.");
     if (await readFile(join(work, "workspace/culler-variable.txt"), "utf8") !== variable.value) throw new Error("The agent command lost a container variable.");
     if (harness === "codex" && await readFile(join(work, "workspace/culler-token-variable.txt"), "utf8") !== "") throw new Error("The agent command received the Culler token variable.");
     let retainedToken = false;
@@ -212,7 +212,7 @@ try {
   if (sessions[0] === sessions[1]) throw new Error("The concurrent conversations share a native session.");
   await scenario("PRIVATE_REJECTED_CONVERSATION", true);
   if (failures.length) throw new Error(failures.join("\n"));
-  console.log(JSON.stringify({ result: "CULLER_HARNESS_PROXY_OK", harness, authMode, versions: pins, requests: 7,
+  console.log(JSON.stringify({ result: "SHZ_HARNESS_PROXY_OK", harness, authMode, versions: pins, requests: 7,
     tls: true, preliminary_before_completion: true, native_resume: true, isolated_conversations: true,
     proxy_rejection_correlation: true, original_session_preservation: true, trace_token_redaction: true,
     container_variable_in_command: true }));

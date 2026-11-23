@@ -255,17 +255,17 @@ jobs:
       - name: Build and validate the application package
         id: package
         env:
-          CULLER_COMMIT: ${{ github.sha }}
-          CULLER_RELEASE_OUTPUT: ${{ runner.temp }}/culler-release
+          SHZ_COMMIT: ${{ github.sha }}
+          SHZ_RELEASE_OUTPUT: ${{ runner.temp }}/culler-release
         run: |
-          ./release/build.sh "$CULLER_RELEASE_OUTPUT"
-          python3 release/validate_package.py --output "$CULLER_RELEASE_OUTPUT"
+          ./release/build.sh "$SHZ_RELEASE_OUTPUT"
+          python3 release/validate_package.py --output "$SHZ_RELEASE_OUTPUT"
       - name: Record the exact release inputs
         id: inputs
         env:
-          CULLER_RELEASE_OUTPUT: ${{ runner.temp }}/culler-release
+          SHZ_RELEASE_OUTPUT: ${{ runner.temp }}/culler-release
         run: |
-          COPYFILE_DISABLE=1 tar -C "$CULLER_RELEASE_OUTPUT" -czf "$RUNNER_TEMP/culler-release-inputs.tar.gz" .
+          COPYFILE_DISABLE=1 tar -C "$SHZ_RELEASE_OUTPUT" -czf "$RUNNER_TEMP/culler-release-inputs.tar.gz" .
           python3 - <<'PY'
           import hashlib
           import os
@@ -334,18 +334,18 @@ jobs:
       - name: Build and validate the Linux application package
         id: package
         env:
-          CULLER_COMMIT: ${{ github.sha }}
-          CULLER_RELEASE_PLATFORM: linux-amd64
-          CULLER_RELEASE_OUTPUT: ${{ runner.temp }}/culler-release-linux
+          SHZ_COMMIT: ${{ github.sha }}
+          SHZ_RELEASE_PLATFORM: linux-amd64
+          SHZ_RELEASE_OUTPUT: ${{ runner.temp }}/culler-release-linux
         run: |
-          ./release/build.sh "$CULLER_RELEASE_OUTPUT"
-          python3 release/validate_package.py --output "$CULLER_RELEASE_OUTPUT" --platform linux-amd64
+          ./release/build.sh "$SHZ_RELEASE_OUTPUT"
+          python3 release/validate_package.py --output "$SHZ_RELEASE_OUTPUT" --platform linux-amd64
       - name: Record the exact release inputs
         id: inputs
         env:
-          CULLER_RELEASE_OUTPUT: ${{ runner.temp }}/culler-release-linux
+          SHZ_RELEASE_OUTPUT: ${{ runner.temp }}/culler-release-linux
         run: |
-          tar -C "$CULLER_RELEASE_OUTPUT" -czf "$RUNNER_TEMP/culler-release-inputs-linux.tar.gz" .
+          tar -C "$SHZ_RELEASE_OUTPUT" -czf "$RUNNER_TEMP/culler-release-inputs-linux.tar.gz" .
           python3 - <<'PY'
           import hashlib
           import os
@@ -675,7 +675,7 @@ jobs:
             -f "$RUNNER_TEMP/culler-release/image/runner/image/runtime.Dockerfile" \
             --build-context "culler-project:check=oci-layout://$PROJECT_BASE_LAYOUT:check" \
             --build-arg "PROJECT_BASE=culler-project:check" --build-arg MC_BIN=mc-prod-bin \
-            --build-arg RUNTIME_DEPS=1 --build-arg "CULLER_RELEASE_ID=$GITHUB_SHA" \
+            --build-arg RUNTIME_DEPS=1 --build-arg "SHZ_RELEASE_ID=$GITHUB_SHA" \
             --label "org.opencontainers.image.revision=$GITHUB_SHA" \
             --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
             --cache-from "type=local,src=$BUILD_CACHE,tag=product" \
@@ -797,7 +797,7 @@ jobs:
             -f "$RUNNER_TEMP/culler-release/image/runner/image/runtime.Dockerfile" \
             --build-context "culler-project:check=oci-layout://$PROJECT_BASE_LAYOUT:check" \
             --build-arg "PROJECT_BASE=culler-project:check" --build-arg MC_BIN=mc-prod-bin \
-            --build-arg RUNTIME_DEPS=1 --build-arg "CULLER_RELEASE_ID=$GITHUB_SHA" \
+            --build-arg RUNTIME_DEPS=1 --build-arg "SHZ_RELEASE_ID=$GITHUB_SHA" \
             --label "org.opencontainers.image.revision=$GITHUB_SHA" \
             --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
             --cache-from "type=local,src=$BUILD_CACHE,tag=product" \

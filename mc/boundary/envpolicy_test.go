@@ -66,7 +66,7 @@ func TestEnvPlanRejectsTheShippedFloorInEveryPlane(t *testing.T) {
 	// Both the harness policy and the tool policy reject each shipped
 	// forbidden key" — the builder is the single mechanism behind both
 	// planes, and even a zero-value guard carries the floor.
-	for _, name := range []string{"CODEX_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "OPENAI_BASE_URL", "ANTHROPIC_BASE_URL", "CLAUDE_CODE_USE_BEDROCK", "MC_PROVIDER_ACCESS_FILE", "CULLER_PROXY_TOKEN", "CODEX_CA_CERTIFICATE"} {
+	for _, name := range []string{"CODEX_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "OPENAI_BASE_URL", "ANTHROPIC_BASE_URL", "CLAUDE_CODE_USE_BEDROCK", "MC_PROVIDER_ACCESS_FILE", "SHZ_PROXY_TOKEN", "CODEX_CA_CERTIFICATE"} {
 		mustReject(t, `{"`+name+`":"sk-plant"}`, boundary.EnvGuard{}, proxyBinding(), nil,
 			boundary.EnvPolicyForbidden, name)
 	}

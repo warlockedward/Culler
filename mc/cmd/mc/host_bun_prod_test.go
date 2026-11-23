@@ -70,7 +70,7 @@ func TestPublishedSupervisionRecordSelectsTheReleaseOfThisSetup(t *testing.T) {
 	previous := releaseBuildID
 	releaseBuildID = strings.Repeat("b", 40)
 	t.Cleanup(func() { releaseBuildID = previous })
-	t.Setenv("CULLER_RELEASE_RECORD", "")
+	t.Setenv("SHZ_RELEASE_RECORD", "")
 	record, err := publishedSupervisionRecord(home)
 	if err != nil || record != nil {
 		t.Fatalf("an empty home is a source install: %+v, %v", record, err)
@@ -95,12 +95,12 @@ func TestPublishedSupervisionRecordSelectsTheReleaseOfThisSetup(t *testing.T) {
 	if err := distribution.Save(path, publishedTestRecord(strings.Repeat("c", 40), 22)); err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("CULLER_RELEASE_RECORD", path)
+	t.Setenv("SHZ_RELEASE_RECORD", path)
 	record, err = publishedSupervisionRecord(home)
 	if err != nil || record == nil || record.Commit != strings.Repeat("c", 40) {
 		t.Fatalf("the installer record = %+v, %v", record, err)
 	}
-	t.Setenv("CULLER_RELEASE_RECORD", filepath.Join(t.TempDir(), "absent.json"))
+	t.Setenv("SHZ_RELEASE_RECORD", filepath.Join(t.TempDir(), "absent.json"))
 	if _, err := publishedSupervisionRecord(home); err == nil {
 		t.Fatal("an absent installer record passed")
 	}
@@ -187,7 +187,7 @@ func TestProviderProxyBunOfAPublishedInstallIsTheHostBun(t *testing.T) {
 	if err := distribution.Save(path, record); err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("CULLER_RELEASE_RECORD", path)
+	t.Setenv("SHZ_RELEASE_RECORD", path)
 	other := t.TempDir()
 	writeHostBunFixture(t, filepath.Join(other, "bun"))
 	t.Setenv("PATH", other)

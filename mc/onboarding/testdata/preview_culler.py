@@ -30,7 +30,7 @@ def capture(binary, scenario, columns, color, output, redirected=False):
                if key in {"PATH", "TMPDIR", "LANG", "LC_ALL", "MISE_DATA_DIR"}}
         env.update(GOMODCACHE=paths[1], GOCACHE=paths[2])
         result_path = Path(scratch) / "result.json"
-        env.update(HOME=scratch, TERM="xterm-256color", CULLER_TERMINAL_PREVIEW=scenario, CULLER_PREVIEW_RESULT=str(result_path), COLUMNS=str(columns))
+        env.update(HOME=scratch, TERM="xterm-256color", SHZ_TERMINAL_PREVIEW=scenario, SHZ_PREVIEW_RESULT=str(result_path), COLUMNS=str(columns))
         if not color:
             env["NO_COLOR"] = "1"
         command = [str(binary), "-test.run=^TestCullerTerminalPreview$"]
@@ -95,7 +95,7 @@ def capture(binary, scenario, columns, color, output, redirected=False):
         stem.with_suffix(".raw").write_bytes(raw)
         stem.with_suffix(".txt").write_text(re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", text).replace("\r", ""))
         stem.with_suffix(".json").write_text(json.dumps({
-            "command": command, "environment": {"CULLER_TERMINAL_PREVIEW": scenario,
+            "command": command, "environment": {"SHZ_TERMINAL_PREVIEW": scenario,
             "TERM": env["TERM"], "NO_COLOR": env.get("NO_COLOR")}, "columns": columns,
             "frame": frame, "process_exit_status": process_code, "redirected": redirected, **metadata,
         }, indent=2))

@@ -8,8 +8,8 @@ import (
 )
 
 func TestAPIKeyReplacementSyntheticTransportRequiresSyntheticCredentials(t *testing.T) {
-	t.Setenv("CULLER_TEST_HOST_SECRET_DIR", t.TempDir())
-	t.Setenv("CULLER_TEST_API_KEY_VALIDATION_STATUS", "401")
+	t.Setenv("SHZ_TEST_HOST_SECRET_DIR", t.TempDir())
+	t.Setenv("SHZ_TEST_API_KEY_VALIDATION_STATUS", "401")
 	if _, err := apiKeyReplacementClient("ordinary-fixture-key"); err == nil {
 		t.Fatal("The synthetic transport accepted a non-synthetic credential.")
 	}

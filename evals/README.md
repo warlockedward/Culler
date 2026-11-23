@@ -67,11 +67,11 @@ An optional token-free container check uses an existing Culler runner image:
 
 ```sh
 uv run python bridge/container-smoke.py \
-  --image "$CULLER_EVAL_IMAGE" \
+  --image "$SHZ_EVAL_IMAGE" \
   --output /private/tmp/culler-eval-container-check
 ```
 
-Set `CULLER_EVAL_IMAGE` to its immutable image digest or local image identifier.
+Set `SHZ_EVAL_IMAGE` to its immutable image digest or local image identifier.
 Use a new output directory for each check.
 The check uses the actual product Codex adapter with a deterministic test executable.
 It verifies mounts, private commands, packet snapshots, repository preservation, and Judge file access without a model call.
@@ -630,7 +630,7 @@ Execute separate contract trials with an explicit trial count:
 uv run culler-evals contract --protocol /private/tmp/experiment/packager.json \
   --cases /private/tmp/experiment/contract-case.json \
   --directive /private/tmp/culler-eval-original/directive.md \
-  --trials "$CULLER_EVAL_CONTRACT_TRIALS" \
+  --trials "$SHZ_EVAL_CONTRACT_TRIALS" \
   --credentials ~/.local/share/culler-evals/credentials/credentials.json \
   --cache ~/.local/share/culler-evals/cache \
   --output ~/.local/share/culler-evals/experiments/contract

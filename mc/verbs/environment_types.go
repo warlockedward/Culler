@@ -174,7 +174,7 @@ func environmentRelative(value string, directory bool) bool {
 }
 
 func reservedEnvironmentName(name string) bool {
-	for _, prefix := range []string{"MC_", "CULLER_", "LD_", "DYLD_", "BASH_FUNC_"} {
+	for _, prefix := range []string{"MC_", "SHZ_", "LD_", "DYLD_", "BASH_FUNC_"} {
 		if strings.HasPrefix(name, prefix) {
 			return true
 		}

@@ -2,8 +2,8 @@ import { rename, writeFile } from "node:fs/promises";
 
 export function cleanShellEnvironment(env) {
   for (const name of Object.keys(env)) {
-    if (name.startsWith("OPENCODE_") || name.startsWith("CULLER_OPENCODE_") ||
-        name === "CULLER_PROXY_TOKEN" || name === "MC_PROVIDER_ACCESS_FILE" ||
+    if (name.startsWith("OPENCODE_") || name.startsWith("SHZ_OPENCODE_") ||
+        name === "SHZ_PROXY_TOKEN" || name === "MC_PROVIDER_ACCESS_FILE" ||
         (typeof env[name] === "string" && env[name].includes("culler_proxy_"))) delete env[name];
   }
   return env;
@@ -40,10 +40,10 @@ export default {
     await ctx.shell.hook("create.before", input => { cleanShellEnvironment(input.env); });
     await ctx.tool.transform(tools => {
       tools.remove("question");
-      if (process.env.CULLER_OPENCODE_WEBSEARCH !== "1") tools.remove("websearch");
+      if (process.env.SHZ_OPENCODE_WEBSEARCH !== "1") tools.remove("websearch");
     });
-    const sessionFile = process.env.CULLER_OPENCODE_SESSION_FILE;
-    const required = JSON.parse(process.env.CULLER_OPENCODE_OPENWIKI_TOOLS ?? "[]");
+    const sessionFile = process.env.SHZ_OPENCODE_SESSION_FILE;
+    const required = JSON.parse(process.env.SHZ_OPENCODE_OPENWIKI_TOOLS ?? "[]");
     if (sessionFile || required.length) {
       let registered = false;
       await ctx.session.hook("prompt", async ({ sessionID }) => {

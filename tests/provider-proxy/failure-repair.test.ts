@@ -6,8 +6,8 @@ import { createFailureRepairFixture } from "./failure-repair-fixture";
 import { runNativeHarness } from "./native-harness";
 import { dashboardState, installFixtureRunner, recordFixtureAvailability, refreshDashboard, replaceKeyInDashboard, retainDashboardEvidence, testAndSaveProfileInDashboard } from "./dashboard-assertions";
 
-const image = process.env.CULLER_PROXY_TEST_IMAGE ?? process.env.MC_BOUNDARY_IMAGE;
-if (!image) throw new Error("Set CULLER_PROXY_TEST_IMAGE to the image with the pinned release harnesses.");
+const image = process.env.SHZ_PROXY_TEST_IMAGE ?? process.env.MC_BOUNDARY_IMAGE;
+if (!image) throw new Error("Set SHZ_PROXY_TEST_IMAGE to the image with the pinned release harnesses.");
 const connections = [
   { id: "synthetic-codex-repair", harness: "codex" as const, template: "codex-api-key" },
   { id: "synthetic-claude-repair", harness: "claude-sdk" as const, template: "claude-api-key" },
@@ -15,14 +15,14 @@ const connections = [
 let smoke: Smoke;
 let fixture: Awaited<ReturnType<typeof createFailureRepairFixture>>;
 const commands: string[] = [];
-const previousStore = process.env.CULLER_TEST_HOST_SECRET_DIR;
-const previousImage = process.env.CULLER_TEST_PROVIDER_IMAGE;
-const previousValidation = process.env.CULLER_TEST_API_KEY_VALIDATION_STATUS;
+const previousStore = process.env.SHZ_TEST_HOST_SECRET_DIR;
+const previousImage = process.env.SHZ_TEST_PROVIDER_IMAGE;
+const previousValidation = process.env.SHZ_TEST_API_KEY_VALIDATION_STATUS;
 
 beforeAll(async () => {
   smoke = await bootSmoke({ observedCommand: value => commands.push(value.command) });
-  process.env.CULLER_TEST_HOST_SECRET_DIR = join(smoke.stateScratch, "host-secrets");
-  process.env.CULLER_TEST_PROVIDER_IMAGE = image;
+  process.env.SHZ_TEST_HOST_SECRET_DIR = join(smoke.stateScratch, "host-secrets");
+  process.env.SHZ_TEST_PROVIDER_IMAGE = image;
   await installFixtureRunner(smoke);
   await seedProject(smoke, "provider-repair", { title: "Provider repair" });
   for (const connection of connections) {
@@ -44,12 +44,12 @@ afterEach(async () => {
 
 afterAll(async () => {
   await fixture?.stop();
-  if (previousValidation === undefined) delete process.env.CULLER_TEST_API_KEY_VALIDATION_STATUS;
-  else process.env.CULLER_TEST_API_KEY_VALIDATION_STATUS = previousValidation;
-  if (previousStore === undefined) delete process.env.CULLER_TEST_HOST_SECRET_DIR;
-  else process.env.CULLER_TEST_HOST_SECRET_DIR = previousStore;
-  if (previousImage === undefined) delete process.env.CULLER_TEST_PROVIDER_IMAGE;
-  else process.env.CULLER_TEST_PROVIDER_IMAGE = previousImage;
+  if (previousValidation === undefined) delete process.env.SHZ_TEST_API_KEY_VALIDATION_STATUS;
+  else process.env.SHZ_TEST_API_KEY_VALIDATION_STATUS = previousValidation;
+  if (previousStore === undefined) delete process.env.SHZ_TEST_HOST_SECRET_DIR;
+  else process.env.SHZ_TEST_HOST_SECRET_DIR = previousStore;
+  if (previousImage === undefined) delete process.env.SHZ_TEST_PROVIDER_IMAGE;
+  else process.env.SHZ_TEST_PROVIDER_IMAGE = previousImage;
   await teardown(smoke);
 }, 30000);
 
@@ -77,7 +77,7 @@ for (const connection of connections) test(`${connection.harness} provider rejec
   const configBefore = await readFile(join(smoke.home, "config.toml"), "utf8");
   const referencePath = join(smoke.home, "refresh-grants", `${connection.id}.json`);
   const referenceBefore = await readFile(referencePath, "utf8");
-  process.env.CULLER_TEST_API_KEY_VALIDATION_STATUS = "401";
+  process.env.SHZ_TEST_API_KEY_VALIDATION_STATUS = "401";
   await replaceKeyInDashboard(smoke, connection.id, `synthetic-${connection.harness}-rejected-replacement`, false);
   expect(await readFile(join(smoke.home, "config.toml"), "utf8")).toBe(configBefore);
   expect(await readFile(referencePath, "utf8")).toBe(referenceBefore);
@@ -87,10 +87,10 @@ for (const connection of connections) test(`${connection.harness} provider rejec
   const oldKeyRequest = await runNativeHarness({ image, access: await fixture.authorize(connection.id, { model: "fixture-model" }),
     model: "fixture-model", prompt: "Return the controlled provider response without tools." });
   expect(oldKeyRequest.exitCode).toBe(0);
-  expect(oldKeyRequest.output).toBe("CULLER_REPAIR_OK");
+  expect(oldKeyRequest.output).toBe("SHZ_REPAIR_OK");
   await fixture.flush();
   await smoke.page.keyboard.press("Escape");
-  process.env.CULLER_TEST_API_KEY_VALIDATION_STATUS = "200";
+  process.env.SHZ_TEST_API_KEY_VALIDATION_STATUS = "200";
   const commandStart = commands.length;
   const replacement = await replaceKeyInDashboard(smoke, connection.id, `synthetic-${connection.harness}-after-repair`);
   expect(replacement.connections.find((row: any) => row.id === connection.id).authorization_id).not.toBe(authorization);
@@ -106,7 +106,7 @@ for (const connection of connections) test(`${connection.harness} provider rejec
     model: "fixture-model", prompt: "Return the controlled provider response without tools." });
   await fixture.flush();
   expect(recovered.exitCode).toBe(0);
-  expect(recovered.output).toBe("CULLER_REPAIR_OK");
+  expect(recovered.output).toBe("SHZ_REPAIR_OK");
   expect(fixture.requests(connection.id) - previousRequests).toBe(5);
   const ready = await dashboardState(smoke);
   expect(ready.status.conditions.filter((row: any) => row.connection_id === connection.id)).toHaveLength(0);

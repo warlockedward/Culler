@@ -94,7 +94,7 @@ func setupPreviewPublished(t *testing.T, name string) setupPreviewCase {
 		if err := os.WriteFile(filepath.Join(w.home, "supervision", "resident.json"), []byte(`{"releaseBuildId":"`+pending.Commit+`"}`), 0600); err != nil {
 			t.Fatal(err)
 		}
-		t.Setenv("CULLER_RELEASE_RECORD", filepath.Join(w.home, "state", "pending-release.json"))
+		t.Setenv("SHZ_RELEASE_RECORD", filepath.Join(w.home, "state", "pending-release.json"))
 		preview.run = func() {
 			w.servicesTouched = true
 			w.serviceStates = map[string]bool{"resident": false, "dashboard": false}

@@ -14,9 +14,9 @@ import (
 )
 
 func TestRuntimeUpdatePreservesProjectImageDocker(t *testing.T) {
-	project := os.Getenv("CULLER_PROJECT_TEST_IMAGE")
-	first := os.Getenv("CULLER_RUNTIME_TEST_IMAGE")
-	second := os.Getenv("CULLER_RUNTIME_NEXT_TEST_IMAGE")
+	project := os.Getenv("SHZ_PROJECT_TEST_IMAGE")
+	first := os.Getenv("SHZ_RUNTIME_TEST_IMAGE")
+	second := os.Getenv("SHZ_RUNTIME_NEXT_TEST_IMAGE")
 	if project == "" || first == "" || second == "" {
 		t.Fatal("Set the three CULLER image variables for the isolated runtime update check.")
 	}
@@ -64,9 +64,9 @@ func TestRuntimeUpdatePreservesProjectImageDocker(t *testing.T) {
 }
 
 func TestRuntimeVolumeRepairsUnreadableSourceDocker(t *testing.T) {
-	image := os.Getenv("CULLER_RUNTIME_TEST_IMAGE")
+	image := os.Getenv("SHZ_RUNTIME_TEST_IMAGE")
 	if image == "" {
-		t.Fatal("Set CULLER_RUNTIME_TEST_IMAGE for the runtime repair check.")
+		t.Fatal("Set SHZ_RUNTIME_TEST_IMAGE for the runtime repair check.")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
@@ -146,9 +146,9 @@ func changedPaths(before, after string, ignored ...string) []string {
 // The install writes only the entries that differ from the image, and the
 // volume equals the image runtime file for file after each install.
 func TestRuntimeVolumeInstallWritesOnlyChangesDocker(t *testing.T) {
-	image := os.Getenv("CULLER_RUNTIME_TEST_IMAGE")
+	image := os.Getenv("SHZ_RUNTIME_TEST_IMAGE")
 	if image == "" {
-		t.Fatal("Set CULLER_RUNTIME_TEST_IMAGE for the runtime install check.")
+		t.Fatal("Set SHZ_RUNTIME_TEST_IMAGE for the runtime install check.")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
 	defer cancel()

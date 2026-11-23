@@ -96,7 +96,7 @@ Its cleanup restores the prior test configuration and runner files.
 
 The host binary requires the `test_fake_routing,test_scratch_spine` tags for the isolated image selector.
 The real macOS credential store remains active.
-The test leaves `CULLER_TEST_HOST_SECRET_DIR` unset.
+The test leaves `SHZ_TEST_HOST_SECRET_DIR` unset.
 The task image supplies the fixed harness packages.
 
 ```sh

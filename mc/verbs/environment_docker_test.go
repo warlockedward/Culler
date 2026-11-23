@@ -29,11 +29,11 @@ func TestEnvironmentDeniedImageImportsWithCurrentImage(t *testing.T) {
 }
 
 func testEnvironmentSetupRunnerDocker(t *testing.T, decision string) {
-	project := os.Getenv("CULLER_PROJECT_TEST_IMAGE")
+	project := os.Getenv("SHZ_PROJECT_TEST_IMAGE")
 	if project == "" {
 		project = "mc-project"
 	}
-	runtime := os.Getenv("CULLER_RUNTIME_TEST_IMAGE")
+	runtime := os.Getenv("SHZ_RUNTIME_TEST_IMAGE")
 	if runtime == "" {
 		runtime = "mc-prod"
 	}

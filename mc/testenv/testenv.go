@@ -14,7 +14,7 @@ import (
 // runVariables are the variables that Culler sets in an agent container or
 // that name a deployment. runner/shared/test-environment.ts holds the same list.
 var runVariables = []string{
-	"CODEX_HOME", "CULLER_CACHE_LIMIT_BYTES", "MC_AGENT_RUNNER_ROUTES", "MC_ARTIFACTS_ROOT", "MC_BIN", "MC_BIN_DIR",
+	"CODEX_HOME", "SHZ_CACHE_LIMIT_BYTES", "MC_AGENT_RUNNER_ROUTES", "MC_ARTIFACTS_ROOT", "MC_BIN", "MC_BIN_DIR",
 	"MC_CLAUDE_ADAPTER", "MC_CLAUDE_BIN", "MC_CODEX_ADAPTER", "MC_CODEX_BIN", "MC_HARNESS_CLI", "MC_HELPER",
 	"MC_HOME", "MC_COLLIE_POLL_MS", "MC_LOG_LEVEL", "MC_OPERATOR_ORIGIN", "MC_POOL_IDS", "MC_PRIVATE_BUN",
 	"MC_PRIVATE_NODE", "MC_ROLE", "MC_RUN_ID", "MC_RUN_JSON", "MC_RUN_LOG_DIR",

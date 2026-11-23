@@ -38,7 +38,7 @@ func hostBunExecutable(home, version string) string {
 // install, or nil for a source install. It selects the record of this setup
 // program the same way that the agent image selection does.
 func publishedSupervisionRecord(home string) (*distribution.Record, error) {
-	path := os.Getenv("CULLER_RELEASE_RECORD")
+	path := os.Getenv("SHZ_RELEASE_RECORD")
 	if path == "" {
 		if pending, err := distribution.Load(filepath.Join(home, "state", "pending-release.json")); err == nil && pending.Commit == releaseBuildID {
 			return &pending, nil
@@ -46,13 +46,13 @@ func publishedSupervisionRecord(home string) (*distribution.Record, error) {
 		path = filepath.Join(home, distribution.InstalledRecord)
 	}
 	r, err := distribution.Load(path)
-	if os.IsNotExist(err) && os.Getenv("CULLER_RELEASE_RECORD") == "" {
+	if os.IsNotExist(err) && os.Getenv("SHZ_RELEASE_RECORD") == "" {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	if r.Commit != releaseBuildID && os.Getenv("CULLER_RELEASE_RECORD") == "" {
+	if r.Commit != releaseBuildID && os.Getenv("SHZ_RELEASE_RECORD") == "" {
 		return nil, nil
 	}
 	return &r, nil

@@ -428,7 +428,7 @@ func cullerNext(s cullerStatus) (string, string) {
 }
 
 func cullerInstallCommand(home string) string {
-	installer := os.Getenv("CULLER_SOURCE_INSTALLER")
+	installer := os.Getenv("SHZ_SOURCE_INSTALLER")
 	if installer == "" {
 		if source, err := deployment.RuntimeSourceDirectory(home); err == nil {
 			installer = filepath.Join(source, "scripts", "install-source.sh")
@@ -661,7 +661,7 @@ func cullerUpdateAction(ctx context.Context, home string, noColor, restore bool,
 	command := exec.CommandContext(ctx, "/bin/bash", args...)
 	command.Cancel = func() error { return command.Process.Signal(os.Interrupt) }
 	command.Stdin, command.Stdout, command.Stderr = stdin, stdout, stderr
-	command.Env = append(os.Environ(), "CULLER_PARENT_PATH="+os.Getenv("PATH"))
+	command.Env = append(os.Environ(), "SHZ_PARENT_PATH="+os.Getenv("PATH"))
 	if noColor {
 		command.Env = append(command.Env, "NO_COLOR=1")
 	}

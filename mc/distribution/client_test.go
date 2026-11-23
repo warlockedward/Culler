@@ -366,7 +366,7 @@ func TestARecordWithAVersionFieldReadsIntoTheRecord(t *testing.T) {
 
 func TestCredentialFileRequiresPrivateOwnerMode(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "token")
-	t.Setenv("CULLER_GITHUB_TOKEN_FILE", path)
+	t.Setenv("SHZ_GITHUB_TOKEN_FILE", path)
 	if err := os.WriteFile(path, []byte("fixture-token\n"), 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -401,7 +401,7 @@ func TestCredentialFindsGitHubOutsideServicePath(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	t.Setenv("PATH", "/usr/bin:/bin")
-	t.Setenv("CULLER_GITHUB_TOKEN_FILE", "")
+	t.Setenv("SHZ_GITHUB_TOKEN_FILE", "")
 	directory := filepath.Join(home, ".local", "bin")
 	if err := os.MkdirAll(directory, 0700); err != nil {
 		t.Fatal(err)

@@ -84,11 +84,11 @@ class PackageValidationTests(unittest.TestCase):
         self.assertNotIn("GH_TOKEN", env)
         self.assertNotIn("MC_HELPER", env)
         self.assertNotIn("GOFLAGS", env)
-        self.assertFalse(Path(env["CULLER_GITHUB_TOKEN_FILE"]).exists())
+        self.assertFalse(Path(env["SHZ_GITHUB_TOKEN_FILE"]).exists())
         self.assertEqual(Path(env["HOME"]).parent, cwd)
         self.assertEqual(Path(env["MC_HOME"]).parent, cwd)
-        self.assertEqual(env["CULLER_BOOTSTRAP_DIR"], str(cwd / "alias") + "//bootstrap")
-        bootstrap = Path(env["CULLER_BOOTSTRAP_DIR"])
+        self.assertEqual(env["SHZ_BOOTSTRAP_DIR"], str(cwd / "alias") + "//bootstrap")
+        bootstrap = Path(env["SHZ_BOOTSTRAP_DIR"])
         self.assertEqual(bootstrap.resolve(), cwd / "bootstrap")
         record = json.loads((bootstrap / "release.json").read_text())
         self.assertEqual(record["commit"], "a" * 40)
@@ -100,10 +100,10 @@ class PackageValidationTests(unittest.TestCase):
         self.assertEqual(record["agentsview"], self.identity)
         self.assertEqual(record["package"]["sha256"], hashlib.sha256(self.archive.read_bytes()).hexdigest())
         # The record names the pinned Bun release and a local archive in place of the pinned one.
-        bun_archive = Path(env["CULLER_PACKAGE_CHECK_BUN_ARCHIVE"])
+        bun_archive = Path(env["SHZ_PACKAGE_CHECK_BUN_ARCHIVE"])
         pinned = HOST_BUN["archives"]["darwin-arm64"]
         self.assertEqual(record["host_bun"]["version"], HOST_BUN["version"])
-        self.assertEqual(env["CULLER_PACKAGE_CHECK_BUN_URL"], pinned["url"])
+        self.assertEqual(env["SHZ_PACKAGE_CHECK_BUN_URL"], pinned["url"])
         archive = record["host_bun"]["archives"]["darwin-arm64"]
         self.assertEqual((archive["name"], archive["url"]), (pinned["name"], pinned["url"]))
         self.assertEqual(archive["sha256"], hashlib.sha256(bun_archive.read_bytes()).hexdigest())
@@ -124,14 +124,14 @@ class PackageValidationTests(unittest.TestCase):
                 destination.chmod(member.mode)
         fetches = DOWNLOAD_URL + "\n"
         if setup:
-            fetches += env["CULLER_PACKAGE_CHECK_BUN_URL"] + "\n"
+            fetches += env["SHZ_PACKAGE_CHECK_BUN_URL"] + "\n"
             if self.install_bun:
                 with zipfile.ZipFile(bun_archive) as reader:
                     program = Path(env["MC_HOME"]) / "bun" / record["host_bun"]["version"] / "bin" / "bun"
                     program.parent.mkdir(parents=True)
                     program.write_bytes(reader.read("bun-darwin-aarch64/bun"))
                     program.chmod(0o755)
-        Path(env["CULLER_PACKAGE_CHECK_FETCHES"]).write_text(fetches)
+        Path(env["SHZ_PACKAGE_CHECK_FETCHES"]).write_text(fetches)
         linux = validate_package.RECORD_PLATFORM.startswith("linux")
         if setup:
             code, message = 2, (validate_package.SETUP_MAC_REFUSAL if linux else LOCK_REFUSAL)
@@ -357,7 +357,7 @@ class PackageValidationTests(unittest.TestCase):
 
         def changed(*args, **kwargs):
             result = self.handoff(*args, **kwargs)
-            (Path(kwargs["env"]["CULLER_BOOTSTRAP_DIR"]) / "package/bin/mc").write_bytes(b"different")
+            (Path(kwargs["env"]["SHZ_BOOTSTRAP_DIR"]) / "package/bin/mc").write_bytes(b"different")
             return result
 
         with patch("validate_package.subprocess.run", side_effect=changed):

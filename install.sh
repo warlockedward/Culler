@@ -7,10 +7,10 @@
 set -eu
 set +x
 umask 077
-CULLER_INSTALL_STARTED_AT=$(date +%s)
-export CULLER_INSTALL_STARTED_AT
-CULLER_PARENT_PATH=${CULLER_PARENT_PATH-$PATH}
-export CULLER_PARENT_PATH
+SHZ_INSTALL_STARTED_AT=$(date +%s)
+export SHZ_INSTALL_STARTED_AT
+SHZ_PARENT_PATH=${SHZ_PARENT_PATH-$PATH}
+export SHZ_PARENT_PATH
 say() { printf '%s\n' "$*"; }
 fail() {
   message_width=${COLUMNS:-80}
@@ -72,14 +72,14 @@ for argument do
   esac
 done
 case "$(uname -s):$(uname -m)" in
-  Darwin:arm64) CULLER_PLATFORM=darwin-arm64 ;;
-  Linux:x86_64) CULLER_PLATFORM=linux-amd64 ;;
+  Darwin:arm64) SHZ_PLATFORM=darwin-arm64 ;;
+  Linux:x86_64) SHZ_PLATFORM=linux-amd64 ;;
   *) fail "Culler runs on a Mac with Apple silicon or on Linux for x86_64." ;;
 esac
 for tool in curl tar unzip; do
   command -v "$tool" >/dev/null 2>&1 || fail "The required tool $tool is absent from the PATH. Add /usr/bin to the PATH, then run install.sh again."
 done
-case "$CULLER_PLATFORM" in
+case "$SHZ_PLATFORM" in
   darwin-arm64)
     for tool in plutil shasum; do
       command -v "$tool" >/dev/null 2>&1 || fail "The required tool $tool is absent from the PATH. Add /usr/bin to the PATH, then run install.sh again."
@@ -168,9 +168,9 @@ if [ -e "$recovery_record" ] || [ -L "$recovery_record" ]; then
       [ "$(sha256_of "$recovery_program")" = "$recovery_checksum" ] || fail "The retained update command failed verification. Keep Culler stopped and repair the recovery files."
       MC_HOME=$recovery_home
       MC_BIN_DIR=$(json "$recovery_record" bin_dir)
-      CULLER_PACKAGE_ROOT=$recovery_root
-      CULLER_RELEASE_RECORD=$recovery_root/release.json
-      export MC_HOME MC_BIN_DIR CULLER_PACKAGE_ROOT CULLER_RELEASE_RECORD
+      SHZ_PACKAGE_ROOT=$recovery_root
+      SHZ_RELEASE_RECORD=$recovery_root/release.json
+      export MC_HOME MC_BIN_DIR SHZ_PACKAGE_ROOT SHZ_RELEASE_RECORD
       if [ ! -t 0 ] && [ -t 1 ] && [ -r /dev/tty ]; then
         exec "$recovery_program" __setup "$@" --release-source "$recovery_root/runner" --host-release-source "$recovery_root/host" </dev/tty
       fi
@@ -179,38 +179,38 @@ if [ -e "$recovery_record" ] || [ -L "$recovery_record" ]; then
   esac
 fi
 [ "$recovery_restore" = false ] || fail "This deployment has no incomplete update to restore."
-CULLER_REPOSITORY=${CULLER_REPOSITORY:-vinchenkov/Culler}
-case "$CULLER_REPOSITORY" in
+SHZ_REPOSITORY=${SHZ_REPOSITORY:-vinchenkov/Culler}
+case "$SHZ_REPOSITORY" in
   *[!a-zA-Z0-9._/-]*|/*|*/|*/*/*|*..*) fail "The GitHub repository must use owner/name." ;;
   */*) ;;
   *) fail "The GitHub repository must use owner/name." ;;
 esac
-CULLER_BOOTSTRAP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/culler-install.XXXXXX")
-trap 'rm -rf "$CULLER_BOOTSTRAP_DIR"' EXIT HUP INT TERM
-export CULLER_BOOTSTRAP_DIR CULLER_REPOSITORY
-credential=${CULLER_GITHUB_TOKEN_FILE:-$HOME/.config/culler/github-token}
-if [ -e "$credential" ] || [ -n "${CULLER_GITHUB_TOKEN_FILE:-}" ]; then
+SHZ_BOOTSTRAP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/culler-install.XXXXXX")
+trap 'rm -rf "$SHZ_BOOTSTRAP_DIR"' EXIT HUP INT TERM
+export SHZ_BOOTSTRAP_DIR SHZ_REPOSITORY
+credential=${SHZ_GITHUB_TOKEN_FILE:-$HOME/.config/culler/github-token}
+if [ -e "$credential" ] || [ -n "${SHZ_GITHUB_TOKEN_FILE:-}" ]; then
   [ -f "$credential" ] && [ ! -L "$credential" ] || fail "The GitHub token file must be a private regular file."
   [ "$(stat_identity "$credential")" = "$(id -u) 600 1" ] || \
     fail "Set the GitHub token file owner to your account and its permissions to 600."
-  cp "$credential" "$CULLER_BOOTSTRAP_DIR/token"
+  cp "$credential" "$SHZ_BOOTSTRAP_DIR/token"
 elif command -v gh >/dev/null 2>&1; then
-  gh auth token --hostname github.com >"$CULLER_BOOTSTRAP_DIR/token" 2>/dev/null || rm -f "$CULLER_BOOTSTRAP_DIR/token"
+  gh auth token --hostname github.com >"$SHZ_BOOTSTRAP_DIR/token" 2>/dev/null || rm -f "$SHZ_BOOTSTRAP_DIR/token"
 fi
-: >"$CULLER_BOOTSTRAP_DIR/curl.conf"
-if [ -s "$CULLER_BOOTSTRAP_DIR/token" ]; then
-  token=$(cat "$CULLER_BOOTSTRAP_DIR/token")
+: >"$SHZ_BOOTSTRAP_DIR/curl.conf"
+if [ -s "$SHZ_BOOTSTRAP_DIR/token" ]; then
+  token=$(cat "$SHZ_BOOTSTRAP_DIR/token")
   case "$token" in *[!a-zA-Z0-9_]*|'') fail "The GitHub credential is invalid. Renew access, then run install.sh again." ;; esac
-  printf 'header = "Authorization: Bearer %s"\n' "$token" >"$CULLER_BOOTSTRAP_DIR/curl.conf"
+  printf 'header = "Authorization: Bearer %s"\n' "$token" >"$SHZ_BOOTSTRAP_DIR/curl.conf"
   unset token
-  CULLER_GITHUB_TOKEN_FILE=$CULLER_BOOTSTRAP_DIR/token
-  export CULLER_GITHUB_TOKEN_FILE
+  SHZ_GITHUB_TOKEN_FILE=$SHZ_BOOTSTRAP_DIR/token
+  export SHZ_GITHUB_TOKEN_FILE
 else
-  unset CULLER_GITHUB_TOKEN_FILE
+  unset SHZ_GITHUB_TOKEN_FILE
 fi
 required_json() { json "$@" || fail "The release record is incomplete. Run install.sh again after publication completes."; }
 fetch() {
-  status=$(curl -q --config "$CULLER_BOOTSTRAP_DIR/curl.conf" --silent --location \
+  status=$(curl -q --config "$SHZ_BOOTSTRAP_DIR/curl.conf" --silent --location \
     --proto '=https' --proto-redir '=https' --connect-timeout 15 --max-time 300 \
     --header "Accept: $3" --header 'X-GitHub-Api-Version: 2022-11-28' --header 'Cache-Control: no-cache' \
     --output "$2" --write-out '%{http_code}' "$1" 2>/dev/null) || \
@@ -219,8 +219,8 @@ fetch() {
     200) ;;
     401|403) fail "GitHub refused access. Renew the repository and package credentials, then run install.sh again." ;;
     404)
-      if [ "$1" = "https://api.github.com/repos/$CULLER_REPOSITORY/releases/latest" ]; then
-        fetch "https://api.github.com/repos/$CULLER_REPOSITORY" "$CULLER_BOOTSTRAP_DIR/repository.json" application/vnd.github+json
+      if [ "$1" = "https://api.github.com/repos/$SHZ_REPOSITORY/releases/latest" ]; then
+        fetch "https://api.github.com/repos/$SHZ_REPOSITORY" "$SHZ_BOOTSTRAP_DIR/repository.json" application/vnd.github+json
         fail "No complete release is available. Wait for the release workflow, then run install.sh again."
       fi
       fail "GitHub repository access is absent. Renew access, then run install.sh again." ;;
@@ -230,10 +230,10 @@ fetch() {
 asset_id() {
   index=0
   found=
-  while name=$(json "$CULLER_BOOTSTRAP_DIR/github-release.json" "assets.$index.name"); do
+  while name=$(json "$SHZ_BOOTSTRAP_DIR/github-release.json" "assets.$index.name"); do
     if [ "$name" = "$1" ]; then
       [ -z "$found" ] || fail "The release contains duplicate files. Ask your coding harness to inspect the release."
-      found=$(json "$CULLER_BOOTSTRAP_DIR/github-release.json" "assets.$index.id")
+      found=$(json "$SHZ_BOOTSTRAP_DIR/github-release.json" "assets.$index.id")
     fi
     index=$((index+1))
   done
@@ -242,15 +242,15 @@ asset_id() {
 }
 say 'Culler'
 say 'Check the published release...'
-api="https://api.github.com/repos/$CULLER_REPOSITORY/releases"
-fetch "$api/latest" "$CULLER_BOOTSTRAP_DIR/github-release.json" application/vnd.github+json
-[ "$(json "$CULLER_BOOTSTRAP_DIR/github-release.json" draft)" = false ] && \
-  [ "$(json "$CULLER_BOOTSTRAP_DIR/github-release.json" prerelease)" = false ] || fail "No complete production release is available."
+api="https://api.github.com/repos/$SHZ_REPOSITORY/releases"
+fetch "$api/latest" "$SHZ_BOOTSTRAP_DIR/github-release.json" application/vnd.github+json
+[ "$(json "$SHZ_BOOTSTRAP_DIR/github-release.json" draft)" = false ] && \
+  [ "$(json "$SHZ_BOOTSTRAP_DIR/github-release.json" prerelease)" = false ] || fail "No complete production release is available."
 record_id=$(asset_id "$record_asset")
-fetch "$api/assets/$record_id" "$CULLER_BOOTSTRAP_DIR/release.json" application/octet-stream
-record=$CULLER_BOOTSTRAP_DIR/release.json
+fetch "$api/assets/$record_id" "$SHZ_BOOTSTRAP_DIR/release.json" application/octet-stream
+record=$SHZ_BOOTSTRAP_DIR/release.json
 [ "$(json "$record" format)" = 1 ] || fail "The release format is unsupported. Download install.sh again."
-[ "$(json "$record" platform)" = "$CULLER_PLATFORM" ] || fail "The release record is not for this platform."
+[ "$(json "$record" platform)" = "$SHZ_PLATFORM" ] || fail "The release record is not for this platform."
 commit=$(required_json "$record" commit)
 case "$commit" in ''|*[!0-9a-f]*) fail "The release identity is invalid." ;; esac
 version=$(required_json "$record" version)
@@ -264,7 +264,7 @@ case "$test_release" in
 esac
 [ "${#commit}" = 40 ] && [ "$(json "$record" release_id)" = "$commit" ] && \
   [ "$(json "$record" tag)" = "$tag" ] && \
-  [ "$(json "$CULLER_BOOTSTRAP_DIR/github-release.json" tag_name)" = "$tag" ] || fail "The release identities differ. Run install.sh again."
+  [ "$(json "$SHZ_BOOTSTRAP_DIR/github-release.json" tag_name)" = "$tag" ] || fail "The release identities differ. Run install.sh again."
 for required in fast-suite-macos deployment-linux application-package product-image release-downloads; do
   index=0
   found=0
@@ -278,18 +278,18 @@ done
 [ "$(json "$record" installer.name)" = installer.sh ] || fail "The installer name is invalid."
 installer_id=$(asset_id installer.sh)
 # Resolve every required file before any downloaded code starts.
-asset_id "culler-$CULLER_PLATFORM.tar.gz" >/dev/null
+asset_id "culler-$SHZ_PLATFORM.tar.gz" >/dev/null
 say 'Download and verify the installer...'
-fetch "$api/assets/$installer_id" "$CULLER_BOOTSTRAP_DIR/installer.sh" application/octet-stream
+fetch "$api/assets/$installer_id" "$SHZ_BOOTSTRAP_DIR/installer.sh" application/octet-stream
 checksum=$(required_json "$record" installer.sha256)
 case "$checksum" in ''|*[!0-9a-f]*) fail "The installer checksum is invalid." ;; esac
 [ "${#checksum}" = 64 ] || fail "The installer checksum is invalid."
-[ "$(sha256_of "$CULLER_BOOTSTRAP_DIR/installer.sh")" = "$checksum" ] && \
-  [ "$(wc -c <"$CULLER_BOOTSTRAP_DIR/installer.sh" | tr -d ' ')" = "$(json "$record" installer.size)" ] || \
+[ "$(sha256_of "$SHZ_BOOTSTRAP_DIR/installer.sh")" = "$checksum" ] && \
+  [ "$(wc -c <"$SHZ_BOOTSTRAP_DIR/installer.sh" | tr -d ' ')" = "$(json "$record" installer.size)" ] || \
   fail "The installer failed verification. Run install.sh again to retry."
 # A pipe carries the launcher, while the terminal carries operator input.
 if [ ! -t 0 ] && [ -t 1 ] && [ -r /dev/tty ]; then
-  sh "$CULLER_BOOTSTRAP_DIR/installer.sh" "$@" </dev/tty
+  sh "$SHZ_BOOTSTRAP_DIR/installer.sh" "$@" </dev/tty
 else
-  sh "$CULLER_BOOTSTRAP_DIR/installer.sh" "$@"
+  sh "$SHZ_BOOTSTRAP_DIR/installer.sh" "$@"
 fi

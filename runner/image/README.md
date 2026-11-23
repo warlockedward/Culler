@@ -191,8 +191,8 @@ The check requires these prerequisites:
 - The repository's mise toolchain.
 - Network access for the initial fixed dependency downloads.
 
-`CULLER_ACCEPT_RUNTIME_IMAGE` selects another Culler service image.
-`CULLER_ACCEPT_PROJECT_IMAGE` selects another Project image.
+`SHZ_ACCEPT_RUNTIME_IMAGE` selects another Culler service image.
+`SHZ_ACCEPT_PROJECT_IMAGE` selects another Project image.
 The host downloads `is-number` 7.0.0 and `idna` 3.10 once per invocation.
 A local package source supplies them to the Setup Agent.
 Worker containers receive neither that source nor external network access.
@@ -242,8 +242,8 @@ The Go checks also cover the real setup runner and runtime replacement.
 These checks use the `docker_boundary` build tag.
 The setup checks accept these image variables:
 
-- `CULLER_PROJECT_TEST_IMAGE`: the default Project image.
-- `CULLER_RUNTIME_TEST_IMAGE`: the complete Culler service image.
+- `SHZ_PROJECT_TEST_IMAGE`: the default Project image.
+- `SHZ_RUNTIME_TEST_IMAGE`: the complete Culler service image.
 
 From `mc/`, this command tests setup, approval, and denial:
 
@@ -252,7 +252,7 @@ mise exec -- go test -tags docker_boundary -count=1 -v -timeout 10m ./verbs \
   -run '^TestEnvironment(SetupRunnerUsesMountedRuntime|ImageDependenciesResumeWithOneAdditionalAgent|DeniedImageImportsWithCurrentImage)$'
 ```
 
-The runtime replacement check also requires `CULLER_RUNTIME_NEXT_TEST_IMAGE`.
+The runtime replacement check also requires `SHZ_RUNTIME_NEXT_TEST_IMAGE`.
 Its Project image requires the fixture file for Image dependencies, `/usr/local/share/image-dependency-proof`.
 The two runtime images require different release identities.
 

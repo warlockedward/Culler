@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	if root := os.Getenv("CULLER_TEST_HOST_SECRET_DIR"); root != "" {
+	if root := os.Getenv("SHZ_TEST_HOST_SECRET_DIR"); root != "" {
 		hostSecretBackend = &fixtureHostSecretStore{root: root}
 	}
 }
@@ -119,5 +119,5 @@ func (store *fixtureHostSecretStore) Delete(service, account string) error {
 }
 
 func HostCredentialCommandsAvailable() bool {
-	return runtime.GOOS == "darwin" || os.Getenv("CULLER_TEST_HOST_SECRET_DIR") != ""
+	return runtime.GOOS == "darwin" || os.Getenv("SHZ_TEST_HOST_SECRET_DIR") != ""
 }

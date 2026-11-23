@@ -67,7 +67,7 @@ if [ "${1:-}" = go ] && [ "${2:-}" = build ]; then
 #!/bin/sh
 if [ -n "${MC_INSTALL_TEST_LOG:-}" ]; then
   if [ -n "${MC_INSTALL_TEST_ENV_LOG:-}" ]; then
-    printf '%s\n%s\n%s\n' "${MC_HOME:-}" "${MC_INSTALL_TEST_MISE:-}" "${CULLER_PARENT_PATH:-}" >"$MC_INSTALL_TEST_ENV_LOG"
+    printf '%s\n%s\n%s\n' "${MC_HOME:-}" "${MC_INSTALL_TEST_MISE:-}" "${SHZ_PARENT_PATH:-}" >"$MC_INSTALL_TEST_ENV_LOG"
   fi
   {
     printf 'CALL'
@@ -186,7 +186,7 @@ chmod 755 "$case_root/bin/docker" "$case_root/bin/uname" "$case_root/bin/xcode-s
 mkdir -p "$case_root/home" "$case_root/project root" "$case_root/install bin"
 printf 'existing deployment executable\n' >"$case_root/install bin/mc"
 run_terminal "$case_root/terminal.out" \
-  env -u CULLER_PARENT_PATH PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_root/home" \
+  env -u SHZ_PARENT_PATH PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_root/home" \
   MC_HOME= COLUMNS=60 MC_INSTALL_TEST_LOG="$case_root/forward.log" \
   MC_INSTALL_TEST_ENV_LOG="$case_root/environment.log" \
   MC_INSTALL_TEST_DOCKER_LOG="$case_root/docker.log" \
@@ -217,7 +217,7 @@ grep -F 'deployment home (MC_HOME)' "$case_root/terminal.out" >/dev/null && \
 
 run_terminal "$case_root/parent-path.out" \
   env PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_root/home" \
-  MC_HOME= CULLER_PARENT_PATH="/original/shell/bin:/usr/bin:/bin" \
+  MC_HOME= SHZ_PARENT_PATH="/original/shell/bin:/usr/bin:/bin" \
   MC_INSTALL_TEST_LOG="$case_root/parent-path.log" \
   MC_INSTALL_TEST_ENV_LOG="$case_root/parent-path-env.log" \
   sh "$ROOT/scripts/install-source.sh" --bin-dir "$case_root/install bin" || \

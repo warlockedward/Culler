@@ -3,12 +3,12 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
 output=${1:?The output directory is required.}
 case "$output" in /*) ;; *) exit 2 ;; esac
-commit=${CULLER_COMMIT:?The release commit is required.}
+commit=${SHZ_COMMIT:?The release commit is required.}
 [ "$(git -C "$ROOT" rev-parse HEAD)" = "$commit" ]
 test -z "$(git -C "$ROOT" status --porcelain --untracked-files=all)"
 # One release leg builds one platform's package. The default is the historical
 # darwin leg; the Linux leg is selected explicitly, never by accident.
-platform=${CULLER_RELEASE_PLATFORM:-darwin-arm64}
+platform=${SHZ_RELEASE_PLATFORM:-darwin-arm64}
 case "$platform" in
   darwin-arm64)
     host_goos=darwin; host_goarch=arm64; image_arch=arm64; host_bun_key=darwin-arm64
@@ -18,7 +18,7 @@ case "$platform" in
     host_goos=linux; host_goarch=amd64; image_arch=amd64; host_bun_key=linux-x64
     agentsview_pin_file=agentsview.linux-amd64.json; opencode_platform=linux-x64
     package_meta=package.linux-amd64.json; opencode_meta=opencode.linux-amd64.json ;;
-  *) echo "release/build.sh: unsupported CULLER_RELEASE_PLATFORM $platform" >&2; exit 2 ;;
+  *) echo "release/build.sh: unsupported SHZ_RELEASE_PLATFORM $platform" >&2; exit 2 ;;
 esac
 package_asset=culler-$platform.tar.gz
 opencode_asset=culler-opencode-$opencode_platform.tar.gz

@@ -458,7 +458,7 @@ version=$("$program" --version </dev/null 2>/dev/null) || version=unavailable
 [ "$version" = "opencode v$1" ] || { printf 'The installed OpenCode is %s. This release requires OpenCode %s.\n' "$version" "$1" >&2; exit 1; }
 export OPENCODE_CONFIG_CONTENT='{"plugins":["file:///tmp/work/facts"]}'
 derive() {
-  CULLER_MODEL_FACTS="/tmp/work/$1.json" "$program" api --standalone GET /api/model </dev/null >/dev/null 2>"/tmp/work/$1.log" && [ -s "/tmp/work/$1.json" ] && return
+  SHZ_MODEL_FACTS="/tmp/work/$1.json" "$program" api --standalone GET /api/model </dev/null >/dev/null 2>"/tmp/work/$1.log" && [ -s "/tmp/work/$1.json" ] && return
   printf 'OpenCode could not derive the model facts: %s\n' "$(tail -n 1 "/tmp/work/$1.log")" >&2
   exit 1
 }

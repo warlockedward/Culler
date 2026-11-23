@@ -34,8 +34,8 @@ if (await lstat(options.output).then(() => true, error => { if (error.code === "
   throw new Error("The acceptance output directory must be new.");
 }
 const env = scribeHostEnv(options.home);
-delete env.CULLER_TEST_HOST_SECRET_DIR;
-env.CULLER_TEST_PROVIDER_IMAGE = options.image;
+delete env.SHZ_TEST_HOST_SECRET_DIR;
+env.SHZ_TEST_PROVIDER_IMAGE = options.image;
 const source = resolve(import.meta.dir, "../..");
 const privateRoot = await mkdtemp(join(options.home, ".scribe-profile-"));
 const spine = join(privateRoot, "spine.db");

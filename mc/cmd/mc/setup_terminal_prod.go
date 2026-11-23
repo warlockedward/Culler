@@ -874,7 +874,7 @@ func (w *setupWizard) serviceNotice() {
 	if err != nil {
 		lines = append(lines, "The service state check could not finish.")
 	}
-	if os.Getenv("CULLER_RELEASE_RECORD") != "" {
+	if os.Getenv("SHZ_RELEASE_RECORD") != "" {
 		lines = append(lines, publishedRecoveryLines(w.home)...)
 	}
 	w.ui.Panel("Current services", lines)

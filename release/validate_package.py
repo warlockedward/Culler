@@ -237,11 +237,11 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 case "$url" in
-  "$CULLER_PACKAGE_CHECK_URL") source=$CULLER_PACKAGE_CHECK_ARCHIVE ;;
-  "$CULLER_PACKAGE_CHECK_BUN_URL") source=$CULLER_PACKAGE_CHECK_BUN_ARCHIVE ;;
+  "$SHZ_PACKAGE_CHECK_URL") source=$SHZ_PACKAGE_CHECK_ARCHIVE ;;
+  "$SHZ_PACKAGE_CHECK_BUN_URL") source=$SHZ_PACKAGE_CHECK_BUN_ARCHIVE ;;
   *) exit 91 ;;
 esac
-printf '%s\\n' "$url" >>"$CULLER_PACKAGE_CHECK_FETCHES"
+printf '%s\\n' "$url" >>"$SHZ_PACKAGE_CHECK_FETCHES"
 cp "$source" "$output"
 printf 200
 """)
@@ -259,15 +259,15 @@ printf 200
     env = {
         "PATH": str(tools) + ":/usr/bin:/bin", "HOME": str(scratch / "home"),
         "TMPDIR": str(scratch / "tmp"), "TERM": "dumb", "NO_COLOR": "1",
-        "CULLER_BOOTSTRAP_DIR": str(alias) + "//bootstrap", "CULLER_REPOSITORY": "culler/package-check",
-        "CULLER_GITHUB_TOKEN_FILE": str(scratch / "absent-token"),
+        "SHZ_BOOTSTRAP_DIR": str(alias) + "//bootstrap", "SHZ_REPOSITORY": "culler/package-check",
+        "SHZ_GITHUB_TOKEN_FILE": str(scratch / "absent-token"),
         "MC_HOME": str(scratch / "deployment"),
         "MC_BIN_DIR": str(scratch / "installed-bin"),
-        "CULLER_PACKAGE_CHECK_URL": DOWNLOAD_URL,
-        "CULLER_PACKAGE_CHECK_FETCHES": str(scratch / "fetches"),
-        "CULLER_PACKAGE_CHECK_ARCHIVE": str(archive),
-        "CULLER_PACKAGE_CHECK_BUN_URL": record["host_bun"]["archives"][HOST_BUN_PLATFORM]["url"],
-        "CULLER_PACKAGE_CHECK_BUN_ARCHIVE": str(bun_archive),
+        "SHZ_PACKAGE_CHECK_URL": DOWNLOAD_URL,
+        "SHZ_PACKAGE_CHECK_FETCHES": str(scratch / "fetches"),
+        "SHZ_PACKAGE_CHECK_ARCHIVE": str(archive),
+        "SHZ_PACKAGE_CHECK_BUN_URL": record["host_bun"]["archives"][HOST_BUN_PLATFORM]["url"],
+        "SHZ_PACKAGE_CHECK_BUN_ARCHIVE": str(bun_archive),
     }
     home = Path(env["MC_HOME"])
     home.mkdir(mode=0o700)
@@ -291,7 +291,7 @@ printf 200
         code, message = 1, "GitHub refused access."
     if result.returncode != code or "Culler passed the download checks." not in text or message not in text:
         raise ValueError("The packaged installer did not complete the expected local check: " + text)
-    fetches = [DOWNLOAD_URL] + ([env["CULLER_PACKAGE_CHECK_BUN_URL"]] if check_setup else [])
+    fetches = [DOWNLOAD_URL] + ([env["SHZ_PACKAGE_CHECK_BUN_URL"]] if check_setup else [])
     if (scratch / "fetches").read_text().splitlines() != fetches:
         raise ValueError("The installer used an unexpected download request.")
     validate_staged(bootstrap / "package", files)

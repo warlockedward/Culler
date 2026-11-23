@@ -8,8 +8,8 @@ import { createFailureRepairFixture } from "./failure-repair-fixture";
 import { runNativeHarness } from "./native-harness";
 import { recordFixtureAvailability, retainDashboardEvidence } from "./dashboard-assertions";
 
-const image = process.env.CULLER_PROXY_TEST_IMAGE ?? process.env.MC_BOUNDARY_IMAGE;
-if (!image) throw new Error("Set CULLER_PROXY_TEST_IMAGE to the image with the pinned release harnesses.");
+const image = process.env.SHZ_PROXY_TEST_IMAGE ?? process.env.MC_BOUNDARY_IMAGE;
+if (!image) throw new Error("Set SHZ_PROXY_TEST_IMAGE to the image with the pinned release harnesses.");
 const connections = [
   { id: "synthetic-codex-draft", harness: "codex" as const, template: "codex-api-key" },
   { id: "synthetic-claude-draft", harness: "claude-sdk" as const, template: "claude-api-key" },
@@ -18,11 +18,11 @@ let smoke: Smoke;
 let fixture: Awaited<ReturnType<typeof createFailureRepairFixture>>;
 let session: string;
 let identity: string;
-const previousStore = process.env.CULLER_TEST_HOST_SECRET_DIR;
+const previousStore = process.env.SHZ_TEST_HOST_SECRET_DIR;
 
 beforeAll(async () => {
   smoke = await bootSmoke();
-  process.env.CULLER_TEST_HOST_SECRET_DIR = join(smoke.stateScratch, "host-secrets");
+  process.env.SHZ_TEST_HOST_SECRET_DIR = join(smoke.stateScratch, "host-secrets");
   await seedProject(smoke, "provider-draft", { title: "Provider draft" });
   for (const connection of connections) {
     const catalog = await mc(["agent-profile", "list"]);
@@ -38,8 +38,8 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await fixture?.stop();
-  if (previousStore === undefined) delete process.env.CULLER_TEST_HOST_SECRET_DIR;
-  else process.env.CULLER_TEST_HOST_SECRET_DIR = previousStore;
+  if (previousStore === undefined) delete process.env.SHZ_TEST_HOST_SECRET_DIR;
+  else process.env.SHZ_TEST_HOST_SECRET_DIR = previousStore;
   await teardown(smoke);
 }, 30000);
 
@@ -84,7 +84,7 @@ for (const connection of connections) test(`${connection.harness} text reaches t
     await drafts.stop();
     await fixture.flush();
     expect(result.exitCode).toBe(0);
-    expect(result.output).toBe("CULLER_REPAIR_OK");
+    expect(result.output).toBe("SHZ_REPAIR_OK");
     await mc(["collie", "reply", session, "--to", String(claimed.message.id), "--body", result.output!,
       ...(claimed.message.attempt_id ? ["--attempt", claimed.message.attempt_id] : [])], { MC_RUN_JSON: identity });
     await page.getByTestId("board-collie-transcript").getByTestId("collie-draft").waitFor({ state: "hidden" });

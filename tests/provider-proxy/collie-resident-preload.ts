@@ -2,7 +2,7 @@ import { appendFile, readFile, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { syntheticFinalResponse } from "./native-harness";
 
-const root = process.env.CULLER_COLLIE_PROXY_FIXTURE;
+const root = process.env.SHZ_COLLIE_PROXY_FIXTURE;
 if (!root) throw new Error("The controlled resident requires its private fixture directory.");
 const config = JSON.parse(await readFile(join(root, "config.json"), "utf8")) as {
   harness: "codex" | "claude-sdk"; key: string; model: string; text: string;

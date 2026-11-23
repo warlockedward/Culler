@@ -5,8 +5,8 @@ package deployment
 import "testing"
 
 func TestAPIKeyReplacementProductionIgnoresTestTransportSelection(t *testing.T) {
-	t.Setenv("CULLER_TEST_HOST_SECRET_DIR", t.TempDir())
-	t.Setenv("CULLER_TEST_API_KEY_VALIDATION_STATUS", "401")
+	t.Setenv("SHZ_TEST_HOST_SECRET_DIR", t.TempDir())
+	t.Setenv("SHZ_TEST_API_KEY_VALIDATION_STATUS", "401")
 	client, err := apiKeyReplacementClient("synthetic-key")
 	if err != nil || client != apiKeyValidationClient {
 		t.Fatal("The production build selected a synthetic provider transport.")

@@ -320,7 +320,7 @@ func (c *Client) Username(ctx context.Context) (string, error) {
 }
 
 func Credential(ctx context.Context) (string, error) {
-	path := os.Getenv("CULLER_GITHUB_TOKEN_FILE")
+	path := os.Getenv("SHZ_GITHUB_TOKEN_FILE")
 	explicit := path != ""
 	if path == "" {
 		home, err := os.UserHomeDir()

@@ -9,8 +9,8 @@ import { makeTestLogger } from "../runner/shared/log";
 import type { SetupTraceCandidate } from "../resident/src/setup-traces";
 
 test("the pinned AgentsView imports setup traces, incremental bytes, and restored archives", async () => {
-  const binary = process.env.CULLER_AGENTSVIEW_BIN;
-  if (!binary) throw new Error("Set CULLER_AGENTSVIEW_BIN to the pinned AgentsView executable.");
+  const binary = process.env.SHZ_AGENTSVIEW_BIN;
+  if (!binary) throw new Error("Set SHZ_AGENTSVIEW_BIN to the pinned AgentsView executable.");
   const pin = await Bun.file(new URL("../mc/deployment/agentsview.json", import.meta.url)).json();
   expect(createHash("sha256").update(await readFile(binary)).digest("hex")).toBe(pin.executable.sha256);
 

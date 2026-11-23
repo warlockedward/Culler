@@ -59,7 +59,7 @@ func TestOnboardCLIRequiresPrivateSourceDeployment(t *testing.T) {
 			t.Setenv("ZDOTDIR", userHome)
 			t.Setenv("MC_HOME", home)
 			t.Setenv("MC_BIN_DIR", directory)
-			t.Setenv("CULLER_PARENT_PATH", "/usr/bin:/bin")
+			t.Setenv("SHZ_PARENT_PATH", "/usr/bin:/bin")
 			changed, err := installOnboardCLI(test.private, verbs.OnboardArgs{HostReleaseSource: test.source})
 			if err != nil || changed != test.install {
 				t.Fatalf("changed=%t error=%v", changed, err)

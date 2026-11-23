@@ -31,8 +31,8 @@ test("the package starts independently and supplies the same inputs to the image
     expect(job.needs).toBeUndefined();
     expect(job.steps[0].with).toEqual({ ref: "${{ github.sha }}", "fetch-depth": 0, "persist-credentials": false });
     const commands = job.steps.map((step: any) => step.run ?? "").join("\n");
-    expect(commands).toContain('./release/build.sh "$CULLER_RELEASE_OUTPUT"');
-    expect(commands).toContain("release/validate_package.py --output \"$CULLER_RELEASE_OUTPUT\"");
+    expect(commands).toContain('./release/build.sh "$SHZ_RELEASE_OUTPUT"');
+    expect(commands).toContain("release/validate_package.py --output \"$SHZ_RELEASE_OUTPUT\"");
     expect(jobs[images].needs).toEqual([packaging]);
   }
   for (const name of ["release-images", "release-images-linux", "release-downloads"]) {

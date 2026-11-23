@@ -39,7 +39,7 @@ func testTerminalPair(t *testing.T) (*os.File, *os.File) {
 }
 
 func TestReleaseTerminalInput(t *testing.T) {
-	if os.Getenv("CULLER_TEST_RELEASE_TERMINAL") == "1" {
+	if os.Getenv("SHZ_TEST_RELEASE_TERMINAL") == "1" {
 		terminal := NewTerminal(os.Stdin, os.Stdout)
 		if !terminal.HasTerminal() {
 			t.Fatal("the release input requires a terminal")
@@ -55,7 +55,7 @@ func TestReleaseTerminalInput(t *testing.T) {
 	defer cancel()
 	// The shell opens /dev/tty, as the public release launcher does.
 	cmd := exec.CommandContext(ctx, "sh", "-c", `exec "$1" -test.run '^TestReleaseTerminalInput$' </dev/tty`, "sh", os.Args[0])
-	cmd.Env = append(os.Environ(), "CULLER_TEST_RELEASE_TERMINAL=1", "TERM=xterm")
+	cmd.Env = append(os.Environ(), "SHZ_TEST_RELEASE_TERMINAL=1", "TERM=xterm")
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = slave, slave, slave
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true, Setctty: true, Ctty: 0}
 	if err := cmd.Start(); err != nil {

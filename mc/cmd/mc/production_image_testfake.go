@@ -12,7 +12,7 @@ import (
 var testProviderImagePattern = regexp.MustCompile(`^[a-z0-9][a-z0-9._/-]*(?::[A-Za-z0-9_.-]+|@sha256:[0-9a-f]{64})?$`)
 
 func testProviderImage() (string, error) {
-	image := os.Getenv("CULLER_TEST_PROVIDER_IMAGE")
+	image := os.Getenv("SHZ_TEST_PROVIDER_IMAGE")
 	if image == "" {
 		return "", nil
 	}

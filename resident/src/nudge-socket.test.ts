@@ -137,9 +137,9 @@ describe("the nudge socket", () => {
     const path = join(home, "resident.socket");
     // A forced process exit leaves the socket file behind.
     const dead = Bun.spawn(["mise", "exec", "--", process.execPath, "-e", `
-      Bun.listen({ unix: process.env.CULLER_TEST_SOCKET, socket: { data() {} } });
+      Bun.listen({ unix: process.env.SHZ_TEST_SOCKET, socket: { data() {} } });
       console.log("ready");
-    `], { env: { ...process.env, CULLER_TEST_SOCKET: path }, stdout: "pipe", stderr: "pipe" });
+    `], { env: { ...process.env, SHZ_TEST_SOCKET: path }, stdout: "pipe", stderr: "pipe" });
     try {
       const { value } = await dead.stdout.getReader().read();
       expect(new TextDecoder().decode(value)).toBe("ready\n");

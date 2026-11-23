@@ -567,7 +567,7 @@ func setup(t *testing.T, opts ...func(*setupOptions)) *fixture {
 	if err := os.Mkdir(secretDir, 0o700); err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("CULLER_TEST_HOST_SECRET_DIR", secretDir)
+	t.Setenv("SHZ_TEST_HOST_SECRET_DIR", secretDir)
 	sfx := strings.ToLower(filepath.Base(base)[len("mc-e2e-"):])
 	f.volume = "mc-e2e-spine-" + sfx
 	f.helper = "mc-e2e-helper-" + sfx

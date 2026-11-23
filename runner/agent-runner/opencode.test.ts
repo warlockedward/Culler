@@ -100,17 +100,17 @@ test("OpenWiki waits for its tools and rejects a failed or incomplete server", a
 });
 
 test("the control plugin removes questions and unavailable web search", async () => {
-  const previous = process.env.CULLER_OPENCODE_WEBSEARCH;
+  const previous = process.env.SHZ_OPENCODE_WEBSEARCH;
   try {
     for (const available of ["0", "1"]) {
-      process.env.CULLER_OPENCODE_WEBSEARCH = available;
+      process.env.SHZ_OPENCODE_WEBSEARCH = available;
       const removed: string[] = [];
       await control.setup({ shell: { hook: async () => {} }, tool: { transform: async change => change({ remove: name => removed.push(name) }) } });
       expect(removed).toEqual(available === "1" ? ["question"] : ["question", "websearch"]);
     }
   } finally {
-    if (previous === undefined) delete process.env.CULLER_OPENCODE_WEBSEARCH;
-    else process.env.CULLER_OPENCODE_WEBSEARCH = previous;
+    if (previous === undefined) delete process.env.SHZ_OPENCODE_WEBSEARCH;
+    else process.env.SHZ_OPENCODE_WEBSEARCH = previous;
   }
 });
 
@@ -124,8 +124,8 @@ test("OpenCode access rejects an account credential or another base path", () =>
 test("the prompt hook retains the main session identity before a model request", async () => {
   const root = await mkdtemp(join(tmpdir(), "culler-opencode-session-")); roots.push(root);
   const file = join(root, "native-session");
-  const previous = process.env.CULLER_OPENCODE_SESSION_FILE;
-  process.env.CULLER_OPENCODE_SESSION_FILE = file;
+  const previous = process.env.SHZ_OPENCODE_SESSION_FILE;
+  process.env.SHZ_OPENCODE_SESSION_FILE = file;
   try {
     let prompt: (input: { sessionID: string }) => Promise<void>;
     await control.setup({
@@ -137,8 +137,8 @@ test("the prompt hook retains the main session identity before a model request",
     await prompt!({ sessionID: "ses_child" });
     expect(await readFile(file, "utf8")).toBe("ses_main");
   } finally {
-    if (previous === undefined) delete process.env.CULLER_OPENCODE_SESSION_FILE;
-    else process.env.CULLER_OPENCODE_SESSION_FILE = previous;
+    if (previous === undefined) delete process.env.SHZ_OPENCODE_SESSION_FILE;
+    else process.env.SHZ_OPENCODE_SESSION_FILE = previous;
   }
 });
 
@@ -148,7 +148,7 @@ test("the adapter registers a session while the first model response remains inc
   await writeFile(join(root, "access.json"), JSON.stringify(access));
   const native = join(root, "native"), release = join(root, "release");
   await writeFile(native, `#!${process.execPath}\nawait Bun.stdin.text();
-await Bun.write(process.env.CULLER_OPENCODE_SESSION_FILE, "ses_delayed");
+await Bun.write(process.env.SHZ_OPENCODE_SESSION_FILE, "ses_delayed");
 while (!await Bun.file(process.env.FIXTURE_RELEASE).exists()) await Bun.sleep(10);
 console.log(JSON.stringify({type:"text",sessionID:"ses_delayed",part:{text:"Complete"}}));
 console.log(JSON.stringify({type:"step_finish",sessionID:"ses_delayed",part:{reason:"stop"}}));\n`, { mode: 0o755 });

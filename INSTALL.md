@@ -28,7 +28,7 @@ sh /tmp/culler-install.sh
 ```
 
 The installer can also use an existing GitHub credential.
-It first checks `CULLER_GITHUB_TOKEN_FILE`, or `~/.config/culler/github-token` when that variable is absent.
+It first checks `SHZ_GITHUB_TOKEN_FILE`, or `~/.config/culler/github-token` when that variable is absent.
 Without an explicit token path or a default token file, it checks the GitHub command tool.
 A token file must contain only the token, belong to the operator, and use mode `600`.
 An invalid configured credential can stop installation even when the release is public.

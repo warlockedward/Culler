@@ -103,7 +103,7 @@ func runUninstallFixture(t *testing.T, args ...string) (int, uninstallReport, st
 	var out, diagnostics bytes.Buffer
 	code := runUninstall(append([]string{"__uninstall"}, args...), &out, &diagnostics, []string{t.TempDir()})
 	// Optional actual terminal output for the required setup review.
-	if os.Getenv("CULLER_TERMINAL_REVIEW") == "1" {
+	if os.Getenv("SHZ_TERMINAL_REVIEW") == "1" {
 		fmt.Fprint(os.Stderr, diagnostics.String())
 	}
 	var report uninstallReport

@@ -33,8 +33,8 @@ let image = restart?.image ?? "", activeImage = restart?.activeImage ?? "", comm
 let operation: EnvironmentOperation | undefined;
 let configuration: ProjectEnvironment = restart?.configuration;
 const results: any[] = [];
-const fixtureRuntime = process.env.CULLER_ACCEPT_RUNTIME_IMAGE ?? "mc-prod";
-const fixtureImage = process.env.CULLER_ACCEPT_PROJECT_IMAGE ?? "mc-project";
+const fixtureRuntime = process.env.SHZ_ACCEPT_RUNTIME_IMAGE ?? "mc-prod";
+const fixtureImage = process.env.SHZ_ACCEPT_PROJECT_IMAGE ?? "mc-project";
 
 async function execute(argv: string[], stdin?: Uint8Array, timeout = 120_000, env = process.env): Promise<ExecResult> {
   const child = Bun.spawn(argv, { stdin: stdin ?? "ignore", stdout: "pipe", stderr: "pipe", env });

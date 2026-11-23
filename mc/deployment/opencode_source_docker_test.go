@@ -17,7 +17,7 @@ import (
 func TestOpenCodeSourceDockerPreparationAndOfflineReuse(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()
-	image := os.Getenv("CULLER_OPENCODE_TEST_IMAGE")
+	image := os.Getenv("SHZ_OPENCODE_TEST_IMAGE")
 	if image == "" {
 		image = "mc-prod"
 	}

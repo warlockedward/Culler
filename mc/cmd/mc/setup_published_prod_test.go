@@ -701,7 +701,7 @@ func TestConnectionTestUsesTheAgentImageOfTheInstall(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			home := t.TempDir()
 			t.Setenv("MC_HOME", home)
-			t.Setenv("CULLER_RELEASE_RECORD", "")
+			t.Setenv("SHZ_RELEASE_RECORD", "")
 			previous := releaseBuildID
 			releaseBuildID = pending.Commit
 			t.Cleanup(func() { releaseBuildID = previous })

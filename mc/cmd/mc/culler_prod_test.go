@@ -21,7 +21,7 @@ import (
 
 func TestCullerInstallCommandRetainsSourceInstallation(t *testing.T) {
 	home := t.TempDir()
-	t.Setenv("CULLER_SOURCE_INSTALLER", "")
+	t.Setenv("SHZ_SOURCE_INSTALLER", "")
 	if !strings.HasPrefix(cullerInstallCommand(home), "curl -fsSL ") {
 		t.Fatal("The published installation lost its recovery command.")
 	}
@@ -34,11 +34,11 @@ func TestCullerInstallCommandRetainsSourceInstallation(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := "sh " + cullerQuote(filepath.Join(root, "scripts", "install-source.sh")) + " --mc-home " + cullerQuote(home)
-	t.Setenv("CULLER_SOURCE_INSTALLER", filepath.Join(root, "scripts", "install-source.sh"))
+	t.Setenv("SHZ_SOURCE_INSTALLER", filepath.Join(root, "scripts", "install-source.sh"))
 	if got := cullerInstallCommand(home); got != want {
 		t.Fatalf("The initial source setup command differs: %s", got)
 	}
-	t.Setenv("CULLER_SOURCE_INSTALLER", "")
+	t.Setenv("SHZ_SOURCE_INSTALLER", "")
 	if err := deployment.ConfigureRuntimeSource(home, filepath.Join(root, "runner"), strings.Repeat("a", 40)); err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func TestCullerSourceRecoveryCommandRemainsExact(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Setenv("CULLER_SOURCE_INSTALLER", "/Users/operator/source checkout/scripts/install-source.sh")
+	t.Setenv("SHZ_SOURCE_INSTALLER", "/Users/operator/source checkout/scripts/install-source.sh")
 	if err := os.WriteFile(filepath.Join(home, "config.toml"), nil, 0600); err != nil {
 		t.Fatal(err)
 	}

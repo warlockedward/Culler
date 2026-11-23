@@ -6,11 +6,11 @@ let smoke: Smoke;
 let catalog: any;
 const connection = "synthetic-delete";
 const profile = "synthetic_delete_profile";
-const previousStore = process.env.CULLER_TEST_HOST_SECRET_DIR;
+const previousStore = process.env.SHZ_TEST_HOST_SECRET_DIR;
 
 beforeAll(async () => {
   smoke = await bootSmoke();
-  process.env.CULLER_TEST_HOST_SECRET_DIR = join(smoke.stateScratch, "host-secrets");
+  process.env.SHZ_TEST_HOST_SECRET_DIR = join(smoke.stateScratch, "host-secrets");
   await seedProject(smoke, "delete-form", { title: "Connection deletion" });
   const before = await mc(["agent-profile", "list"]);
   const saved = await mc(["agent-profile", "connection-save"], {}, {
@@ -25,8 +25,8 @@ beforeAll(async () => {
 }, 60000);
 
 afterAll(async () => {
-  if (previousStore === undefined) delete process.env.CULLER_TEST_HOST_SECRET_DIR;
-  else process.env.CULLER_TEST_HOST_SECRET_DIR = previousStore;
+  if (previousStore === undefined) delete process.env.SHZ_TEST_HOST_SECRET_DIR;
+  else process.env.SHZ_TEST_HOST_SECRET_DIR = previousStore;
   await teardown(smoke);
 }, 30000);
 
