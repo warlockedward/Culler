@@ -177,6 +177,11 @@ jobs:
         # local image would either pass against code that is not under review or
         # fail closed on a release identity mismatch.
         run: ./runner/image/build-prod.sh
+      - name: Build the fake-harness image the lanes pin
+        # The boundary lane inspects the shipped fake image, and the pipeline
+        # lane's real-harness builds run against it, so it must exist before
+        # either lane starts.
+        run: ./runner/image/build.sh
       - name: Run the container boundary lane
         run: (cd mc && mise exec -- go test -tags docker_boundary -count=1 ./boundarydocker/...)
       - name: Run the pipeline lane with real containers
