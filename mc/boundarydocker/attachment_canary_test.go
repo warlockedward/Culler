@@ -120,10 +120,17 @@ func TestAttachmentCanaryPublisherHasNoProductionCollieRouteDockerBoundary(t *te
 		}
 	})
 	t.Run("a Collie run envelope loses host scope before any frame", func(t *testing.T) {
+		// A real resident mints the envelope with the release that built the
+		// binary, so the fixture carries that identity too; read it from the
+		// image under test instead of pinning a value the loader would refuse.
+		ridOut, ridErr := dockerRun(t, prodImage, "/bin/cat", "/opt/culler-runtime/release-id")
+		if ridErr != nil || strings.TrimSpace(ridOut) == "" {
+			t.Fatalf("read the image release identity: %v output %q", ridErr, ridOut)
+		}
 		root := sharedTempDir(t)
 		runJSON := filepath.Join(root, "run.json")
-		if err := os.WriteFile(runJSON,
-			[]byte(`{"run_id":"h-probe","tier":"collie","role":"collie"}`), 0o444); err != nil {
+		body := `{"run_id":"h-probe","tier":"collie","role":"collie","release_build_id":"` + strings.TrimSpace(ridOut) + `"}`
+		if err := os.WriteFile(runJSON, []byte(body), 0o444); err != nil {
 			t.Fatal(err)
 		}
 		out, err := dockerRun(t, "--user", "10002:10002",
@@ -143,6 +150,9 @@ func TestAttachmentCanaryRecoversExactInterruptedAttemptDockerBoundary(t *testin
 	}
 	const generation = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	name := "mc-attachment-canary-" + generation
+	// The fixture name is deterministic, so a fixture container left behind by
+	// an interrupted earlier run would make the create below conflict.
+	_ = exec.Command("docker", "rm", "-f", name).Run()
 	root := filepath.Join(home, "health", "attachment-canary")
 	attempt := filepath.Join(root, "attempt-"+generation)
 	for _, path := range []string{
