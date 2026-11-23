@@ -2,6 +2,15 @@
 
 状态=DESIGN（route-A 已解 C01 治理门，但 C01 触 **P1 不变量**上的净新增配置层，字段闭集需 Authority 确认后才起 P1 码）。侦察结论全部实读（file:line 本回合亲验）。
 
+## 0.5 ⚑ 进码前二次侦察：**落点从"新命名空间"改为"扩现有 CredentialSource"**（轮二十六·据代码实况，纠正本件 §1 草案；**不改所有者 P1 批的字段闭集，只改放置**）
+深读 config.go 后本件原拟"新建 `runtimes.registry` 命名空间"**是错的**——会与既有抽象成平行第二权威（违复用优先律）。实况：
+- `CredentialSource`（config.go:73-80）**已有** `InferenceURL`(`inference_url`) 字段，且**目的地流已经通**（agentprofiles.go:181→ResidentRuntimeBinding；:508 integrationAddress；deployment/agentprofile_models.go:149/175/199）。
+- 但 `validateCredentialSource`（:1222-1247）把它**锁死为目录值**：`:1243 (source.InferenceURL != "" && source.InferenceURL != reference.InferenceURL)` ⇒ 非空时**必须等于发布目录固定值**；`base_url` 全禁（:1226-1228）；OpenCode kind 要求"no address"（:1230）。⇒ **当前无任何自定义端点入口**，D4（vLLM/SGLang/Ollama 私有推理）今天进不来。
+- **正解**=在 `CredentialSource`+`validateCredentialSource` 上**增一条受控 custom kind 分支**（如 `CredentialKindCustomInference`），携 §1 批过的字段闭集（`inference_url` 必填且过 scheme=https / canonical_host / 拒 loopback·私有·保留 / `port∈port_allowlist{443}` 默认 / `pooling∈{off,bound}` / 禁 `insecure*`）；目的地解析复用既有 :181/:508 路径，不另建。
+- **收益**：单一权威、既有测试面延续、改动集中在 `validateCredentialSource`（P1 校验咽喉，正是该改的地方）；blast radius 远小于新命名空间。
+- **仍守**：`base_url` 继续禁（不放宽，P1）；新分支只开**受控登记**，目的地仍不来自 agent/请求侧。
+- ⇒ **进码专窗据本节实施，勿再照 §1 旧"新命名空间"文**。
+
 ## 0. C01 到底要什么（厘清，避免误读 routing）
 - `routing.Registry`= `map[string]string`（binding→harness 族）是**模型路由表**，**不是** PS §1 的 L2 Provider Registry。
 - PS §1 L2 = **受控 provider 端点登记**（自托管 vLLM/Ollama 等 D4 需求）：目的地**仍不得来自 agent/请求侧（P1）**，只能来自操作者登记的 registry 条目，agent 侧只引用条目 id。
