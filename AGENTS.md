@@ -7,6 +7,15 @@ Rules for the coding agents that work in this repository.
 
 Each rule applies to both kinds of agent unless its section names one.
 
+## Fork boundary
+
+This repository is a fork of the upstream project `vinchenkov/Culler`; the development done here is S-Horizon. The upstream is history and stays untouched:
+
+- Every outbound operation — push, pull request, issue, release — targets `warlockedward/Culler` (the `origin` of this checkout) only. `vinchenkov/Culler` gets zero contact.
+- Name `--repo warlockedward/Culler` explicitly in every `gh` command. After creating a pull request, read back `base.repo.full_name` before any other action.
+- `main` advances only on explicit operator instruction. The fork's probe branches (`ci/*`) may be force-pushed with a pinned lease.
+- Nothing has been published from this fork yet (no releases, no tags). While `test_releases` is `true` in `mc/distribution/update_policy.json`, a passing push to `main` publishes a `test-<commit>` release from this fork, never from upstream (see "When you change these things").
+
 ## S-Horizon
 
 S-Horizon is a local-first orchestration system for AI coding agents with one human operator.
