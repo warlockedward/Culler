@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/url"
 	"os"
 	"path/filepath"
 	"slices"
@@ -66,6 +67,18 @@ type Runtimes struct {
 	ForbiddenEnv    []string                    `toml:"forbidden_env"`
 	Credentials     map[string]CredentialSource `toml:"credentials"`
 	Bindings        map[string]RuntimeBinding   `toml:"bindings"`
+	Registry        map[string]RegistryEntry    `toml:"registry"`
+}
+
+// RegistryEntry is one controlled provider-endpoint record in the L2 provider
+// registry. Destinations never come from an agent or a request: they come only
+// from an entry here, referenced by a binding or credential. The field set is
+// closed — any key not listed below (including a reintroduced insecure flag) is
+// rejected as an unknown key by the decoder.
+type RegistryEntry struct {
+	BaseURL       string `toml:"base_url"`
+	PortAllowlist []int  `toml:"port_allowlist"`
+	Pooling       string `toml:"pooling"`
 }
 
 // CredentialSource selects one supported provider connection.
@@ -751,6 +764,9 @@ func (c Config) Validate() error {
 			return fmt.Errorf("runtimes.enabled_bindings references undefined binding %q", id)
 		}
 	}
+	if err := validateRegistry(c.Runtimes.Registry); err != nil {
+		return err
+	}
 	for name, value := range map[string]int{
 		"budgets.review_wip_cap":        c.Budgets.ReviewWIPCap,
 		"budgets.max_correction_count":  c.Budgets.MaxCorrectionCount,
@@ -1246,6 +1262,68 @@ func validateCredentialSource(id string, source CredentialSource) error {
 		return nil
 	}
 	return fmt.Errorf("runtimes.credentials.%s has an unsupported kind", id)
+}
+
+// validateRegistry checks each controlled provider endpoint. An empty registry
+// is valid: entries exist only when the operator adds a self-hosted provider.
+// The scheme, address class, and port are judged at configuration time; the
+// resolved-IP and TLS-identity checks are enforced at connect time (the
+// DestinationPolicy layer), which is where a hostname resolves.
+func validateRegistry(registry map[string]RegistryEntry) error {
+	for id := range registry {
+		if !safeRuntimeID(id) {
+			return fmt.Errorf("runtimes.registry contains invalid entry id %q", id)
+		}
+	}
+	ids := make([]string, 0, len(registry))
+	for id := range registry {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+	for _, id := range ids {
+		entry := registry[id]
+		if entry.Pooling != "" && entry.Pooling != "off" && entry.Pooling != "bound" {
+			return fmt.Errorf("runtimes.registry.%s pooling must be off or bound", id)
+		}
+		if entry.BaseURL == "" {
+			return fmt.Errorf("runtimes.registry.%s requires a base_url", id)
+		}
+		parsed, err := url.Parse(entry.BaseURL)
+		if err != nil {
+			return fmt.Errorf("runtimes.registry.%s base_url is not a valid URL", id)
+		}
+		if parsed.Scheme != "https" {
+			return fmt.Errorf("runtimes.registry.%s base_url must use https", id)
+		}
+		if parsed.User != nil {
+			return fmt.Errorf("runtimes.registry.%s base_url must not carry userinfo", id)
+		}
+		host := parsed.Hostname()
+		if host == "" {
+			return fmt.Errorf("runtimes.registry.%s base_url must carry a host", id)
+		}
+		if ip := net.ParseIP(host); ip != nil {
+			if ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified() {
+				return fmt.Errorf("runtimes.registry.%s base_url may not point at a loopback, private, or reserved address", id)
+			}
+		}
+		port := 443
+		if raw := parsed.Port(); raw != "" {
+			n, err := strconv.Atoi(raw)
+			if err != nil || n < 1 || n > 65535 {
+				return fmt.Errorf("runtimes.registry.%s base_url carries an invalid port", id)
+			}
+			port = n
+		}
+		allowed := entry.PortAllowlist
+		if len(allowed) == 0 {
+			allowed = []int{443}
+		}
+		if !slices.Contains(allowed, port) {
+			return fmt.Errorf("runtimes.registry.%s port %d is not in its allowlist", id, port)
+		}
+	}
+	return nil
 }
 
 // ValidateBindingShape checks the profile against its supported sign-in connection.
