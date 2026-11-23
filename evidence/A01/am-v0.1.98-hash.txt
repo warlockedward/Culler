@@ -1,0 +1,8 @@
+AM v0.1.98 双面哈希登记（轮二十六：P1 认草案[C01 编码门开]+P7 自定复用后端[A06 编码门开]+P6 ADR-0 定稿文本已起草待签[§9 空格待 Authority]；三裁不擅改 status 据实申明）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 60274bc114b9c60f58f7cdc897a9621ccbb4c2c7f0de279fc391fb741d384a0d
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-23 +0800 实测）
+- 前轮: v0.1.97 = f2722fc981c446c2822639291e82dfc7e5b865c537a8158602bc334871f159f0（evidence/A09/am-v0.1.97-hash.txt）
+- 同轮事实: 支 TR33 并入 dev；ADR-0 定稿草案=evidence/A01/adr-0-final-draft-001.md（八格+P7+A02实测，§9 定稿批准行留空不代签）；P1→C01 字段闭集批准编码门开(BACKLOG 未码，P1 安全面需专窗全绿)；P7→A06 备份加密复用 hostSecretStore 门开(BACKLOG 未码，复用件 A02 已 EVIDENCED)；DC§7.4↔A01件7 交叠经 ADR§7 收敛 O1给抽象/A06给密钥环；status 无改(A01 AM-REFERRAL/C01 A06 BACKLOG/A02 EVIDENCED ledger 27)；blcheck 69/0；worktree 仅 dev；main 远端 dd087c7 未推；外发只 warlockedward；PR#1 留探针；不宣称项目安全
+- 唯挂一笔: ADR-0 定稿批准之笔(§9 空格)——不签则 A01 不转 EVIDENCED/IG 表 B 不销账，但不挡 C01/A06 进码
+- 下回合自动连开(不再请示): 专窗 C01 进码→专窗 A06 进码
