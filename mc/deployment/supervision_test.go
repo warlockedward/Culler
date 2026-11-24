@@ -118,9 +118,9 @@ func TestPrepareSupervisionPublishesClosedUnloadedLaunchAgentBundle(t *testing.T
 		t.Fatalf("status=%q inspected=%v", status, inspected)
 	}
 	names, _ := RuntimeNames(home)
-	wantLabels := []string{"com.culler." + names.Suffix + ".resident", "com.culler." + names.Suffix + ".dashboard"}
+	wantLabels := []string{"com.s.shorizon." + names.Suffix + ".resident", "com.s.shorizon." + names.Suffix + ".dashboard"}
 	if result.ResidentLabel != wantLabels[0] || result.DashboardLabel != wantLabels[1] ||
-		result.AgentsViewLabel != "com.culler."+names.Suffix+".agentsview" {
+		result.AgentsViewLabel != "com.s.shorizon."+names.Suffix+".agentsview" {
 		t.Fatalf("labels=%+v", result)
 	}
 

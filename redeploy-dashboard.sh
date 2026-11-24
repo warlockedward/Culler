@@ -104,15 +104,15 @@ fi
 
 case "$os_name" in
 Linux)
-  unit=$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 2>/dev/null |
-    awk '$1 ~ /^com\.culler\.[0-9a-f]*\.dashboard\.service$/ {print $1; exit}')
-  [ -n "$unit" ] || fail "server-side files changed but no com.culler.*.dashboard unit is loaded; run redeploy.sh"
+  unit=$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 'com.s.shorizon.*' 'shorizon-*' 2>/dev/null |
+    awk '$1 ~ /^com\.culler\.[0-9a-f]*\.dashboard\.service$/ || $1 ~ /^com\.s\.shorizon\.[0-9a-f]*\.dashboard\.service$/ || $1 ~ /^shorizon-[0-9a-f]{12}-dashboard\.service$/ {print $1; exit}')
+  [ -n "$unit" ] || fail "server-side files changed but no supervised dashboard unit is loaded; run redeploy.sh"
   say "== restart: $unit"
   systemctl --user restart "$unit" || fail "could not restart $unit"
   ;;
 *)
-row=$(launchctl list 2>/dev/null | grep 'com\.culler\.[0-9a-f]*\.dashboard$' | head -n 1) || true
-[ -n "$row" ] || fail "server-side files changed but no com.culler.*.dashboard unit is loaded; run redeploy.sh"
+row=$(launchctl list 2>/dev/null | grep -E 'com\.culler\.[0-9a-f]*\.dashboard$|com\.s\.shorizon\.[0-9a-f]*\.dashboard$' | head -n 1) || true
+[ -n "$row" ] || fail "server-side files changed but no supervised dashboard unit is loaded; run redeploy.sh"
 label=${row##*[[:space:]]}
 pid=${row%%[[:space:]]*}
 say "== restart: $label"

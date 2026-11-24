@@ -92,7 +92,7 @@ func TestPreparedAgentsViewUnitRunsThePinnedServerOnLoopbackOnly(t *testing.T) {
 	names, _ := RuntimeNames(home)
 	paths := AgentsViewPathsFor(home)
 	want := map[string]any{
-		"Label": "com.culler." + names.Suffix + ".agentsview",
+		"Label": "com.s.shorizon." + names.Suffix + ".agentsview",
 		"ProgramArguments": []any{
 			filepath.Join(home, "bin", "agentsview"), "serve", "--host", "localhost", "--port", "7444",
 			"--no-browser", "--no-update-check",

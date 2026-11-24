@@ -47,7 +47,7 @@ case "$1" in
   bootout) : >"$DEV_RESET_TEST_LOG.booted" ;;
   list)
     if [ -n "${DEV_RESET_TEST_STUCK:-}" ] || [ ! -e "$DEV_RESET_TEST_LOG.booted" ]; then
-      printf '1\t0\tcom.culler.abc.resident\n2\t0\tcom.culler.abc.dashboard\n'
+      printf '1\t0\tcom.s.shorizon.abc.resident\n2\t0\tcom.s.shorizon.abc.dashboard\n'
     fi ;;
 esac
 exit 0
@@ -61,7 +61,7 @@ EOF
 cat >"$TMP/tools/systemctl" <<'EOF'
 #!/bin/sh
 printf 'systemctl %s\n' "$*" >>"$DEV_RESET_TEST_LOG"
-for a in "$@"; do [ "$a" = "list-units" ] && { [ -n "${DEV_RESET_TEST_STUCK:-}" ] || [ ! -e "$DEV_RESET_TEST_LOG.disabled" ] && printf 'com.culler.abc.resident.service loaded active running Culler resident\n'; exit 0; } done
+for a in "$@"; do [ "$a" = "list-units" ] && { [ -n "${DEV_RESET_TEST_STUCK:-}" ] || [ ! -e "$DEV_RESET_TEST_LOG.disabled" ] && printf 'shorizon-deadbeefcafe-resident.service loaded active running S-Horizon resident\n'; exit 0; } done
 for a in "$@"; do [ "$a" = "disable" ] && : >"$DEV_RESET_TEST_LOG.disabled"; done
 exit 0
 EOF
@@ -113,7 +113,7 @@ MC_OS_OVERRIDE=Linux DEV_RESET_TEST_STUCK=1 MC_HOME="$TMP/deploy/home" "$REPO/de
 [ "$status" -ne 0 ] || fail 'a stuck systemd unit returned success'
 grep -F 'still loaded after the stop' "$TMP/out" >/dev/null || fail 'the stuck systemd unit failure omits the cause'
 grep -E '^build-prod$|__reset' "$LOG" >/dev/null && fail 'a stuck systemd unit did not stop the build and the reset'
-grep -F 'systemctl --user disable --now com.culler.abc.resident.service' "$LOG" >/dev/null || fail 'the systemd stop was not issued'
+grep -F 'systemctl --user disable --now shorizon-deadbeefcafe-resident.service' "$LOG" >/dev/null || fail 'the systemd stop was not issued'
 grep -F 'launchctl' "$LOG" >/dev/null && fail 'the Linux branch called launchctl'
 
 # The rebuild compiles first, builds the image after the stop, and installs the

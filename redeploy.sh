@@ -1,5 +1,5 @@
 #!/bin/sh
-# redeploy.sh moves the live Culler deployment to this checkout.
+# redeploy.sh moves the live S-Horizon deployment to this checkout.
 #
 #   ./redeploy.sh                   Keep the deployed database.
 #   ./redeploy.sh --reset-database  Replace the deployed database with an
@@ -10,7 +10,8 @@
 # and runs mc doctor. A rerun is safe: it rebuilds the same release, finds the
 # units stopped, and each onboard section without a change reports `ok`.
 #
-# Order: the production image build refuses (exit 3) while a com.culler.* unit
+# Order: the production image build refuses (exit 3) while a supervised unit
+# (current or legacy name) is loaded.
 # is loaded, because the helper comes from that image. A rebuilt image under a
 # running deployment is a release identity mismatch at the next tick. Thus the
 # script builds the host mc and the Linux mc into a scratch path first, so a
@@ -156,7 +157,7 @@ service_control_stop() {
   {
     paragraph "redeploy.sh: Stopped. $1"
     say ""
-    paragraph "The service state is unverified. This attempt kept the container image, Culler executable, and database unchanged."
+    paragraph "The service state is unverified. This attempt kept the container image, S-Horizon executable, and database unchanged."
     say ""
     paragraph "Details: $2"
     say ""
@@ -170,7 +171,7 @@ read_units() {
   unit_status=0
   case "$os_name" in
   Linux)
-    UNITS=$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 2>"$SCRATCH/systemctl.err") || unit_status=$?
+    UNITS=$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 'com.s.shorizon.*' 'shorizon-*' 2>"$SCRATCH/systemctl.err") || unit_status=$?
     if [ "$unit_status" -ne 0 ]; then
       service_control_stop "The systemd service check failed." \
         "systemctl list-units exited with $unit_status. $(cat "$SCRATCH/systemctl.err")"
@@ -187,20 +188,20 @@ read_units() {
 }
 units_loaded() {
   read_units
-  printf '%s\n' "$UNITS" | grep -q 'com\.culler\.'
+  printf '%s\n' "$UNITS" | grep -Eq 'com\.culler\.|com\.s\.shorizon\.|shorizon-[0-9a-f]{12}-'
 }
 
 # early_database_stop explains a database check that stopped the script before
 # any change, then exits. Its argument is the state that the check found.
 early_database_stop() {
   if units_loaded; then
-    services="The Culler services still run the deployed release."
-    [ "$1" = absent ] || services="The Culler services still run the deployed release with its database."
+    services="The S-Horizon services still run the deployed release."
+    [ "$1" = absent ] || services="The S-Horizon services still run the deployed release with its database."
     keep_action="Keep the database records: no action is necessary. The deployed release continues to run."
     keep_commands=
   else
-    services="The Culler services are stopped."
-    [ "$1" = absent ] || services="The Culler services are stopped. The deployment keeps its database."
+    services="The S-Horizon services are stopped."
+    [ "$1" = absent ] || services="The S-Horizon services are stopped. The deployment keeps its database."
     keep_records_action
     keep_action=$KEEP_ACTION
     keep_commands=$KEEP_COMMANDS
@@ -224,7 +225,7 @@ for argument do
       WIDTH=$(message_width)
       paragraph "Usage: ./redeploy.sh [--reset-database]"
       say ""
-      paragraph "redeploy.sh moves the live Culler deployment to this checkout. The deployment keeps its database. A schema difference stops redeploy.sh and keeps the database."
+      paragraph "redeploy.sh moves the live S-Horizon deployment to this checkout. The deployment keeps its database. A schema difference stops redeploy.sh and keeps the database."
       say ""
       paragraph "Option:"
       item "--reset-database: Replace the database with an empty database. You confirm the reset at a terminal."
@@ -350,9 +351,9 @@ if [ "$RESET_DATABASE" -eq 0 ]; then
     *)
       WIDTH=$(message_width)
       if units_loaded; then
-        services="The Culler services still run the deployed release with its database."
+        services="The S-Horizon services still run the deployed release with its database."
       else
-        services="The Culler services are stopped. The deployment keeps its database."
+        services="The S-Horizon services are stopped. The deployment keeps its database."
       fi
       {
         paragraph "redeploy.sh: Stopped. The database check refused the deployment. Nothing changed."
@@ -378,13 +379,13 @@ Linux)
   # The unit list is the ground truth here, unlike the launchd branch below:
   # a systemd unit that is loaded stops even when its unit file is gone.
   read_units
-  for unit in $(printf '%s\n' "$UNITS" | awk '$1 ~ /^com\.culler\..*\.service$/ {print $1}'); do
+  for unit in $(printf '%s\n' "$UNITS" | awk '$1 ~ /^com\.culler\..*\.service$/ || $1 ~ /^shorizon-[0-9a-f]{12}-(resident|dashboard|agentsview)\.service$/ {print $1}'); do
     if systemctl --user disable --now "$unit" >"$SCRATCH/disable.out" 2>&1; then
       WIDTH=$(message_width)
       paragraph "   Stop requested: $unit"
     else
       disable_status=$?
-      service_control_stop "A Culler service could not stop." \
+      service_control_stop "A S-Horizon service could not stop." \
         "systemctl disable --now exited with $disable_status for $unit. $(cat "$SCRATCH/disable.out")"
     fi
     stopped=1
@@ -397,7 +398,7 @@ Linux)
   # in the list, so driving the stop from the plist glob would never name it and
   # the wait would wedge. Column three of `launchctl list` is the label.
   read_units
-  for label in $(printf '%s\n' "$UNITS" | awk '$3 ~ /^com\.culler\./ {print $3}'); do
+  for label in $(printf '%s\n' "$UNITS" | awk '$3 ~ /^com\.culler\./ || $3 ~ /^com\.s\.shorizon\./ {print $3}'); do
     if launchctl bootout "gui/$(id -u)/$label" >"$SCRATCH/bootout.out" 2>&1; then
       WIDTH=$(message_width)
       paragraph "   Stop requested: $label"
@@ -411,7 +412,7 @@ Linux)
          printf '%s\n' "$inspection" | grep -Eiq 'could not find service|service not found'; then
         say "   $label already stopped"
       else
-        service_control_stop "A Culler service could not stop." \
+        service_control_stop "A S-Horizon service could not stop." \
           "launchctl bootout exited with $bootout_status for $label. $(cat "$SCRATCH/bootout.out") Service inspection exited with $inspect_status. $inspection"
       fi
     fi
@@ -424,12 +425,12 @@ esac
 # Stopping is asynchronous on both service managers: `launchctl bootout`
 # returns before the unit leaves `launchctl list`, and `systemctl disable --now`
 # can return while the unit still shows in `list-units`. The image build below
-# refuses while any com.culler.* label is listed.
+# refuses while any supervised unit (current or legacy name) is listed.
 # Wait, bounded to a few seconds, for the labels to clear.
 polls=0
 while units_loaded; do
   polls=$((polls + 1))
-  [ "$polls" -lt 50 ] || fail "a supervised Culler deployment is loaded."
+  [ "$polls" -lt 50 ] || fail "a supervised S-Horizon deployment is loaded."
   sleep 0.1
 done
 
@@ -439,7 +440,7 @@ if ! ( cd "$REPO_DIR" && MC_RELEASE_BUILD_ID="$RELEASE_BUILD_ID" ./runner/image/
   {
     paragraph "redeploy.sh: Stopped. The production image build failed."
     say ""
-    paragraph "This attempt kept the Culler executable and database unchanged. Service activation did not run."
+    paragraph "This attempt kept the S-Horizon executable and database unchanged. Service activation did not run."
     say ""
     paragraph "Give this output to your coding harness. Ask it to resolve the error before you run ./redeploy.sh again."
   } >&2
@@ -458,7 +459,7 @@ else
   say "== deploy: mc __onboard home (runner and host release; the deployed database)"
 fi
 set -- "$@" --release-source "$REPO_DIR/runner" --host-release-source "$REPO_DIR"
-LATE_STATE="The Culler services are stopped. This release's command-line tool and container image are installed. The deployment home keeps the other files of the previous release."
+LATE_STATE="The S-Horizon services are stopped. This release's command-line tool and container image are installed. The deployment home keeps the other files of the previous release."
 if ! "$BIN_DIR/mc" "$@" >"$SCRATCH/home.out" 2>"$SCRATCH/home.err"; then
   if grep -q '"code":"database-schema-differs"' "$SCRATCH/home.out"; then
     keep_records_action

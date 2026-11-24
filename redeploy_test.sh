@@ -121,7 +121,7 @@ SCRIPT
 fi
 exit 92
 FAKE
-  # `launchctl list` shows a com.culler. label while the file
+  # `launchctl list` shows a com.s.shorizon. label while the file
   # MC_REDEPLOY_TEST_LOADED_FILE exists, and bootout removes that file. The list
   # also shows the label while the counter in MC_REDEPLOY_TEST_LIST_BUSY_FILE is
   # above zero (one decrement per list call). With both files unset, nothing is
@@ -155,13 +155,13 @@ if [ "${1:-}" = bootout ] && [ -n "${MC_REDEPLOY_TEST_LOADED_FILE:-}" ]; then
   rm -f "$MC_REDEPLOY_TEST_LOADED_FILE"
 fi
 if [ "${1:-}" = list ] && [ -n "${MC_REDEPLOY_TEST_LOADED_FILE:-}" ] && [ -e "$MC_REDEPLOY_TEST_LOADED_FILE" ]; then
-  printf -- '-\t0\tcom.culler.abc.resident\n-\t0\tcom.culler.abc.dashboard\n'
+  printf -- '-\t0\tcom.s.shorizon.abc.resident\n-\t0\tcom.s.shorizon.abc.dashboard\n'
 fi
 if [ "${1:-}" = list ] && [ -n "${MC_REDEPLOY_TEST_LIST_BUSY_FILE:-}" ]; then
   left=$(cat "$MC_REDEPLOY_TEST_LIST_BUSY_FILE" 2>/dev/null || printf '0')
   if [ "$left" -gt 0 ]; then
     printf '%s\n' "$((left - 1))" >"$MC_REDEPLOY_TEST_LIST_BUSY_FILE"
-    printf -- '-\t0\tcom.culler.abc.resident\n-\t0\tcom.culler.abc.dashboard\n'
+    printf -- '-\t0\tcom.s.shorizon.abc.resident\n-\t0\tcom.s.shorizon.abc.dashboard\n'
   fi
 fi
 exit 0
@@ -181,8 +181,8 @@ for arg in "$@"; do
       exit 0 ;;
     list-units)
       if [ -n "${MC_REDEPLOY_TEST_LOADED_FILE:-}" ] && [ -e "$MC_REDEPLOY_TEST_LOADED_FILE" ]; then
-        printf 'com.culler.abc.dashboard.service loaded active running Culler dashboard\n'
-        printf 'com.culler.abc.resident.service loaded active running Culler resident\n'
+        printf 'shorizon-deadbeefcafe-dashboard.service loaded active running S-Horizon dashboard\n'
+        printf 'shorizon-deadbeefcafe-resident.service loaded active running S-Horizon resident\n'
       fi
       exit 0 ;;
   esac
@@ -238,8 +238,8 @@ release=$(git -C "$ROOT" rev-parse --verify 'HEAD^{commit}')
 case_root="$TMP/happy"
 make_fakes "$case_root/bin"
 mkdir -p "$case_root/home/Library/LaunchAgents" "$case_root/mc-bin"
-touch "$case_root/home/Library/LaunchAgents/com.culler.abc.resident.plist" \
-      "$case_root/home/Library/LaunchAgents/com.culler.abc.dashboard.plist"
+touch "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.resident.plist" \
+      "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.dashboard.plist"
 # Both units are LOADED (a real running deployment): `launchctl list` reports them
 # while this sentinel exists, and a bootout removes it. The stop loop drives from
 # this loaded list, not from the plist glob.
@@ -254,7 +254,7 @@ env MC_OS_OVERRIDE=Darwin PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_root/h
   sh "$ROOT/redeploy.sh" >"$case_root/out" 2>&1 || { cat "$case_root/out" >&2; fail "happy path did not complete"; }
 [ "$(cat "$case_root/spine.db")" = "schema=current records=5" ] || fail "a redeploy changed a database with the current schema"
 grep -F -- "== release $release" "$case_root/out" >/dev/null || fail "the release commit was not stated"
-expected=$(printf 'CALL\tlaunchctl\tlist\nCALL\tdocker\timage\nCALL\t__redeploy-check\tmc-linux\nCALL\t__onboard\tagentsview\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tbootout\tgui/%s/com.culler.abc.resident\nCALL\tlaunchctl\tbootout\tgui/%s/com.culler.abc.dashboard\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tlist\nCALL\tdocker\tbuild\nCALL\tdocker\tbuild\nCALL\tdocker\trun\nCALL\tdocker\trun\nCALL\t__onboard\thome\t--release-source\t%s/runner\t--host-release-source\t%s\nCALL\t__onboard\ttunables\nCALL\t__onboard\tsupervision\t--activate\t--reconfigure\nCALL\tdoctor' \
+expected=$(printf 'CALL\tlaunchctl\tlist\nCALL\tdocker\timage\nCALL\t__redeploy-check\tmc-linux\nCALL\t__onboard\tagentsview\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tbootout\tgui/%s/com.s.shorizon.abc.resident\nCALL\tlaunchctl\tbootout\tgui/%s/com.s.shorizon.abc.dashboard\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tlist\nCALL\tdocker\tbuild\nCALL\tdocker\tbuild\nCALL\tdocker\trun\nCALL\tdocker\trun\nCALL\t__onboard\thome\t--release-source\t%s/runner\t--host-release-source\t%s\nCALL\t__onboard\ttunables\nCALL\t__onboard\tsupervision\t--activate\t--reconfigure\nCALL\tdoctor' \
   "$(id -u)" "$(id -u)" "$ROOT" "$ROOT")
 actual=$(grep -v '^CALL	docker	info$' "$log")
 [ "$actual" = "$expected" ] || {
@@ -290,8 +290,8 @@ env -u MC_BIN_DIR MC_OS_OVERRIDE=Darwin PATH="$case_root/bin:/usr/bin:/bin" HOME
 case_root="$TMP/bootout-race"
 make_fakes "$case_root/bin"
 mkdir -p "$case_root/home/Library/LaunchAgents" "$case_root/mc-bin"
-touch "$case_root/home/Library/LaunchAgents/com.culler.abc.resident.plist" \
-      "$case_root/home/Library/LaunchAgents/com.culler.abc.dashboard.plist"
+touch "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.resident.plist" \
+      "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.dashboard.plist"
 printf 'old release\n' >"$case_root/mc-bin/mc"
 log="$case_root/calls.log"
 : >"$log"
@@ -300,7 +300,7 @@ env MC_OS_OVERRIDE=Darwin PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_root/h
   MC_BIN_DIR="$case_root/mc-bin" MC_REDEPLOY_TEST_LOG="$log" \
   MC_REDEPLOY_TEST_LIST_BUSY_FILE="$case_root/busy" \
   sh "$ROOT/redeploy.sh" >"$case_root/out" 2>&1 || { cat "$case_root/out" >&2; fail "a lingering bootout was not waited out"; }
-expected_race=$(printf 'CALL\tlaunchctl\tlist\nCALL\tdocker\timage\nCALL\t__redeploy-check\tmc-linux\nCALL\t__onboard\tagentsview\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tbootout\tgui/%s/com.culler.abc.resident\nCALL\tlaunchctl\tbootout\tgui/%s/com.culler.abc.dashboard\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tlist\nCALL\tdocker\tbuild\nCALL\tdocker\tbuild\nCALL\tdocker\trun\nCALL\tdocker\trun\nCALL\t__onboard\thome\t--release-source\t%s/runner\t--host-release-source\t%s\nCALL\t__onboard\ttunables\nCALL\t__onboard\tsupervision\t--activate\t--reconfigure\nCALL\tdoctor' \
+expected_race=$(printf 'CALL\tlaunchctl\tlist\nCALL\tdocker\timage\nCALL\t__redeploy-check\tmc-linux\nCALL\t__onboard\tagentsview\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tbootout\tgui/%s/com.s.shorizon.abc.resident\nCALL\tlaunchctl\tbootout\tgui/%s/com.s.shorizon.abc.dashboard\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tlist\nCALL\tlaunchctl\tlist\nCALL\tdocker\tbuild\nCALL\tdocker\tbuild\nCALL\tdocker\trun\nCALL\tdocker\trun\nCALL\t__onboard\thome\t--release-source\t%s/runner\t--host-release-source\t%s\nCALL\t__onboard\ttunables\nCALL\t__onboard\tsupervision\t--activate\t--reconfigure\nCALL\tdoctor' \
   "$(id -u)" "$(id -u)" "$ROOT" "$ROOT")
 actual=$(grep -v '^CALL	docker	info$' "$log")
 [ "$actual" = "$expected_race" ] || {
@@ -312,7 +312,7 @@ actual=$(grep -v '^CALL	docker	info$' "$log")
 case_root="$TMP/bootout-stuck"
 make_fakes "$case_root/bin"
 mkdir -p "$case_root/home/Library/LaunchAgents" "$case_root/mc-bin"
-touch "$case_root/home/Library/LaunchAgents/com.culler.abc.resident.plist"
+touch "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.resident.plist"
 printf 'old release\n' >"$case_root/mc-bin/mc"
 log="$case_root/calls.log"
 : >"$log"
@@ -323,7 +323,7 @@ if env MC_OS_OVERRIDE=Darwin PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_roo
   sh "$ROOT/redeploy.sh" >"$case_root/out" 2>&1; then
   fail "a deployment that never unloaded was reported as a deploy"
 fi
-grep -F "redeploy.sh: a supervised Culler deployment is loaded." "$case_root/out" >/dev/null || \
+grep -F "redeploy.sh: a supervised S-Horizon deployment is loaded." "$case_root/out" >/dev/null || \
   { cat "$case_root/out" >&2; fail "the expired wait did not fail with the existing message"; }
 grep -q 'CALL	docker	build' "$log" && fail "the expired wait still built the image"
 [ "$(cat "$case_root/mc-bin/mc")" = "old release" ] || fail "the expired wait replaced the installed mc"
@@ -349,8 +349,8 @@ if ! env MC_OS_OVERRIDE=Darwin PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_r
   cat "$case_root/out" >&2
   fail "loaded units with missing plist files wedged the redeploy (DEFECT-REGISTER-001)"
 fi
-grep -q "CALL	launchctl	bootout	gui/$(id -u)/com.culler.abc.resident" "$log" || fail "the loaded resident was not stopped"
-grep -q "CALL	launchctl	bootout	gui/$(id -u)/com.culler.abc.dashboard" "$log" || fail "the loaded dashboard was not stopped"
+grep -q "CALL	launchctl	bootout	gui/$(id -u)/com.s.shorizon.abc.resident" "$log" || fail "the loaded resident was not stopped"
+grep -q "CALL	launchctl	bootout	gui/$(id -u)/com.s.shorizon.abc.dashboard" "$log" || fail "the loaded dashboard was not stopped"
 [ -e "$case_root/loaded" ] && fail "the wait loop did not see the units unload"
 grep -q 'CALL	doctor' "$log" || fail "the redeploy did not complete"
 
@@ -375,8 +375,8 @@ grep -q 'supervision' "$log" && fail "a failed image build still activated super
 case_root="$TMP/agentsview-fails"
 make_fakes "$case_root/bin"
 mkdir -p "$case_root/home/Library/LaunchAgents" "$case_root/mc-bin"
-touch "$case_root/home/Library/LaunchAgents/com.culler.abc.resident.plist" \
-      "$case_root/home/Library/LaunchAgents/com.culler.abc.dashboard.plist"
+touch "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.resident.plist" \
+      "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.dashboard.plist"
 printf 'old release\n' >"$case_root/mc-bin/mc"
 log="$case_root/calls.log"
 : >"$log"
@@ -398,7 +398,7 @@ for width in 80 40; do
       case_root="$TMP/service-$scenario-$width-$color"
       make_fakes "$case_root/bin"
       mkdir -p "$case_root/home/Library/LaunchAgents" "$case_root/mc-bin"
-      touch "$case_root/home/Library/LaunchAgents/com.culler.abc.resident.plist"
+      touch "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.resident.plist"
       printf 'old release\n' >"$case_root/mc-bin/mc"
       database='schema=current records=5'
       [ "$scenario" != database ] || database='schema=previous records=5'
@@ -471,7 +471,7 @@ setup_case() {
   case_root="$TMP/$1"
   make_fakes "$case_root/bin"
   mkdir -p "$case_root/home/Library/LaunchAgents" "$case_root/mc-bin"
-  touch "$case_root/home/Library/LaunchAgents/com.culler.abc.resident.plist"
+  touch "$case_root/home/Library/LaunchAgents/com.s.shorizon.abc.resident.plist"
   printf 'old release\n' >"$case_root/mc-bin/mc"
   log="$case_root/calls.log"
   : >"$log"
@@ -529,7 +529,7 @@ for WIDTH in 80 40; do
   LOADED=0
   changed_nothing "schema=previous records=5" "loaded units"
   for text in "redeploy.sh: Stopped. The deployed database has a different schema from this release. Nothing changed." \
-              "The Culler services still run the deployed release with its database." \
+              "The S-Horizon services still run the deployed release with its database." \
               "Choose one action: - Replace the database with an empty database: ./redeploy.sh --reset-database" \
               "- Keep the database records: no action is necessary. The deployed release continues to run."; do
     contains "$case_root/out" "$text" || { cat "$case_root/out" >&2; fail "the early schema stop omits: $text"; }
@@ -584,14 +584,14 @@ for WIDTH in 80 40; do
       if [ "$stage" = early ]; then
         changed_nothing "schema=previous records=5" "$record"
         cause="redeploy.sh: Stopped. The deployed database has a different schema from this release. Nothing changed."
-        state="The Culler services are stopped. The deployment keeps its database."
+        state="The S-Horizon services are stopped. The deployment keeps its database."
       else
         grep -Fx -- "$release_call" "$log" >/dev/null || { cat "$log" >&2; fail "the late schema stop did not come from the kept-database deploy step"; }
         grep -q 'MC_REDEPLOY_TEST_LOG' "$case_root/mc-bin/mc" || fail "the stop message states an installed release that was not installed"
         contains "$case_root/out" "the database check could not run: The fake database check stopped." || \
           { cat "$case_root/out" >&2; fail "the script did not state the database check that could not run"; }
         cause="redeploy.sh: Stopped. The deployed database has a different schema from this release."
-        state="The database is unchanged. The Culler services are stopped. This release's command-line tool and container image are installed."
+        state="The database is unchanged. The S-Horizon services are stopped. This release's command-line tool and container image are installed."
       fi
       for text in "$cause" "$state" \
                   "Choose one action: - Replace the database with an empty database: ./redeploy.sh --reset-database" \
@@ -622,11 +622,11 @@ for stage in early late; do
   if [ "$stage" = early ]; then
     changed_nothing absent "absent database"
     contains "$case_root/out" "redeploy.sh: Stopped. The deployed database is absent. Nothing changed." || { cat "$case_root/out" >&2; fail "the absent database was not named"; }
-    contains "$case_root/out" "The Culler services still run the deployed release. Next action:" || \
+    contains "$case_root/out" "The S-Horizon services still run the deployed release. Next action:" || \
       { cat "$case_root/out" >&2; fail "the early absent-database stop omits the deployment state"; }
   else
     contains "$case_root/out" "redeploy.sh: Stopped. The deployed database is absent." || { cat "$case_root/out" >&2; fail "the absent database was not named"; }
-    contains "$case_root/out" "The deployment still has no database. The Culler services are stopped." || fail "the absent-database stop omits the deployment state"
+    contains "$case_root/out" "The deployment still has no database. The S-Horizon services are stopped." || fail "the absent-database stop omits the deployment state"
   fi
   contains "$case_root/out" "Next action: - Create an empty database: ./redeploy.sh --reset-database" || fail "the absent-database stop omits the reset option"
   names_mc_command && fail "the absent-database stop names an mc command"
@@ -645,9 +645,9 @@ for WIDTH in 80 40; do
     CHECK_EXIT= LOADED=0
     changed_nothing "schema=current records=5" "refused check"
     if [ "$units" = loaded ]; then
-      services="The Culler services still run the deployed release with its database."
+      services="The S-Horizon services still run the deployed release with its database."
     else
-      services="The Culler services are stopped. The deployment keeps its database."
+      services="The S-Horizon services are stopped. The deployment keeps its database."
     fi
     for text in "redeploy.sh: Stopped. The database check refused the deployment. Nothing changed." \
                 "The fake database check stopped." "$services" \
@@ -740,7 +740,7 @@ for WIDTH in 80 40; do
   run_redeploy --help </dev/null || { cat "$case_root/out" >&2; fail "the help did not complete"; }
   [ ! -s "$log" ] || fail "the help ran a step"
   for text in "Usage: ./redeploy.sh [--reset-database]" \
-              "redeploy.sh moves the live Culler deployment to this checkout. The deployment keeps its database. A schema difference stops redeploy.sh and keeps the database." \
+              "redeploy.sh moves the live S-Horizon deployment to this checkout. The deployment keeps its database. A schema difference stops redeploy.sh and keeps the database." \
               "Option: - --reset-database: Replace the database with an empty database. You confirm the reset at a terminal."; do
     contains "$case_root/out" "$text" || { cat "$case_root/out" >&2; fail "the help omits: $text"; }
   done
@@ -772,7 +772,7 @@ env PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_root/home" \
   MC_BIN_DIR="$case_root/mc-bin" MC_REDEPLOY_TEST_LOG="$log" \
   MC_REDEPLOY_TEST_DB="$case_root/spine.db" MC_REDEPLOY_TEST_LOADED_FILE="$loaded" \
   sh "$ROOT/redeploy.sh" >"$case_root/out" 2>&1 || { cat "$case_root/out" >&2; fail "the Linux happy path did not complete"; }
-expected_linux=$(printf 'CALL\tsystemctl\t--user\tlist-units\t--type=service\t--no-legend\tcom.culler.*\nCALL\tdocker\timage\nCALL\t__redeploy-check\tmc-linux\nCALL\t__onboard\tagentsview\nCALL\tsystemctl\t--user\tlist-units\t--type=service\t--no-legend\tcom.culler.*\nCALL\tsystemctl\t--user\tdisable\t--now\tcom.culler.abc.dashboard.service\nCALL\tsystemctl\t--user\tdisable\t--now\tcom.culler.abc.resident.service\nCALL\tsystemctl\t--user\tlist-units\t--type=service\t--no-legend\tcom.culler.*\nCALL\tsystemctl\t--user\tlist-units\t--type=service\t--no-legend\tcom.culler.*\nCALL\tdocker\tbuild\nCALL\tdocker\tbuild\nCALL\tdocker\trun\nCALL\tdocker\trun\nCALL\t__onboard\thome\t--release-source\t%s/runner\t--host-release-source\t%s\nCALL\t__onboard\ttunables\nCALL\t__onboard\tsupervision\t--activate\t--reconfigure\nCALL\tdoctor' "$ROOT" "$ROOT")
+expected_linux=$(printf 'CALL\tsystemctl\t--user\tlist-units\t--type=service\t--no-legend\tcom.culler.*\tcom.s.shorizon.*\tshorizon-*\nCALL\tdocker\timage\nCALL\t__redeploy-check\tmc-linux\nCALL\t__onboard\tagentsview\nCALL\tsystemctl\t--user\tlist-units\t--type=service\t--no-legend\tcom.culler.*\tcom.s.shorizon.*\tshorizon-*\nCALL\tsystemctl\t--user\tdisable\t--now\tshorizon-deadbeefcafe-dashboard.service\nCALL\tsystemctl\t--user\tdisable\t--now\tshorizon-deadbeefcafe-resident.service\nCALL\tsystemctl\t--user\tlist-units\t--type=service\t--no-legend\tcom.culler.*\tcom.s.shorizon.*\tshorizon-*\nCALL\tsystemctl\t--user\tlist-units\t--type=service\t--no-legend\tcom.culler.*\tcom.s.shorizon.*\tshorizon-*\nCALL\tdocker\tbuild\nCALL\tdocker\tbuild\nCALL\tdocker\trun\nCALL\tdocker\trun\nCALL\t__onboard\thome\t--release-source\t%s/runner\t--host-release-source\t%s\nCALL\t__onboard\ttunables\nCALL\t__onboard\tsupervision\t--activate\t--reconfigure\nCALL\tdoctor' "$ROOT" "$ROOT")
 actual_linux=$(grep -v '^CALL	docker	info$' "$log")
 [ "$actual_linux" = "$expected_linux" ] || {
   printf 'expected:\n%s\nactual:\n%s\n' "$expected_linux" "$actual_linux" >&2

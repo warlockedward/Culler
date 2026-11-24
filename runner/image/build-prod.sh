@@ -29,8 +29,8 @@ case "${MC_TARGET_ARCH:-}" in
 esac
 
 # A loaded deployment uses the shared image tag. Its image identity must stay unchanged.
-# The probe follows the service manager of the host: launchctl on macOS, the user
-# systemd manager on Linux (the deployment unit names are shared across both).
+# The probe follows the service manager of the host: launchctl on macOS, the
+# user systemd manager on Linux, recognizing the current and legacy unit names.
 # MC_OS_OVERRIDE is a test seam: supported families only, fail-closed otherwise;
 # unset asks the real host.
 resolve_service_os() {
@@ -71,7 +71,7 @@ case "$os_name" in
       # is running", the same truth source as launchctl list on the Mac and
       # redeploy.sh's stop loop. systemd 249 makes `list-unit-files` with a
       # pattern that matches nothing exit 1, which would reject a clean host.
-      if units=$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 2>&1); then
+      if units=$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 'com.s.shorizon.*' 'shorizon-*' 2>&1); then
         :
       else
         status=$?
@@ -81,15 +81,15 @@ case "$os_name" in
     fi
     ;;
 esac
-if printf '%s\n' "$units" | grep -q 'com\.culler\.'; then
-  echo "build-prod.sh: a supervised Culler deployment is loaded." >&2
+if printf '%s\n' "$units" | grep -Eq 'com\.culler\.|com\.s\.shorizon\.|shorizon-[0-9a-f]{12}-'; then
+  echo "build-prod.sh: a supervised S-Horizon deployment is loaded." >&2
   echo "  Rebuilding mc-prod would re-stamp the image its helper is recreated from," >&2
   echo "  and every tick would then fail closed with a release identity mismatch that" >&2
   echo "  appears only in logs/resident.stderr.log." >&2
   echo "  Boot the units out first:" >&2
   case "$os_name" in
-    Darwin) printf '%s\n' "$units" | awk -v u="$(id -u)" '/com\.culler\./ {print "    launchctl bootout gui/" u "/" $3}' >&2 ;;
-    Linux) printf '%s\n' "$units" | awk '/com\.culler\./ {gsub(/\.service$/,"",$1); print "    systemctl --user disable --now " $1 ".service"}' >&2 ;;
+    Darwin) printf '%s\n' "$units" | awk -v u="$(id -u)" '/com\.culler\.|com\.s\.shorizon\./ {print "    launchctl bootout gui/" u "/" $3}' >&2 ;;
+    Linux) printf '%s\n' "$units" | awk '/com\.culler\.|com\.s\.shorizon\.|shorizon-[0-9a-f]{12}-/ {gsub(/\.service$/,"",$1); print "    systemctl --user disable --now " $1 ".service"}' >&2 ;;
   esac
   exit 3
 fi

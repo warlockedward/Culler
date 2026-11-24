@@ -124,6 +124,61 @@ func TestCullerLaunchAgentsFindsEveryUnit(t *testing.T) {
 	}
 }
 
+func TestCullerLaunchAgentsFindsCurrentGenerationUnits(t *testing.T) {
+	labels, plists := CullerLaunchAgents([]string{
+		"/Users/o/Library/LaunchAgents/com.s.shorizon.0287f755f1b7.agentsview.plist",
+		"/Users/o/Library/LaunchAgents/com.s.shorizon.0287f755f1b7.dashboard.plist",
+		"/Users/o/Library/LaunchAgents/com.s.shorizon.0287f755f1b7.resident.plist",
+		"/Users/o/Library/LaunchAgents/com.s.shorizon.notes.plist",
+	})
+	wantLabels := []string{
+		"com.s.shorizon.0287f755f1b7.agentsview",
+		"com.s.shorizon.0287f755f1b7.dashboard",
+		"com.s.shorizon.0287f755f1b7.resident",
+	}
+	if !reflect.DeepEqual(labels, wantLabels) {
+		t.Fatalf("labels:\n got %v\nwant %v", labels, wantLabels)
+	}
+	if len(plists) != 3 {
+		t.Fatalf("plists = %v, want the three matching files", plists)
+	}
+}
+
+func TestCullerLaunchLabelRecognizesEveryGeneration(t *testing.T) {
+	for _, label := range []string{
+		"com.s.shorizon.0287f755f1b7.resident",
+		"com.s.shorizon.0287f755f1b7.dashboard",
+		"com.s.shorizon.0287f755f1b7.agentsview",
+		"shorizon-0287f755f1b7-resident",
+		"shorizon-0287f755f1b7-dashboard",
+		"shorizon-0287f755f1b7-agentsview",
+		"com.culler.0287f755f1b7.resident",
+		"com.culler.0287f755f1b7.agentsview",
+		"com.mission-control.0287f755f1b7.resident",
+		"com.mission-control.0287f755f1b7.dashboard",
+	} {
+		if !CullerLaunchLabel(label) {
+			t.Errorf("CullerLaunchLabel(%q) = false, want true", label)
+		}
+	}
+	for _, label := range []string{
+		"com.mission-control.0287f755f1b7.agentsview",  // mission control never had this unit
+		"shorizon-resident",                            // no derived suffix
+		"shorizon-0287f755f1b7-notes",                  // unknown unit name
+		"shorizon-0287f755f1b7.resident",               // mixed grammars
+		"com.s.shorizon.personal.resident",             // not a derived suffix
+		"com.s.shorizon.0287f755f1b7.agentsview.extra", // extra segment
+		"shorizon-0287F755F1B7-resident",               // uppercase: not our alphabet
+		"shorizon-0287f755f1b-resident",                // 11 chars
+		"shorizon-0287f755f1b7a-resident",              // 13 chars
+		"steam.com.valvesoftware.clean",                // unrelated
+	} {
+		if CullerLaunchLabel(label) {
+			t.Errorf("CullerLaunchLabel(%q) = true, want false", label)
+		}
+	}
+}
+
 func TestCullerLaunchAgentsIncludesLegacyAndRejectsNearMisses(t *testing.T) {
 	labels, _ := CullerLaunchAgents([]string{
 		"/agents/com.mission-control.012345abcdef.resident.plist",

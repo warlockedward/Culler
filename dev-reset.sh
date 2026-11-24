@@ -124,8 +124,8 @@ VIEWER_DIRS=(agentsview wiki)
 
 # ---------------------------------------------------------------- preflight --
 [ -d "$MC_HOME" ] || die "MC_HOME $MC_HOME does not exist; nothing to reset"
-[ -f "$MC_HOME/config.toml" ] || die "$MC_HOME has no config.toml — refusing to treat it as a Culler home"
-MC_BIN="$(command -v mc 2>/dev/null)" || die "no mc on PATH; install Culler from this checkout first with sh scripts/install-source.sh"
+[ -f "$MC_HOME/config.toml" ] || die "$MC_HOME has no config.toml — refusing to treat it as a S-Horizon home"
+MC_BIN="$(command -v mc 2>/dev/null)" || die "no mc on PATH; install S-Horizon from this checkout first with sh scripts/install-source.sh"
 docker info >/dev/null 2>&1 || die "container runtime unreachable; start Docker Desktop first"
 
 SMOKE_WORKSPACES="$(dirname "$MC_HOME")/.shorizon-smoke-workspaces"
@@ -199,8 +199,8 @@ say "STOP supervision"
 case "$os_name" in
 	Linux)
 		for label in resident dashboard agentsview; do
-			unit="$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 2>/dev/null |
-				awk -v l="$label" '$1 ~ ("com\\.culler\\..*\\." l "\\.service$") {print $1; exit}')"
+			unit="$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 'com.s.shorizon.*' 'shorizon-*' 2>/dev/null |
+				awk -v l="$label" '($1 ~ ("com\\.culler\\..*\\." l "\\.service$")) || ($1 ~ ("com\\.s\\.shorizon\\..*\\." l "\\.service$")) || ($1 ~ ("shorizon-[0-9a-f]{12}-" l "\\.service$")) {print $1; exit}')"
 			if [ -n "$unit" ]; then
 				echo "  stopping $unit"
 				systemctl --user disable --now "$unit" 2>/dev/null || true
@@ -211,7 +211,7 @@ case "$os_name" in
 		;;
 	*)
 		for label in resident dashboard agentsview; do
-			unit="$(launchctl list 2>/dev/null | awk -v l="$label" '$3 ~ ("com.culler..*\\." l "$") {print $3}' | head -1)"
+			unit="$(launchctl list 2>/dev/null | awk -v l="$label" '($3 ~ ("com.culler..*\\." l "$")) || ($3 ~ ("com.s.shorizon..*\\." l "$")) {print $3}' | head -1)"
 			if [ -n "$unit" ]; then
 				echo "  booting out $unit"
 				launchctl bootout "gui/$(id -u)/$unit" 2>/dev/null || true
@@ -223,19 +223,19 @@ case "$os_name" in
 esac
 
 # The stop returns before the unit leaves the loaded list, and both build-prod.sh
-# and `mc __reset` refuse while a com.culler.* unit is listed. Wait, bounded to a
-# few seconds, for the units to clear.
+# and `mc __reset` refuse while a supervised unit (current or legacy name) is
+# listed. Wait, bounded to a few seconds, for the units to clear.
 culler_units_loaded() {
 	case "$os_name" in
 		Linux)
-			case "$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 2>/dev/null || true)" in
-				*com.culler.*) return 0 ;;
+			case "$(systemctl --user list-units --type=service --no-legend 'com.culler.*' 'com.s.shorizon.*' 'shorizon-*' 2>/dev/null || true)" in
+				*com.culler.*|*com.s.shorizon.*|*shorizon-*) return 0 ;;
 				*) return 1 ;;
 			esac
 			;;
 		*)
 			case "$(launchctl list 2>/dev/null || true)" in
-				*com.culler.*) return 0 ;;
+				*com.culler.*|*com.s.shorizon.*) return 0 ;;
 				*) return 1 ;;
 			esac
 			;;
@@ -244,7 +244,7 @@ culler_units_loaded() {
 polls=0
 while culler_units_loaded; do
 	polls=$((polls + 1))
-	[ "$polls" -lt 50 ] || die "a supervised Culler unit is still loaded after the stop. Nothing was removed."
+	[ "$polls" -lt 50 ] || die "a supervised S-Horizon unit is still loaded after the stop. Nothing was removed."
 	sleep 0.1
 done
 

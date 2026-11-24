@@ -59,7 +59,8 @@ if [ -n "${MC_TEST_LAUNCHCTL_EXIT:-}" ]; then
   printf 'Could not print domain: 141: Reentrancy avoided\n' >&2
   exit "$MC_TEST_LAUNCHCTL_EXIT"
 fi
-[ -n "${MC_TEST_SUPERVISED:-}" ] && printf '8156\t0\tcom.culler.deadbeef.resident\n'
+[ -n "${MC_TEST_SUPERVISED:-}" ] && printf '8156\t0\tcom.s.shorizon.deadbeef.resident\n'
+[ -n "${MC_TEST_SUPERVISED_LEGACY:-}" ] && printf '8156\t0\tcom.culler.deadbeef.resident\n'
 exit 0
 EOF
 chmod 755 "$TMP/bin/launchctl"
@@ -88,9 +89,18 @@ done
 guard_output=$(PATH="$TMP/bin:/usr/bin:/bin" MC_TEST_SUPERVISED=1 MC_TEST_MISE_LOG="$TMP/guard.log" \
     MC_RELEASE_BUILD_ID="$release_id" "$HERE/build-prod.sh" 2>&1 || :)
 case "$guard_output" in
-  *"a supervised Culler deployment is loaded"*) ;;
+  *"a supervised S-Horizon deployment is loaded"*) ;;
   *) fail "rebuilding mc-prod under a live deployment was not refused" ;;
 esac
+# The guard must also refuse when only a legacy-generation unit is loaded: a
+# deployment stamped before the rename still re-stamps the shared image.
+legacy_guard=$(PATH="$TMP/bin:/usr/bin:/bin" MC_TEST_SUPERVISED_LEGACY=1 MC_TEST_MISE_LOG="$TMP/legacy-guard.log" \
+    MC_RELEASE_BUILD_ID="$release_id" "$HERE/build-prod.sh" 2>&1 || :)
+case "$legacy_guard" in
+  *"a supervised S-Horizon deployment is loaded"*) ;;
+  *) fail "rebuilding mc-prod under a legacy-generation deployment was not refused" ;;
+esac
+[ -e "$TMP/legacy-guard.log" ] && fail "the legacy supervision guard ran the build before refusing"
 # It must refuse BEFORE compiling anything: a refusal that still re-stamped the
 # binary would leave the same mismatch it exists to prevent.
 [ -e "$TMP/guard.log" ] && fail "the supervision guard ran the build before refusing"
@@ -107,7 +117,8 @@ if [ -n "${MC_TEST_SYSTEMCTL_EXIT:-}" ]; then
   printf 'Failed to connect to user scope bus: 141\n' >&2
   exit "$MC_TEST_SYSTEMCTL_EXIT"
 fi
-[ -n "${MC_TEST_SUPERVISED:-}" ] && printf 'com.culler.deadbeef.resident.service loaded active running Culler resident\n'
+[ -n "${MC_TEST_SUPERVISED:-}" ] && printf 'shorizon-deadbeefcafe-resident.service loaded active running S-Horizon resident\n'
+[ -n "${MC_TEST_SUPERVISED_LEGACY:-}" ] && printf 'com.culler.deadbeef.resident.service loaded active running Culler resident\n'
 exit 0
 EOF
 chmod 755 "$TMP/bin/systemctl"
@@ -116,9 +127,17 @@ linux_guard=$(PATH="$TMP/bin:/usr/bin:/bin" MC_OS_OVERRIDE=Linux MC_TEST_SUPERVI
     MC_RELEASE_BUILD_ID="$release_id" \
     "$HERE/build-prod.sh" 2>&1 || :)
 case "$linux_guard" in
-  *"a supervised Culler deployment is loaded"*) ;;
+  *"a supervised S-Horizon deployment is loaded"*) ;;
   *) fail "the Linux guard did not refuse a live systemd deployment" ;;
 esac
+linux_legacy_guard=$(PATH="$TMP/bin:/usr/bin:/bin" MC_OS_OVERRIDE=Linux MC_TEST_SUPERVISED_LEGACY=1 MC_TEST_MISE_LOG="$TMP/linux-legacy-guard.log" \
+    MC_RELEASE_BUILD_ID="$release_id" \
+    "$HERE/build-prod.sh" 2>&1 || :)
+case "$linux_legacy_guard" in
+  *"a supervised S-Horizon deployment is loaded"*) ;;
+  *) fail "the Linux guard did not refuse a legacy-generation systemd deployment" ;;
+esac
+[ -e "$TMP/linux-legacy-guard.log" ] && fail "the Linux legacy guard compiled before refusing"
 case "$linux_guard" in
   *"systemctl --user disable --now"*) ;;
   *) fail "the Linux guard refused with launchctl remediation text" ;;
@@ -141,7 +160,7 @@ linux_clean=$(PATH="$TMP/bin:/usr/bin:/bin" MC_OS_OVERRIDE=Linux \
     MC_TEST_MISE_LOG="$TMP/linux-clean.log" MC_RELEASE_BUILD_ID="$release_id" \
     "$HERE/build-prod.sh" 2>&1 || :)
 case "$linux_clean" in
-  *"supervised Culler deployment is loaded"*|*"systemd service check failed"*)
+  *"supervised S-Horizon deployment is loaded"*|*"systemd service check failed"*)
     fail "the Linux guard rejected a clean host" ;;
 esac
 [ -e "$TMP/linux-clean.log" ] || fail "the Linux clean-host case stopped before the compiler"

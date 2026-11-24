@@ -21,7 +21,7 @@ This repository is a fork of the upstream project `vinchenkov/Culler`; the devel
 S-Horizon is a local-first orchestration system for AI coding agents with one human operator.
 It deploys onto one Mac and runs unattended.
 The **spine** is the one SQLite database of a deployment. It is the message bus and the ground truth.
-`mc`, `spine`, and the `MC_*` environment names are internal engineering codenames and do not change. Brand identifiers that still read `culler` (`com.culler.*` units, the worktree path, the skill chain, the Git delivery branch, the release asset names) are the current reality until the R2 identifier migration lands.
+`mc`, `spine`, and the `MC_*` environment names are internal engineering codenames and do not change. Brand identifiers that still read `culler` (the worktree path, the skill chain, the Git delivery branch, the release asset names, the Docker image identity labels, and the legacy unit names the guard and removal faces still recognize) are the current reality until the R2 identifier migration lands.
 
 - `mc/`: the Go command-line interface (CLI) `mc`. It owns dispatch, control, and the spine.
 - `resident/`: the Bun host daemon. It runs the dispatch tick and starts agent containers.
@@ -139,7 +139,7 @@ Run an opt-in lane when your change touches what the lane proves:
 - Production runs only the files that `mc/deployment/host_release.go` and `mc/deployment/runner_release.go` list. Add each new resident, dashboard, or runner file to the matching list. The closure tests in `./mc/check.sh` fail on a missing or an unused entry.
 - `runner/shared/` stays under `runner/`, because the runner list cannot address `../`.
 - `runner/shared/log.ts` and `mc/mclog` write byte-identical NDJSON (newline-delimited JSON). Both suites read `runner/shared/testdata/render-golden.json`. Change both implementations. Never change the fixture to satisfy one side.
-- `runner/image/build-prod.sh` refuses while a `com.culler.*` launchd unit is loaded. It has no override. Stop supervision first.
+- `runner/image/build-prod.sh` refuses while a supervised S-Horizon unit (current or legacy name) is loaded. It has no override. Stop supervision first.
 - Pull request CI jobs hold no provider credentials and no publication permissions.
 
 ## When you change these things

@@ -33,7 +33,7 @@ cat >"$TMP/bin/systemctl" <<'EOF'
 #!/bin/sh
 printf 'systemctl %s\n' "$*" >>"$STUB_LOG"
 case "$*" in
-  *list-units*) [ "${STUB_SYSTEMD_NO_UNIT:-}" = 1 ] || printf 'com.culler.abc123456789.dashboard.service loaded active running Culler dashboard\n' ;;
+  *list-units*) [ "${STUB_SYSTEMD_NO_UNIT:-}" = 1 ] || printf 'shorizon-abc123456789-dashboard.service loaded active running S-Horizon dashboard\n' ;;
   *restart*) [ "${STUB_SYSTEMD_FAIL:-}" = 1 ] && exit 5 ;;
 esac
 exit 0
@@ -42,7 +42,7 @@ cat >"$TMP/bin/launchctl" <<'EOF'
 #!/bin/sh
 printf 'launchctl %s\n' "$*" >>"$STUB_LOG"
 case "$1" in
-  list) printf -- '-\t0\tcom.culler.abc123456789.dashboard\n' ;;
+  list) printf -- '-\t0\tcom.s.shorizon.abc123456789.dashboard\n' ;;
 esac
 exit 0
 EOF
@@ -64,8 +64,8 @@ run_case() { # name expected-status extra-env...
 
 # --- Linux happy path (lowercase override proves normalization) -------------
 run_case linux 0 MC_OS_OVERRIDE=linux
-case "$LAST_OUT" in *"== restart: com.culler.abc123456789.dashboard.service"*) ;; *) fail "linux branch did not restart the systemd unit: $LAST_OUT" ;; esac
-grep -F 'systemctl --user restart com.culler.abc123456789.dashboard.service' "$TMP/stub.log" >/dev/null || fail "restart argument wrong: $(cat "$TMP/stub.log")"
+case "$LAST_OUT" in *"== restart: shorizon-abc123456789-dashboard.service"*) ;; *) fail "linux branch did not restart the systemd unit: $LAST_OUT" ;; esac
+grep -F 'systemctl --user restart shorizon-abc123456789-dashboard.service' "$TMP/stub.log" >/dev/null || fail "restart argument wrong: $(cat "$TMP/stub.log")"
 grep -F 'launchctl' "$TMP/stub.log" && fail "linux branch called launchctl"
 
 # --- systemd failure must fail closed, never fall back ----------------------
@@ -89,12 +89,12 @@ printf 'Linux\n'
 EOF
 chmod 755 "$TMP/bin/uname"
 run_case default-uname 0 MC_OS_OVERRIDE=
-case "$LAST_OUT" in *"== restart: com.culler.abc123456789.dashboard.service"*) ;; *) fail "default OS path did not follow the host: $LAST_OUT" ;; esac
+case "$LAST_OUT" in *"== restart: shorizon-abc123456789-dashboard.service"*) ;; *) fail "default OS path did not follow the host: $LAST_OUT" ;; esac
 rm -f "$TMP/bin/uname"
 
 # --- Darwin branch still uses launchctl, not systemctl ----------------------
 run_case darwin 0 MC_OS_OVERRIDE=Darwin
-case "$LAST_OUT" in *"== restart: com.culler.abc123456789.dashboard"*) ;; *) fail "darwin branch lost its label: $LAST_OUT" ;; esac
+case "$LAST_OUT" in *"== restart: com.s.shorizon.abc123456789.dashboard"*) ;; *) fail "darwin branch lost its label: $LAST_OUT" ;; esac
 grep -F 'launchctl kill TERM' "$TMP/stub.log" >/dev/null || fail "darwin branch did not signal via launchctl"
 grep -F 'systemctl' "$TMP/stub.log" && fail "darwin branch called systemctl"
 

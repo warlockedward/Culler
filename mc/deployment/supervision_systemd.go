@@ -123,9 +123,6 @@ func validateUnitValues(u systemdUnit) error {
 
 // systemdBundledUnits renders the prepared bundle's three unit files plus the
 // agentsview config, from the same validated inputs the darwin renderer uses.
-// Descriptions follow the CURRENT runtime identity (com.culler labels): the
-// rename to S-Horizon lands with A09 as one sweep, and new artifacts must not
-// run ahead of it with a mixed brand.
 func systemdBundledUnits(in unitRenderInput) (map[string][]byte, error) {
 	env := [][2]string{{"MC_HOME", in.CanonicalHome}, {"MC_LOG_LEVEL", supervisedLogLevel}, {"PATH", in.PathEnv}}
 	out := map[string][]byte{}
@@ -134,7 +131,7 @@ func systemdBundledUnits(in unitRenderInput) (map[string][]byte, error) {
 		{"dashboard", in.Result.DashboardLabel, filepath.Join(in.HostRoot, "dashboard", "src", "main.ts"), filepath.Join(in.HostRoot, "dashboard")},
 	} {
 		body, err := renderSystemdUnitChecked(systemdUnit{
-			Description:      "Culler " + item.unit + " (" + item.label + ")",
+			Description:      "S-Horizon " + item.unit + " (" + item.label + ")",
 			ExecStart:        []string{in.BunPath, item.entry, "--config", filepath.Join(in.Result.Root, item.unit+".json")},
 			Environment:      env,
 			WorkingDirectory: item.working,
@@ -181,7 +178,7 @@ func agentsViewSystemdBundle(canonicalHome string, names Names, bind, token stri
 	}
 	paths := AgentsViewPathsFor(canonicalHome)
 	unit, err := renderSystemdUnitChecked(systemdUnit{
-		Description: "Culler AgentsView (" + UnitLabel(names, "agentsview") + ")",
+		Description: "S-Horizon AgentsView (" + UnitLabel(names, "agentsview") + ")",
 		ExecStart:   []string{paths.Executable, "serve", "--host", host, "--port", strconv.Itoa(port), "--no-browser", "--no-update-check"},
 		Environment: [][2]string{
 			{"AGENTSVIEW_DATA_DIR", paths.Data},

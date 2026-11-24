@@ -22,10 +22,8 @@ import (
 // that writes the spine. Activation starts the units in the reverse order.
 var SupervisedUnits = []string{"resident", "dashboard", "agentsview"}
 
-// UnitLabel returns the launchd label of one supervised unit.
-func UnitLabel(names Names, unit string) string {
-	return "com.culler." + names.Suffix + "." + unit
-}
+// UnitLabel returns the service identity of one supervised unit, per platform
+// (unitlabel_darwin.go / unitlabel_linux.go).
 
 // SupervisionResultFor returns the unit labels and bundle root of the
 // deployment at canonicalHome.

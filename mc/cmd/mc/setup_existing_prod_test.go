@@ -274,7 +274,7 @@ func TestSetupStopsOnlyTheSelectedDeployment(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	labels := []string{"com.culler." + names.Suffix + ".resident", "com.culler." + names.Suffix + ".dashboard", "com.culler." + names.Suffix + ".agentsview"}
+	labels := []string{"com.s.shorizon." + names.Suffix + ".resident", "com.s.shorizon." + names.Suffix + ".dashboard", "com.s.shorizon." + names.Suffix + ".agentsview"}
 	controller := &setupStopController{loaded: map[string]bool{labels[0]: true, labels[1]: true, labels[2]: true, "com.culler.other.resident": true}}
 	if err := stopSetupServicesWith(names, controller, func(time.Duration) { t.Fatal("stopped service required a wait") }); err != nil {
 		t.Fatal(err)

@@ -65,10 +65,12 @@ func CullerLaunchAgents(files []string) (labels []string, plists []string) {
 	return labels, plists
 }
 
-// CullerLaunchLabel recognizes both names used by released installations.
-// Only the current name has an AgentsView unit.
+// CullerLaunchLabel recognizes every service identity a released
+// installation can carry: the current darwin and systemd names, and the
+// legacy dot names older installations leave behind for removal.
+// Mission Control never had an AgentsView unit.
 func CullerLaunchLabel(label string) bool {
-	for _, prefix := range []string{"com.culler.", "com.mission-control."} {
+	for _, prefix := range []string{"com.s.shorizon.", "com.culler.", "com.mission-control."} {
 		if !strings.HasPrefix(label, prefix) {
 			continue
 		}
@@ -76,7 +78,14 @@ func CullerLaunchLabel(label string) bool {
 		if len(parts) != 2 || !derivedSuffix(parts[0]) {
 			return false
 		}
-		return parts[1] == "resident" || parts[1] == "dashboard" || (prefix == "com.culler." && parts[1] == "agentsview")
+		return parts[1] == "resident" || parts[1] == "dashboard" ||
+			(prefix != "com.mission-control." && parts[1] == "agentsview")
+	}
+	if rest, ok := strings.CutPrefix(label, "shorizon-"); ok {
+		parts := strings.Split(rest, "-")
+		if len(parts) == 2 && derivedSuffix(parts[0]) {
+			return parts[1] == "resident" || parts[1] == "dashboard" || parts[1] == "agentsview"
+		}
 	}
 	return false
 }
