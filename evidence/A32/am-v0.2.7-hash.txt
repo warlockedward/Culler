@@ -1,0 +1,10 @@
+AM v0.2.7 双面哈希登记（轮三十四续窗：A09 三裁定包＋CI 第四跑归因闭合＋incident-002 入册；零产品码纯登记轮）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 203c45769ca5fe7306e1a1542f1e990e851698d1fb9369cc9fd764aadaeda6d3
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-24 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = f742897cd5761cf47366465dfd88b998df3f11404de4110d4a50fa175788249c，与 am-v0.2.6-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.6 = f742897cd5761cf47366465dfd88b998df3f11404de4110d4a50fa175788249c（evidence/A32/am-v0.2.6-hash.txt 实读）；再前 v0.2.5 = 49242067730ed092d46cdbec49212c524dfa6903a18170732176401e34845350（同件记载）
+- 同轮并入 dev 的提交: 0820489(incident-002 boot 归因记录) / 3444103(S4b diff-plan 裁定包: 59 token/38 文件普查+scrub 防御点+方案 B 拒绝；**＝CI push 目标**) / 58f8ca7(S3 diff-plan 骨架: 单元身份面五子面+新发现 Docker 镜像标签面+四个所有者输入) / 09b9613(S5 范围裁定: 7→2 token) / d4cf04f(findings-004 第四跑归因闭合)
+- 关键事实: CI 第四跑 run 45370177577 @ci/routing-base=3444103 = 零 job 级回归（vs main 基线 45127097061）；fast-suite-macos success = S4a 非回归决定性信号；218 专用栈双硬门 update_docker ok 29.685s(第4次)+property ok 2.557s；软门道红面=登记基线逐测试等同（boundary 18 行=A34 后基线；e2e 25 行=exit-41 单根因家族+SpineLockDomainGuard 异签名）；deployment-linux(-amd64) 13 supervision 测=既有 T-b 家族(amd64 机器 diff 同名同签名)；application-package-linux/dashboard-browser/release-images/release-checks 全部既有家族或级联；零新红⇒O1 §3 未触发。S3 新发现面=Docker 镜像身份标签 wire(com.culler.environment.*/com.culler.project/home，45 行/11 文件，R2 表未命名)⇒S3 所有者输入扩为四项(O9/Q-S3-2/3/4)。
+- 账: dev tip=findings-004 提交后（本登记轮提交随后）/ ledger 不变（A09=IN_PROGRESS，S3 候 O9+Q-S3-2/3/4，S4b 候执行方式，S5 候 B02 预冻结窗）/ worktrees=main+dev / 无新外发除 ci/routing-base 探针支(=既定实践，pinned lease d7bd954→3444103，outbound=warlockedward/Culler 安全侧) / main 本地 PRISTINE b22df40 / Mimosa scanner_enobufs 本轮多次=兼容策略继续，不构成安全声明
+- 登记轮自纠: 无（链自检断言+entry count=1 断言+line-count 不变断言三重前置，脚本一次性 SPLICE_OK；条目单物理行 LENGTH=131210）
