@@ -64,7 +64,7 @@ func TestReleaseSkillWorksForExternalAgentWithoutSourceOrDevelopmentTools(t *tes
 	if _, err := deployment.InstallHostRelease(home, source); err != nil {
 		t.Fatal(err)
 	}
-	skillRoot := filepath.Join(home, "release", "host", "skills", "culler")
+	skillRoot := filepath.Join(home, "release", "host", "skills", "shorizon")
 	var installation struct {
 		CommandPrefix []string `json:"command_prefix"`
 		Home          string   `json:"mc_home"`

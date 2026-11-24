@@ -62,7 +62,7 @@ These guides hold the subsystem contracts:
 
 ## Git
 
-- A host agent works in a worktree at `/private/tmp/culler-worktrees/<task>` on its own local branch, for example `task/<name>` or `fix/<name>`.
+- A host agent works in a worktree at `/private/tmp/shorizon-worktrees/<task>` on its own local branch, for example `task/<name>` or `fix/<name>`.
 - macOS deletes `/private/tmp` at boot. Commit work to the branch before the session ends.
 - Do not create a checkout inside the repository. Remove an obsolete worktree with `git worktree remove` after its work is safe on a branch.
 - A commit subject is one imperative sentence in sentence case, with no type prefix.

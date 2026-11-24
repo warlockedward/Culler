@@ -14,7 +14,7 @@ import tempfile
 DATA_HOME = Path.home() / ".local/share/culler-evals"
 DEFAULT_EXPERIMENTS = DATA_HOME / "experiments"
 DEFAULT_CACHE = DATA_HOME / "cache"
-WORKTREE_ROOT = Path("/private/tmp/culler-worktrees")
+WORKTREE_ROOT = Path("/private/tmp/shorizon-worktrees")
 
 
 def durable_directory(path):

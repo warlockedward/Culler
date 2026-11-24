@@ -1,11 +1,11 @@
 ---
-name: culler
-description: Manage Culler through mc as Collie or an external operator agent. Read before the first mc call.
+name: shorizon
+description: Manage S-Horizon through mc as Collie or an external operator agent. Read before the first mc call.
 ---
 
-# Culler
+# S-Horizon
 
-Use `mc` for Culler state reads and authorized state changes.
+Use `mc` for S-Horizon state reads and authorized state changes.
 Read `installation.json` beside this file for the executable, deployment, and evidence paths.
 On the host, use its `command_prefix` array for each invocation to select the exact deployment.
 In a container, use its installed executable.
@@ -46,7 +46,7 @@ Only `mc` writes the spine.
 
 Read only the references that the request needs:
 
-- Read [the Culler model](references/culler-model.md) for system concepts, pipeline behavior, or wiki updates.
+- Read [the S-Horizon model](references/culler-model.md) for system concepts, pipeline behavior, or wiki updates.
 - Read [tasks](references/tasks.md) before task creation, task revisions, or task controls.
 - Read [packet decisions](references/packet-decisions.md) for packet evidence, decisions, or merge status.
 - Read [Project configuration](references/project-configuration.md) for registration, Vision, environments, pause controls, or role instructions.

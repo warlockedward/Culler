@@ -8,7 +8,7 @@ Pipeline agents perform ordinary Project implementation work.
 
 ## Vision
 
-A Vision draft lives in Culler storage outside the workspace.
+A Vision draft lives in S-Horizon storage outside the workspace.
 Each draft edit uses the revision from a current read.
 A conflict requires a fresh read and reconciliation with the operator's edits.
 Repository evidence describes existing work; it does not establish the operator's goals.
@@ -27,7 +27,7 @@ Read the current setup phase, selected environment, proposals, and reports.
 The Setup Journal shows initial setup; the Environment page retains later configuration and history.
 Workspace dependencies use ordinary container permissions.
 Image dependencies require approval of the exact proposed configuration and Dockerfile.
-A build runs only through the host owner and checks Culler runtime compatibility.
+A build runs only through the host owner and checks S-Horizon runtime compatibility.
 Image approval requires a continuation report before initial setup completes.
 An unavailable build or test remains a reported limit under the existing source acceptance rules.
 
@@ -51,7 +51,7 @@ Use the exact Project identifier and required confirmation in the deletion reque
 
 Each role of a Project has one set of custom instructions or none.
 Read the role contract, current instructions, and conflict reports.
-The Culler contract retains authority over custom instructions.
+The S-Horizon contract retains authority over custom instructions.
 A save replaces the current instructions of the role.
 An empty instruction string removes the customization for new runs.
 A save affects new runs and preserves each block and the Project pause state.

@@ -10,17 +10,17 @@ import (
 )
 
 var hostReleaseFiles = []string{
-	"skills/culler/SKILL.md",
-	"skills/culler/installation.json",
-	"skills/culler/references/culler-model.md",
-	"skills/culler/references/tasks.md",
-	"skills/culler/references/packet-decisions.md",
-	"skills/culler/references/project-configuration.md",
-	"skills/culler/references/configuration.md",
-	"skills/culler/references/diagnostics.md",
-	"skills/culler/references/traces.md",
-	"skills/culler/references/task-description.md",
-	"skills/culler/references/writing.md",
+	"skills/shorizon/SKILL.md",
+	"skills/shorizon/installation.json",
+	"skills/shorizon/references/culler-model.md",
+	"skills/shorizon/references/tasks.md",
+	"skills/shorizon/references/packet-decisions.md",
+	"skills/shorizon/references/project-configuration.md",
+	"skills/shorizon/references/configuration.md",
+	"skills/shorizon/references/diagnostics.md",
+	"skills/shorizon/references/traces.md",
+	"skills/shorizon/references/task-description.md",
+	"skills/shorizon/references/writing.md",
 	"runner/shared/trace-read.ts",
 	"resident/src/operator-lane.ts",
 	"runner/shared/provider-token.ts",
@@ -232,8 +232,8 @@ func HostReleaseFiles() []string {
 var hostReleaseDirs = []string{
 	".",
 	"skills",
-	"skills/culler",
-	"skills/culler/references",
+	"skills/shorizon",
+	"skills/shorizon/references",
 	"mc",
 	"mc/substrate",
 	"dashboard",
@@ -347,7 +347,7 @@ func InstallHostRelease(home, repoRoot string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if rel == "skills/culler/installation.json" {
+		if rel == "skills/shorizon/installation.json" {
 			body, err = agentSkillInstallation(canonicalHome)
 			if err != nil {
 				return "", err
@@ -447,7 +447,7 @@ func HostReleaseMatches(home, source string) (bool, error) {
 			return false, err
 		}
 		expected, err := readHostReleaseSource(source, rel)
-		if rel == "skills/culler/installation.json" {
+		if rel == "skills/shorizon/installation.json" {
 			expected, err = agentSkillInstallation(home)
 		}
 		if err != nil {

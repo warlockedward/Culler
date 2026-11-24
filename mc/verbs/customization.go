@@ -224,7 +224,7 @@ func RunCustomizationConflict(db *sql.DB, id *RunIdentity, a CustomizationConfli
 		if fence.WikiUpdate {
 			result["blocked"] = false
 			_, err := domain.EndWikiRun(ctx, q, a.Run, domain.WikiRunEnd{Outcome: "completed", Result: "failed",
-				Cause: "The custom instructions of the Scribe conflict with the Culler contract."})
+				Cause: "The custom instructions of the Scribe conflict with the S-Horizon contract."})
 			return err
 		}
 		return endRun(ctx, q, a.Run, "blocked")

@@ -56,7 +56,7 @@ Resolve the limit first with the `allow-corrections` action or the `revise` acti
 
 A wiki update has no task and holds no Project lease.
 It can run at the same time as a task run.
-Culler merges an accepted wiki commit without operator review.
+S-Horizon merges an accepted wiki commit without operator review.
 
 ## Task failures
 

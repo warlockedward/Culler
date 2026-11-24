@@ -135,7 +135,7 @@ func TestSetupAgentInputStatesTheAttemptModel(t *testing.T) {
 		input += "\n" + skill.Body
 	}
 	for name, required := range map[string][]string{
-		"the attempt limit": {"Submit the report within the 45-minute attempt limit.", "Culler stops the agent and each command at that limit."},
+		"the attempt limit": {"Submit the report within the 45-minute attempt limit.", "S-Horizon stops the agent and each command at that limit."},
 		"the log rule": {
 			"Write the output of each build and test command to a command log in the log folder.",
 			"Send the output to the command log during the operation of the command, not only at its end.",

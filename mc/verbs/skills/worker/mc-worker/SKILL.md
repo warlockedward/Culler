@@ -9,7 +9,7 @@ description: Worker commands, submission checks, and procedures for conditional 
 Use this role skill for assigned run commands and terminal submissions.
 
 The same command authority applies to Codex, the Claude Agent Software Development Kit (SDK), and OpenCode.
-Culler supplies the harness configuration and the skills at `~/.agents/skills/`.
+S-Horizon supplies the harness configuration and the skills at `~/.agents/skills/`.
 
 `<id>` in a read can identify any task.
 
@@ -170,7 +170,7 @@ Use these commands with one JavaScript Object Notation (JSON) object on standard
 
 The get request contains your `project_id` from Project role customization.
 Use the returned configuration object for the proposal.
-Preserve the selected base and Culler's private runtime.
+Preserve the selected base and S-Horizon's private runtime.
 Commit the proposed Dockerfile and every build file first.
 The proposal contains the complete `configuration` and an `explanation` that follows the project-environment-setup skill.
 Set `configuration.source_commit` to the full committed source identifier.
@@ -187,7 +187,7 @@ After the proposal, use the checkpoint terminal.
 
 ## Project role customization
 
-For a custom instruction that conflicts with the Culler contract, use this terminal:
+For a custom instruction that conflicts with the S-Horizon contract, use this terminal:
 
 - `mc run customization-conflict --request <json>`
 

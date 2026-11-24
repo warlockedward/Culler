@@ -1,6 +1,6 @@
 ---
 name: project-wiki
-description: Read before repository work or wiki questions. The ownership and document boundaries form part of the Culler contract.
+description: Read before repository work or wiki questions. The ownership and document boundaries form part of the S-Horizon contract.
 ---
 
 ## Project knowledge

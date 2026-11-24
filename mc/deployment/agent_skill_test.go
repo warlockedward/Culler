@@ -24,7 +24,7 @@ func TestHostSkillReleaseUsesAuthoritativeSources(t *testing.T) {
 	if _, err := InstallHostRelease(home, root); err != nil {
 		t.Fatal(err)
 	}
-	installed := filepath.Join(home, "release", "host", "skills", "culler")
+	installed := filepath.Join(home, "release", "host", "skills", "shorizon")
 	main, err := os.ReadFile(filepath.Join(installed, "SKILL.md"))
 	if err != nil {
 		t.Fatal(err)
@@ -67,7 +67,7 @@ func agentSkillIntegrationFixture(t *testing.T) (string, string, string) {
 	if err := os.Chmod(home, 0700); err != nil {
 		t.Fatal(err)
 	}
-	target := filepath.Join(home, "release", "host", "skills", "culler")
+	target := filepath.Join(home, "release", "host", "skills", "shorizon")
 	if err := os.MkdirAll(target, 0700); err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func agentSkillIntegrationFixture(t *testing.T) (string, string, string) {
 	return home, user, target
 }
 
-func skillLink(user, root string) string { return filepath.Join(user, root, "skills", "culler") }
+func skillLink(user, root string) string { return filepath.Join(user, root, "skills", "shorizon") }
 
 func TestAgentSkillIntegrationPreservesOwnershipAcrossUpdateAndUninstall(t *testing.T) {
 	home, user, target := agentSkillIntegrationFixture(t)

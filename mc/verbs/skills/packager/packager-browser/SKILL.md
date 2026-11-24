@@ -6,8 +6,8 @@ description: Read when browser evidence can confirm the change for media selecti
 # Browser evidence
 
 Capture new media only for a required state that the Verifier evidence omits.
-Culler supplies the Playwright Command Line Interface (CLI) and Chrome for Testing.
-Culler prepares workspace dependencies before the run.
+S-Horizon supplies the Playwright Command Line Interface (CLI) and Chrome for Testing.
+S-Horizon prepares workspace dependencies before the run.
 Before use, check retained dependencies against current declarations and the selected **Project environment**.
 
 Read **Repository** in `~/.agents/skills/mc-packager/SKILL.md` before a build for its temporary copy requirements.

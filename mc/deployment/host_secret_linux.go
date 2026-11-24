@@ -34,6 +34,10 @@ const (
 	hostKeySaltBytes    = 32
 	hostKeyNonceBytes   = 12
 	hostKeyRecordHeader = "HS1"
+	// hostSecretNamePrefix is part of the Linux credential identity: it joins
+	// the HKDF derivation and the record AAD, so it is the backend's own
+	// design value, independent of the operator-visible darwin name.
+	hostSecretNamePrefix = "Culler-"
 )
 
 var (

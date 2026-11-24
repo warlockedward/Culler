@@ -44,7 +44,7 @@ func TestCustomizationReplacementAndRunIsolation(t *testing.T) {
 	}
 	effect := result.(map[string]any)
 	run := effect["run_id"].(string)
-	if !strings.Contains(effect["brief"].(string), "Project role customization") || !strings.Contains(effect["brief"].(string), "Standard Culler directive") {
+	if !strings.Contains(effect["brief"].(string), "Project role customization") || !strings.Contains(effect["brief"].(string), "Standard S-Horizon directive") {
 		t.Fatal("The run input omits the input labels.")
 	}
 	if effect["role"] != "strategist(propose)" {
@@ -262,7 +262,7 @@ func TestScribeCustomizationConflictSetsNoRoleBlock(t *testing.T) {
 	if want := map[string]any{"run_id": run, "blocked": false}; !reflect.DeepEqual(result, want) {
 		t.Fatalf("result = %v, want %v", result, want)
 	}
-	const cause = "The custom instructions of the Scribe conflict with the Culler contract."
+	const cause = "The custom instructions of the Scribe conflict with the S-Horizon contract."
 	if got, want := wrRunEnd(t, db, run), wrEndLine("completed", "", cause, true, false); got != want {
 		t.Fatalf("the run and its wiki update = %swant %s", got, want)
 	}

@@ -7,7 +7,7 @@ description: Read when a criterion or broad check needs browser interaction or v
 
 ## Browser tool
 
-Culler ships the Playwright Command Line Interface (CLI) and the
+S-Horizon ships the Playwright Command Line Interface (CLI) and the
 Chrome for Testing browser. Start each browser session with this command:
 
     playwright-cli -s=verify-<run_id> --browser=chromium open <target-url>

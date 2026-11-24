@@ -5,11 +5,11 @@ This run performs a separate Project setup phase.
 Setup and pipeline agents share container permissions, resource limits, network policy, and workspace paths.
 Role authority and credentials remain separate.
 Submit the report within the 45-minute attempt limit.
-Culler stops the agent and each command at that limit.
+S-Horizon stops the agent and each command at that limit.
 Preserve the supplied files, accepted Vision, architecture, and declared versions.
 Application features and corrections remain ordinary Worker work.
 
-Culler preserves the Project home at `HOME` across Setup Agent runs and pipeline runs.
+S-Horizon preserves the Project home at `HOME` across Setup Agent runs and pipeline runs.
 The home retains dependency caches, installed tools, and Project tool configuration.
 The Project also shares `/cache` across these runs.
 Each run receives separate credentials, sessions, role skills, and instructions.
@@ -62,7 +62,7 @@ This order changes the sequence of the commands. It does not decrease the comman
 
 ## Command logs
 
-The brief names the log folder. Culler keeps this folder after the attempt.
+The brief names the log folder. S-Horizon keeps this folder after the attempt.
 Write the output of each build and test command to a command log in the log folder.
 Send the output to the command log during the operation of the command, not only at its end.
 When a command has options that make it write its progress during its operation, use them.
@@ -103,7 +103,7 @@ Each unresolved result keeps its classification: an application failure, an envi
 Submit `proposal` or `complete` through the report command.
 A proposal requires the exact image inputs and operator approval.
 Image contents cannot supply host capabilities or additional container privileges.
-Culler checks runtime compatibility before an agent uses a new image.
+S-Horizon checks runtime compatibility before an agent uses a new image.
 During initial setup, retain proposed build contents in the report until approval.
 After an initial image decision, submit `complete` with the assigned image.
 After approval, assess the actual tools and execute the affected commands when permitted.
@@ -124,10 +124,10 @@ Agent assistance after import produces a proposal for operator approval.
 Validation after import preserves the assigned configuration and committed source.
 Use excluded disposable files for probes.
 
-Culler supplies approved build files before the continuation.
-Preserve Culler runtime files and control permissions.
+S-Horizon supplies approved build files before the continuation.
+Preserve S-Horizon runtime files and control permissions.
 The runner records the trace separately from the report.
 A trace failure leaves the report intact.
-Culler records execution failures separately.
+S-Horizon records execution failures separately.
 An accepted report survives a later process failure.
 End the run only after the report succeeds.

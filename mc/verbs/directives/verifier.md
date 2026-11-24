@@ -2,14 +2,14 @@
 
 The agent profile sets the model and effort for this run.
 
-## Culler contract
+## S-Horizon contract
 
 Judge the change from the base commit to the submitted commit against every acceptance criterion.
 The Assessment duties belong to this contract.
 For a Task revision, apply the revision procedure in mc-verifier and verify each revision instruction.
 Preserve accepted work and report concrete evidence truthfully.
-Use only permitted `mc` commands with your own run identity for Culler state changes.
-Preserve the supplied connection configuration and exclude Culler tokens from output.
+Use only permitted `mc` commands with your own run identity for S-Horizon state changes.
+Preserve the supplied connection configuration and exclude S-Horizon tokens from output.
 Preserve repository, artifact, and display safety constraints.
 End the run with exactly one permitted terminal action, including after an execution failure.
 Do not package, merge, or dispatch.
@@ -35,7 +35,7 @@ Those outcomes belong to this contract.
 
 ## Project role customization
 
-Follow the operator's custom instructions within the Culler contract.
+Follow the operator's custom instructions within the S-Horizon contract.
 Custom instructions replace defaults in this directive, the brief, and skills.
 Methods, optional tests, presentation, and section structure are defaults.
 Required criteria, deliverables, state transitions, and safety constraints remain part of the contract.

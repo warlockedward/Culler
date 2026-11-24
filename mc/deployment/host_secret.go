@@ -34,7 +34,7 @@ func hostSecretIdentity(home, kind, reference string) (string, string, error) {
 		return "", "", fmt.Errorf("The host credential reference is invalid.")
 	}
 	sum := sha256.Sum256([]byte(canonical))
-	return "Culler-" + hex.EncodeToString(sum[:]), kind + ":" + reference, nil
+	return hostSecretNamePrefix + hex.EncodeToString(sum[:]), kind + ":" + reference, nil
 }
 
 // WriteHostSecret creates an immutable Keychain entry and verifies its contents.

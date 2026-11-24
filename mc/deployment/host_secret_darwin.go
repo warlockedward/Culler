@@ -23,6 +23,10 @@ type keychainHostSecretStore struct {
 
 const keychainPartBytes = 1536
 
+// hostSecretNamePrefix names the Keychain service reference the operator can
+// see in the login keychain.
+const hostSecretNamePrefix = "S-Horizon-"
+
 type keychainSecretManifest struct {
 	Version int    `json:"version"`
 	Parts   int    `json:"parts"`

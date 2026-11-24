@@ -95,6 +95,8 @@ func TestNativeSignInRemovesOnlyItsCredentialFilesAfterAncestorReplacement(t *te
 						return err
 					}
 					for _, path := range []string{"chatgpt/codex/auth.json", "claude/config/.credentials.json",
+						"claude/home/Library/Keychains/shorizon.keychain-db", "claude/home/Library/Keychains/shorizon.keychain-db-wal",
+						"claude/home/Library/Keychains/shorizon.keychain-db-shm",
 						"claude/home/Library/Keychains/culler.keychain-db", "claude/home/Library/Keychains/culler.keychain-db-wal",
 						"claude/home/Library/Keychains/culler.keychain-db-shm"} {
 						file := filepath.Join(flow, path)
@@ -112,7 +114,7 @@ func TestNativeSignInRemovesOnlyItsCredentialFilesAfterAncestorReplacement(t *te
 			if err == nil {
 				t.Fatal("The replaced credential directory was accepted.")
 			}
-			if len(files) != 5 {
+			if len(files) != 8 {
 				t.Fatalf("The fixture did not replace the credential directory: %v", err)
 			}
 			for _, path := range files {

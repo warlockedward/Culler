@@ -12,9 +12,9 @@ import (
 
 func init() { deployment.AgentSkillReleaseID = releaseBuildID }
 
-// installAgentSkill links the Culler skill for each agent harness that setup selected.
+// installAgentSkill links the S-Horizon skill for each agent harness that setup selected.
 func (w *setupWizard) installAgentSkill() error {
-	skill := filepath.Join(w.home, "release", "host", "skills", "culler")
+	skill := filepath.Join(w.home, "release", "host", "skills", "shorizon")
 	if _, err := os.Stat(filepath.Join(skill, "SKILL.md")); errors.Is(err, os.ErrNotExist) {
 		return nil
 	} else if err != nil {

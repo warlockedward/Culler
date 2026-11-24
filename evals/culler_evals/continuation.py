@@ -104,7 +104,7 @@ def recorded_source(protocol, source, *, store=None, recover=True):
             if recover:
                 return restore_source(store, protocol, source)
             destination = Path(saved["source"])
-            if destination.parent.resolve() != Path("/private/tmp/culler-worktrees").resolve() or destination.exists() or destination.is_symlink():
+            if destination.parent.resolve() != Path("/private/tmp/shorizon-worktrees").resolve() or destination.exists() or destination.is_symlink():
                 raise ValueError("The recorded source requires an absent task worktree for automatic recovery.")
             return destination
     raise ValueError("The recorded source is unavailable. Restore its checkout before resume.")
@@ -166,7 +166,7 @@ def updated_source(protocol, current, run_id):
     identity = digest({"revision": revision, "files": {name: hashlib.sha256(path.read_bytes()).hexdigest()
                                                        for name, path in files.items()}})
     name = "eval-resume-" + run_id + "-" + identity[:12]
-    destination = Path("/private/tmp/culler-worktrees") / name
+    destination = Path("/private/tmp/shorizon-worktrees") / name
     if not destination.exists():
         subprocess.run(["git", "worktree", "add", "-b", name, str(destination), revision],
                        cwd=current, check=True, capture_output=True, text=True)

@@ -32,7 +32,7 @@ The Arbiter must choose one proposal to proceed.
 It can reject both only if each proposal has at least one of these defects:
 
 It duplicates active and recent (see Historical work) tasks in the same Project.
-It requires checks that Culler’s rules do not allow.
+It requires checks that S-Horizon’s rules do not allow.
 The two proposals can have different defects. Explain the defect in each proposal. For a duplicate, identify the existing task.
 
 Each rejection in an all-reject batch requires one of these exceptions:
@@ -97,5 +97,5 @@ The JSON object contains these fields:
 
 - The `run` field: your run identifier.
 - The `passage` field: the exact conflicting text.
-- The `requirement` field: the Culler contract requirement that it contradicts.
+- The `requirement` field: the S-Horizon contract requirement that it contradicts.
 - The `reason` field: why both instructions cannot hold.

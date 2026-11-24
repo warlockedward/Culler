@@ -16,7 +16,7 @@ import (
 const claudeKeychainServicePrefix = "Claude Code-credentials"
 
 // A private name avoids macOS login-keychain behavior.
-const claudeIsolatedKeychainName = "culler.keychain-db"
+const claudeIsolatedKeychainName = "shorizon.keychain-db"
 
 type claudeCredentialStore struct {
 	keychainPath string

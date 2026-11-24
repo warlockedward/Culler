@@ -39,7 +39,7 @@ Each run record states these fields:
 
 ### Find the trace files
 
-The main trace is the trace of the agent that Culler starts.
+The main trace is the trace of the agent that S-Horizon starts.
 A child trace is the trace of an agent that the main agent starts.
 
 The path of the main trace is `<trace_root>/<run identifier>/<trace_filename>`.

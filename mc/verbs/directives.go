@@ -36,14 +36,14 @@ var collieDirectiveTemplate string
 var collieDirective = composeCollieDirective()
 
 func composeCollieDirective() string {
-	body, err := roleSkillFS.ReadFile("skills/collie/culler/SKILL.md")
+	body, err := roleSkillFS.ReadFile("skills/collie/shorizon/SKILL.md")
 	if err != nil {
 		panic(err)
 	}
 	_, rest, found := strings.Cut(string(body), "## Authorization\n")
 	policy, _, closed := strings.Cut(rest, "\n## Procedures\n")
 	if !found || !closed || strings.TrimSpace(policy) == "" {
-		panic("the Culler skill requires its authorization section")
+		panic("the S-Horizon skill requires its authorization section")
 	}
 	return strings.Replace(collieDirectiveTemplate, "{{operator_authorization}}", "## Authorization\n"+strings.TrimSpace(policy), 1)
 }
@@ -153,7 +153,7 @@ func roleContract(role dispatch.Role) string {
 	if err != nil {
 		return ""
 	}
-	_, tail, _ := strings.Cut(prose, "## Culler contract\n")
+	_, tail, _ := strings.Cut(prose, "## S-Horizon contract\n")
 	contract, _, _ := strings.Cut(tail, "## Project role customization")
 	return strings.TrimSpace(contract)
 }

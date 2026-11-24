@@ -249,7 +249,7 @@ func TestScribeBriefHoldsTheStartCommit(t *testing.T) {
 			map[string]string{"Start commit": commit}},
 	}
 	// The role directive is the first section. The parts follow it.
-	if len(rendered.Parts) != len(want)+1 || rendered.Parts[0].Heading != "Standard Culler directive" {
+	if len(rendered.Parts) != len(want)+1 || rendered.Parts[0].Heading != "Standard S-Horizon directive" {
 		t.Fatalf("sections of the Scribe run brief = %v, want the directive and %d parts", rendered.headings(), len(want))
 	}
 	for i, part := range rendered.Parts[1:] {
@@ -387,7 +387,7 @@ func TestScribeBriefParts(t *testing.T) {
 		{"Merged tasks", "These tasks merged after the last successful wiki update, oldest first. " +
 			"`Omitted tasks` counts older rows excluded from this part.", nil},
 	}
-	if len(brief.Parts) != len(want)+1 || brief.Parts[0].Heading != "Standard Culler directive" {
+	if len(brief.Parts) != len(want)+1 || brief.Parts[0].Heading != "Standard S-Horizon directive" {
 		t.Fatalf("sections of the Scribe run brief = %v, want the directive and %d parts", brief.headings(), len(want))
 	}
 	for i, part := range brief.Parts[1:] {

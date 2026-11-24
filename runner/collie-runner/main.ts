@@ -381,7 +381,7 @@ export function collieTurnPrompt(
     project_id: run.packet?.project_id ?? run.vision_project_id,
     packet: run.packet,
     release: run.release_build_id ?? "unknown",
-    skill: "~/.agents/skills/culler/SKILL.md",
+    skill: "~/.agents/skills/shorizon/SKILL.md",
     repositories: "/workspaces",
     repository: run.vision_project_id ? `/workspaces/${run.vision_project_id}` : run.packet ? `/workspaces/${run.packet.project_id}` : undefined,
     traces: "/mc/traces",
@@ -916,7 +916,7 @@ async function main(): Promise<number> {
     { session: run.session_id, binding: run.binding, mode: run.mode });
   // Before the first turn, so the harness discovers it in its own startup scan.
   // The container is rebuilt on every wake, so installing once here covers it.
-  if (!await installEnvelopeSkills(run.skills, run.skill_problems, log.child({ session: run.session_id }), process.env, ["culler"])) {
+  if (!await installEnvelopeSkills(run.skills, run.skill_problems, log.child({ session: run.session_id }), process.env, ["shorizon"])) {
     log.error("runner.skill_unavailable", "The complete Culler skill is unavailable.");
     return 2;
   }

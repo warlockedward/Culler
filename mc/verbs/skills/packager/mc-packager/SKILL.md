@@ -13,7 +13,7 @@ A call with another run identity fails without a state change.
 
 ## Repository
 
-Culler supplies an independent Project repository copy at `/workspace/source`, your working directory.
+S-Horizon supplies an independent Project repository copy at `/workspace/source`, your working directory.
 The original Project repository stays outside your write access.
 Preserve its `Start commit` from **Git state** and keep its files unchanged.
 Make no commit or branch change.
@@ -29,7 +29,7 @@ Temporary files disappear with the container.
 
 ### Read the reviewed change
 
-Culler supplies `refs/mc/destination`, the destination branch commit, in the repository copy.
+S-Horizon supplies `refs/mc/destination`, the destination branch commit, in the repository copy.
 Use the `Submitted commit` from **Git state** as `<Submitted commit>`.
 The reviewed range starts at the newest commit that those commits share.
 Find that commit with Git:
@@ -69,7 +69,7 @@ Git returns status 1 for that result.
 ## Packet result
 
 List `/mc/artifacts/` and select an existing plane directory.
-A plane is a durable directory that Culler mounts for artifacts.
+A plane is a durable directory that S-Horizon mounts for artifacts.
 Create the task's packet directory there with `mkdir -p`.
 
 Write `/mc/artifacts/<plane>/<task>/packet/packet.html` and pass that absolute path as `<path>` below.
@@ -85,7 +85,7 @@ The `--thesis` value is your overview text, not a path or the packet title.
 Write one nonblank paragraph of at most 4096 bytes without control characters.
 State the delivered change and why it matters.
 With **Strategic rationale**, apply the directive's **Strategic rationale** requirements to that text.
-Culler also presents this text in the review queue and packet conversations.
+S-Horizon also presents this text in the review queue and packet conversations.
 
 A refused submission records nothing.
 Correct the reported condition and submit again, or use **A run without a packet**.
@@ -122,7 +122,7 @@ Retain an unknown cause unless direct execution observations establish it.
 
 ## Project role customization
 
-Use this procedure when **Project role customization** conflicts with the directive's **Culler contract**.
+Use this procedure when **Project role customization** conflicts with the directive's **S-Horizon contract**.
 Submit the conflict through this terminal action:
 
 - `mc run customization-conflict --request <json>`

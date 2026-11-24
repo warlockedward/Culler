@@ -11,7 +11,7 @@ import (
 
 const agentSkillIntegrationRecord = "state/agent-skill-integration.json"
 
-// AgentSkillRoots lists the personal configuration directories that can receive the Culler skill.
+// AgentSkillRoots lists the personal configuration directories that can receive the S-Horizon skill.
 var AgentSkillRoots = []string{".agents", ".claude", ".codex"}
 
 type AgentSkillIntegration struct {
@@ -19,16 +19,16 @@ type AgentSkillIntegration struct {
 	Target string `json:"target"`
 }
 
-// InstallAgentSkillIntegration links the installed Culler skill into the personal skills directory of each root.
+// InstallAgentSkillIntegration links the installed S-Horizon skill into the personal skills directory of each root.
 // An entry that does not link to the installed skill stays intact.
-// A link that Culler owns outside the selected roots is removed.
+// A link that S-Horizon owns outside the selected roots is removed.
 func InstallAgentSkillIntegration(home, userHome string, roots []string) error {
 	if !filepath.IsAbs(home) || !filepath.IsAbs(userHome) {
 		return errors.New("The skill integration requires absolute home paths.")
 	}
-	target := filepath.Join(home, "release", "host", "skills", "culler")
+	target := filepath.Join(home, "release", "host", "skills", "shorizon")
 	if info, err := os.Lstat(filepath.Join(target, "SKILL.md")); err != nil || !info.Mode().IsRegular() {
-		return errors.New("The installed Culler skill is unavailable.")
+		return errors.New("The installed S-Horizon skill is unavailable.")
 	}
 	existing, err := readAgentSkillIntegration(home)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -39,7 +39,7 @@ func InstallAgentSkillIntegration(home, userHome string, roots []string) error {
 		if !slices.Contains(AgentSkillRoots, root) {
 			return errors.New("The skill integration names an unsupported directory.")
 		}
-		wanted = append(wanted, filepath.Join(userHome, root, "skills", "culler"))
+		wanted = append(wanted, filepath.Join(userHome, root, "skills", "shorizon"))
 	}
 	for _, record := range existing {
 		if !slices.Contains(wanted, record.Path) {
@@ -146,10 +146,10 @@ func readAgentSkillIntegration(home string) ([]AgentSkillIntegration, error) {
 	if err != nil {
 		return nil, errors.New("The skill integration record is invalid.")
 	}
-	target := filepath.Join(home, "release", "host", "skills", "culler")
+	target := filepath.Join(home, "release", "host", "skills", "shorizon")
 	for _, record := range records {
 		if !filepath.IsAbs(record.Path) || filepath.Clean(record.Path) != record.Path ||
-			filepath.Base(record.Path) != "culler" || filepath.Base(filepath.Dir(record.Path)) != "skills" ||
+			filepath.Base(record.Path) != "shorizon" || filepath.Base(filepath.Dir(record.Path)) != "skills" ||
 			!slices.Contains(AgentSkillRoots, filepath.Base(filepath.Dir(filepath.Dir(record.Path)))) || record.Target != target {
 			return nil, errors.New("The skill integration record is invalid.")
 		}

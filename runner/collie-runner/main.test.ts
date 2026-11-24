@@ -1089,7 +1089,7 @@ describe("packet conversations", () => {
     const start = prompt.indexOf("{", prompt.indexOf("# Conversation"));
     const end = prompt.indexOf("\n\n" + packetContext, start);
     const facts = JSON.parse(prompt.slice(start, end));
-    expect(facts).toMatchObject({ session_id: "h-abc", operator_message_sequence: "3", packet, release: "release-test", skill: "~/.agents/skills/culler/SKILL.md" });
+    expect(facts).toMatchObject({ session_id: "h-abc", operator_message_sequence: "3", packet, release: "release-test", skill: "~/.agents/skills/shorizon/SKILL.md" });
     expect(prompt.indexOf(packetContext)).toBeLessThan(prompt.indexOf("# Operator message"));
     expect(prompt).toEndWith("# Operator message\n\nWhy this approach?");
     expect(prompt.match(new RegExp(run.directive, "g"))).toHaveLength(1);

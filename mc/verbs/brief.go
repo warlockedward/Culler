@@ -18,7 +18,7 @@ import (
 
 const (
 	spawnBriefSchema = "mc.spawn-brief.v25"
-	spawnBriefHeader = "Culler immutable run brief"
+	spawnBriefHeader = "S-Horizon immutable run brief"
 )
 
 // The part headings. A role directive and a skill name a part by its heading.
@@ -55,7 +55,7 @@ type runBrief struct {
 }
 
 // briefPart is one block of a run brief with one purpose. The heading and the
-// explanation come before the data, so a reader who sees Culler for the first
+// explanation come before the data, so a reader who sees S-Horizon for the first
 // time knows what the data is and what to do with it.
 type briefPart struct {
 	Heading     string
@@ -238,7 +238,7 @@ func buildRunBrief(ctx context.Context, q Q, sp *dispatch.Spawn, runID string, i
 		}
 	}
 	if environment.SelectedRevisionID != "" {
-		b.Parts = append(b.Parts, briefPart{Heading: "Project environment", Explanation: "Culler supplies the selected image and persistent Project home. A task run receives a fresh source workspace and dependency preparation before the agent starts.", Facts: []briefFact{{Label: "Configuration revision", Value: environment.SelectedRevisionID}, {Label: "Project image", Value: environment.SelectedImageDigest}, {Label: "Selected base", Value: environment.SelectedBaseDigest}}})
+		b.Parts = append(b.Parts, briefPart{Heading: "Project environment", Explanation: "S-Horizon supplies the selected image and persistent Project home. A task run receives a fresh source workspace and dependency preparation before the agent starts.", Facts: []briefFact{{Label: "Configuration revision", Value: environment.SelectedRevisionID}, {Label: "Project image", Value: environment.SelectedImageDigest}, {Label: "Selected base", Value: environment.SelectedBaseDigest}}})
 	}
 
 	var subject *briefTaskRecord
@@ -472,14 +472,14 @@ func trimWorkerBrief(b *runBrief) {
 func customizationPart(sp *dispatch.Spawn, custom RoleCustomization, conflict string) briefPart {
 	return briefPart{
 		Heading:     partCustomization,
-		Explanation: "These operator instructions replace standard defaults within the Culler contract. " + conflict,
+		Explanation: "These operator instructions replace standard defaults within the S-Horizon contract. " + conflict,
 		Facts:       []briefFact{{"Project", sp.Project}, {"Role", string(sp.Role)}, {"Standard directive digest", custom.StandardDigest}},
 		Rows:        map[string]any{"instructions": custom.Instructions},
 	}
 }
 
 func credentialPart() briefPart {
-	return briefPart{Heading: "Agent credentials", Explanation: "The agent profile selects the harness, model, and effort; the same role input applies to Codex, Claude, and OpenCode. Culler keeps provider credentials on the host and supplies this container with temporary proxy access."}
+	return briefPart{Heading: "Agent credentials", Explanation: "The agent profile selects the harness, model, and effort; the same role input applies to Codex, Claude, and OpenCode. S-Horizon keeps provider credentials on the host and supplies this container with temporary proxy access."}
 }
 
 func runPart(runID string) briefPart {
@@ -890,7 +890,7 @@ func addGitStateParts(ctx context.Context, q Q, b *runBrief, sp *dispatch.Spawn,
 	return nil
 }
 
-// loadPreviousPacket returns the part for the newest packet that Culler
+// loadPreviousPacket returns the part for the newest packet that S-Horizon
 // published for another submitted version of the work.
 func loadPreviousPacket(ctx context.Context, q Q, task int64, current sql.NullInt64) (*briefPart, error) {
 	var path, commit string
@@ -904,7 +904,7 @@ func loadPreviousPacket(ctx context.Context, q Q, task int64, current sql.NullIn
 	}
 	return &briefPart{
 		Heading:     partPreviousPacket,
-		Explanation: "Culler published this packet for an earlier submitted commit of this work. " + commandSkillSentence(dispatch.RolePackager, "holds the procedure for the new packet"),
+		Explanation: "S-Horizon published this packet for an earlier submitted commit of this work. " + commandSkillSentence(dispatch.RolePackager, "holds the procedure for the new packet"),
 		Facts:       []briefFact{{"File", path}, {"Submitted commit", commit}},
 	}, nil
 }
@@ -1088,7 +1088,7 @@ var roleTitle = map[dispatch.Role]string{
 func renderRunBrief(b runBrief) (string, error) {
 	var w strings.Builder
 	fmt.Fprintf(&w, "%s (%s)\n\n# %s run %s\n\n", spawnBriefHeader, spawnBriefSchema, roleTitle[b.Role], b.RunID)
-	fmt.Fprintf(&w, "## Standard Culler directive\n\n<role_directive>\n%s\n</role_directive>\n", strings.TrimSpace(b.Directive))
+	fmt.Fprintf(&w, "## Standard S-Horizon directive\n\n<role_directive>\n%s\n</role_directive>\n", strings.TrimSpace(b.Directive))
 	for _, p := range b.Parts {
 		fmt.Fprintf(&w, "\n## %s\n\n%s\n", p.Heading, p.Explanation)
 		if len(p.Facts) > 0 {

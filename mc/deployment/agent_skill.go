@@ -17,14 +17,14 @@ func HostReleaseSourcePath(root, relative string) string {
 	if _, err := os.Lstat(direct); !errors.Is(err, os.ErrNotExist) {
 		return direct
 	}
-	const prefix = "skills/culler/"
+	const prefix = "skills/shorizon/"
 	if strings.HasPrefix(relative, prefix) {
 		file := strings.TrimPrefix(relative, prefix)
 		if file == "references/writing.md" || file == "references/task-description.md" {
 			name := strings.TrimSuffix(strings.TrimPrefix(file, "references/"), ".md")
 			return filepath.Join(root, "mc", "verbs", "skills", "shared", name, "SKILL.md")
 		}
-		return filepath.Join(root, "mc", "verbs", "skills", "collie", "culler", filepath.FromSlash(file))
+		return filepath.Join(root, "mc", "verbs", "skills", "collie", "shorizon", filepath.FromSlash(file))
 	}
 	return direct
 }
@@ -59,7 +59,7 @@ func agentSkillInstallation(home string) ([]byte, error) {
 	body, err := json.MarshalIndent(map[string]any{
 		"environment": "host", "mc_home": home, "executable": executable,
 		"command_prefix": []string{"env", "MC_HOME=" + home, executable},
-		"release":        AgentSkillReleaseID, "skill": filepath.Join(home, "release", "host", "skills", "culler"),
+		"release":        AgentSkillReleaseID, "skill": filepath.Join(home, "release", "host", "skills", "shorizon"),
 		"trace_root":   filepath.Join(home, "agentsview", "inspection"),
 		"trace_reader": filepath.Join(home, "release", "host", "runner", "shared", "trace-read.ts"),
 		"bun":          bun, "scratch": os.TempDir(),

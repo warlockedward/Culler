@@ -12,7 +12,7 @@ func TestCollieShowsTheVerifierCustomizationContract(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(directive, "## Culler contract\n") {
+	if !strings.Contains(directive, "## S-Horizon contract\n") {
 		t.Fatal("the Verifier directive has no contract")
 	}
 
@@ -23,7 +23,7 @@ func TestCollieShowsTheVerifierCustomizationContract(t *testing.T) {
 		t.Fatal(err)
 	}
 	contract := shown.(map[string]any)["contract"].(string)
-	if !strings.Contains(directive, "## Culler contract\n\n"+contract+"\n\n## Project role customization") {
+	if !strings.Contains(directive, "## S-Horizon contract\n\n"+contract+"\n\n## Project role customization") {
 		t.Fatal("Collie and the Verifier receive different customization contract boundaries")
 	}
 }

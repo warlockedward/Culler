@@ -35,11 +35,11 @@ Keep the wiki files unchanged after OpenWiki creates the receipt.
 
 A refusal before the result checks leaves the run active.
 Correct the stated error and repeat the call.
-Culler then checks the wiki result against the contract and the receipt.
+S-Horizon then checks the wiki result against the contract and the receipt.
 A failed result check ends the run with exit code 1.
 Do not submit again after a failed result check.
 Submit the result without operator confirmation.
-Leave the merge to Culler.
+Leave the merge to S-Horizon.
 
 ## Report a failure
 
@@ -50,7 +50,7 @@ When the wiki update cannot finish, report the cause through this terminal actio
 
 ## Report a customization conflict
 
-Use this terminal action when a custom instruction of the operator contradicts the Culler contract:
+Use this terminal action when a custom instruction of the operator contradicts the S-Horizon contract:
 
 - `mc run customization-conflict --request <json>`
 
@@ -58,7 +58,7 @@ The JavaScript Object Notation (JSON) object contains these fields:
 
 - The `run` field contains the `Run identifier` fact of the **Run** part.
 - The `passage` field contains the exact conflicting text from the custom instructions.
-- The `requirement` field names the Culler contract requirement that the text contradicts.
+- The `requirement` field names the S-Horizon contract requirement that the text contradicts.
 - The `reason` field explains why both instructions cannot hold.
 
 This terminal action ends the wiki update as failed.

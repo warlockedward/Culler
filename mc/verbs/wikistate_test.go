@@ -426,7 +426,7 @@ func TestRoleShowReportsNoScribeBlock(t *testing.T) {
 		t.Fatalf("conflict of the Scribe = %v, want the conflict of the run %s with no task and no block", conflict, run)
 	}
 	if got := wsRunUpdate(t, db, run); !reflect.DeepEqual(got, map[string]any{"result": "failed", "result_text": "The wiki update failed.",
-		"cause_text": "The custom instructions of the Scribe conflict with the Culler contract."}) {
+		"cause_text": "The custom instructions of the Scribe conflict with the S-Horizon contract."}) {
 		t.Fatalf("wiki update of the run in the run list = %v, want the failed wiki update with the cause of the conflict", got)
 	}
 }

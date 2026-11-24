@@ -10,14 +10,14 @@ Use this role skill for assigned setup commands and reports.
 
 The agent profile sets the model and effort for this run.
 The same command authority applies to Codex, the Claude Agent Software Development Kit (SDK), and OpenCode.
-Culler supplies the harness configuration and the skills at `~/.agents/skills/`.
+S-Horizon supplies the harness configuration and the skills at `~/.agents/skills/`.
 
 Each command accepts one JavaScript Object Notation (JSON) object on standard input.
 The immutable run identity supplies your authority.
 Use the operation identifier from your brief.
 Each attempt has a 45-minute limit.
 A heartbeat does not extend this limit.
-Culler permits two automatic attempts for each operation.
+S-Horizon permits two automatic attempts for each operation.
 
 - `mc environment get`
 - `mc environment heartbeat`
@@ -67,10 +67,10 @@ Use the brief's `base_reference` as the Dockerfile's sole FROM image.
 Select exact additional versions and integrity digests for downloads.
 During initial setup, keep proposed build contents in the configuration until approval.
 Preserve repository files independently of the proposal.
-Culler materializes the approved contents before the continuation.
+S-Horizon materializes the approved contents before the continuation.
 
 The report retains the proposal and ends this operation.
-Approval permits Culler to build the exact image inputs.
+Approval permits S-Horizon to build the exact image inputs.
 Denial starts a continuation in the image that ran this operation.
 Further image improvements use the Environment page after initial import.
 
@@ -151,4 +151,4 @@ Execute this command after preparation:
 
 Use its exact output as `files_digest`.
 Preserve the files after this command.
-Culler confirms their identity and preserves the development commit before pipeline work.
+S-Horizon confirms their identity and preserves the development commit before pipeline work.

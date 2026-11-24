@@ -103,7 +103,7 @@ func CollieSkillSet() ([]RoleSkill, error) { return skillSetByBasename(CollieSki
 
 func commandSkillByBasename(basename string) (RoleSkill, error) {
 	if basename == CollieSkillBasename {
-		return skillByPath(basename, "culler")
+		return skillByPath(basename, "shorizon")
 	}
 	return skillByPath(basename, commandSkillPrefix+basename)
 }
@@ -191,7 +191,7 @@ func skillByPath(basename, name string) (RoleSkill, error) {
 	if err != nil {
 		return RoleSkill{}, err
 	}
-	if name == "culler" {
+	if name == "shorizon" {
 		for _, shared := range []string{"task-description", "writing"} {
 			body, err := roleSkillFS.ReadFile("skills/shared/" + shared + "/SKILL.md")
 			if err != nil {
@@ -200,7 +200,7 @@ func skillByPath(basename, name string) (RoleSkill, error) {
 			skill.Files["references/"+shared+".md"] = string(body)
 		}
 		metadata, _ := json.Marshal(map[string]any{
-			"environment": "container", "executable": "/usr/local/bin/mc", "skill": "~/.agents/skills/culler",
+			"environment": "container", "executable": "/usr/local/bin/mc", "skill": "~/.agents/skills/shorizon",
 			"trace_root": "/mc/traces", "trace_reader": "/opt/culler-runtime/app/src/shared/trace-read.ts",
 			"bun": "/opt/culler-runtime/bin/bun", "scratch": "/mc/scratch", "release_record": "/mc/run.json",
 		})

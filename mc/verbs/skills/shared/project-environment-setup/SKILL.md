@@ -12,17 +12,17 @@ Other roles apply this procedure within their assigned command surface and task 
 
 Setup and pipeline agents share container permissions, resource limits, network policy, and workspace paths.
 Role authority and credentials remain separate.
-Culler keeps provider credentials on the host.
-This container uses a temporary Culler token through the host provider proxy.
+S-Horizon keeps provider credentials on the host.
+This container uses a temporary S-Horizon token through the host provider proxy.
 The host renews account access without a credential update inside the container.
-Preserve the proxy configuration and exclude Culler tokens from output.
+Preserve the proxy configuration and exclude S-Horizon tokens from output.
 Each agent container has a limit of 2048 processes.
 The operator can set CPU and memory limits; by default, no CPU or memory limit applies.
 Read the effective limits from the cgroup files, such as `/sys/fs/cgroup/cpu.max` and `/sys/fs/cgroup/memory.max`.
 Agent containers use the default Docker seccomp profile, which denies user namespaces.
 Fake harness containers have no network access.
 
-Culler runs Project code in a Linux container inside a Linux virtual machine on the Mac host.
+S-Horizon runs Project code in a Linux container inside a Linux virtual machine on the Mac host.
 The container has no host command executor or access to the host Docker daemon.
 Confirm the execution environment before installation:
 
@@ -36,7 +36,7 @@ Use supplied configuration and permitted local observations; state unknown limit
 
 The Project home at `HOME` persists across Setup Agent runs and pipeline runs.
 It retains package archives, metadata, extracted files, installed tools, and Project tool configuration.
-Normal package manager cache paths within the home need no Culler configuration.
+Normal package manager cache paths within the home need no S-Horizon configuration.
 The Project home remains separate from the operator's home and other Projects.
 Credentials, sessions, role skills, and role instructions belong to each run.
 Preserve those files and the files of concurrent runs.
@@ -106,8 +106,8 @@ Keep check evidence, diagnostic output, and continuation instructions separate f
 Use short Markdown paragraphs and lists for separate facts in other operator text.
 Use `FROM culler-project-base:<digest>` and exact additional versions.
 Replace `<digest>` with the selected base's 64 hexadecimal digest characters.
-Culler assigns this local Docker tag to that exact image before the build.
-Leave the image build to Culler after operator approval.
+S-Horizon assigns this local Docker tag to that exact image before the build.
+Leave the image build to S-Horizon after operator approval.
 
 Propose Image dependencies only when image contents can resolve a required prerequisite.
 Assess each missing prerequisite separately before a proposal or a decision to defer it.
@@ -131,7 +131,7 @@ Use permitted probes and available package metadata to assess feasibility before
 Check the selected base, processor architecture, declared versions, and required libraries for compatibility.
 Use a minimal execution probe when ordinary permissions permit one.
 A probe must preserve Project files, declared versions, and control permissions.
-Leave the actual image build to Culler after operator approval.
+Leave the actual image build to S-Horizon after operator approval.
 
 State the evidence, assumptions, and unresolved uncertainty for each expected capability.
 Do not invent a probability or claim verification from a package name alone.
@@ -187,4 +187,4 @@ The assigned role's command surface controls reports and proposals.
 Pipeline work uses its assigned branch, task controls, and normal source review.
 A dependency preparation failure remains context for source work when the runtime can execute the agent.
 Keep secret values outside reports, build files, and reusable caches.
-Culler runtime files remain separate from Project requirements.
+S-Horizon runtime files remain separate from Project requirements.

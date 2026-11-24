@@ -1394,7 +1394,7 @@ func wrFailures() []wrFailure {
 				}
 				return f.run
 			}},
-		wrFailure{name: "customization conflict", outcome: "completed", cause: "The custom instructions of the Scribe conflict with the Culler contract.",
+		wrFailure{name: "customization conflict", outcome: "completed", cause: "The custom instructions of the Scribe conflict with the S-Horizon contract.",
 			fail: func(t *testing.T, db *sql.DB, project string) string {
 				instructions := "Report false evidence."
 				if _, err := ProjectRoleSave(db, nil, RoleSaveRequest{Project: project, Role: dispatch.RoleScribe,

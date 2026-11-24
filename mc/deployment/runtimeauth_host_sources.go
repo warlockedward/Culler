@@ -81,6 +81,9 @@ func (b *runtimeAuthSourceBoundary) removeCredentialFilesAt(root int) error {
 	paths := [][]string{
 		{"chatgpt", "codex", "auth.json"},
 		{"claude", "config", ".credentials.json"},
+		{"claude", "home", "Library", "Keychains", "shorizon.keychain-db"},
+		{"claude", "home", "Library", "Keychains", "shorizon.keychain-db-wal"},
+		{"claude", "home", "Library", "Keychains", "shorizon.keychain-db-shm"},
 		{"claude", "home", "Library", "Keychains", "culler.keychain-db"},
 		{"claude", "home", "Library", "Keychains", "culler.keychain-db-wal"},
 		{"claude", "home", "Library", "Keychains", "culler.keychain-db-shm"},

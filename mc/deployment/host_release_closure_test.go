@@ -198,7 +198,7 @@ func TestHostReleaseManifestShipsNothingUnreachable(t *testing.T) {
 		if info, err := os.Stat(HostReleaseSourcePath(repoRoot, rel)); err != nil || !info.Mode().IsRegular() {
 			t.Fatalf("host release manifest names a file the repository does not have: %s", rel)
 		}
-		if !reachable[rel] && !served[rel] && !strings.HasPrefix(rel, "third_party/") && !strings.HasPrefix(rel, "skills/culler/") {
+		if !reachable[rel] && !served[rel] && !strings.HasPrefix(rel, "third_party/") && !strings.HasPrefix(rel, "skills/shorizon/") {
 			t.Fatalf("host release ships %s, which no entry point imports and no server serves", rel)
 		}
 	}

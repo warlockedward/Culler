@@ -430,7 +430,7 @@ func TestEndWikiRunEndsRunAndWikiUpdateTogether(t *testing.T) {
 		Result: "failed", Cause: "The Project is archived."}, failed("The Project is archived."))
 	for _, c := range []struct{ name, cause string }{
 		{"failure report of the Scribe", "The Scribe reported a failure: The OpenWiki command failed."},
-		{"customization conflict", "The custom instructions of the Scribe conflict with the Culler contract."},
+		{"customization conflict", "The custom instructions of the Scribe conflict with the S-Horizon contract."},
 	} {
 		end, w := terminal(c.cause)
 		cases = add(cases, c.name, end, w)

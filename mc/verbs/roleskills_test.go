@@ -82,7 +82,7 @@ func TestRoleSkillSetIsTheCommandSurfaceThenTheAdditionalSkills(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", tier, err)
 		}
-		if len(set) == 0 || (tier == "collie" && set[0].Name != "culler") || (tier != "collie" && !strings.HasPrefix(set[0].Name, "mc-")) {
+		if len(set) == 0 || (tier == "collie" && set[0].Name != "shorizon") || (tier != "collie" && !strings.HasPrefix(set[0].Name, "mc-")) {
 			t.Fatalf("%s set does not open with its command surface: %v", tier, set)
 		}
 		command := set[0]
@@ -169,7 +169,7 @@ func TestCollieSkillReferencesResolveInDeliveredTree(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if skill.Name != "culler" {
+	if skill.Name != "shorizon" {
 		t.Fatalf("skill name = %q", skill.Name)
 	}
 	links := regexp.MustCompile(`\]\((references/[^)]+)\)`)

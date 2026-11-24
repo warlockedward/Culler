@@ -392,7 +392,7 @@ The same experiment identifier and output directory remain in use.
 A resumed experiment still requires service availability for fast mode.
 The runtime records each harness report about fast mode.
 
-The server creates a separate resume checkout under `/private/tmp/culler-worktrees/`.
+The server creates a separate resume checkout under `/private/tmp/shorizon-worktrees/`.
 Its product and runner files come from the original revision.
 Ordinary resume uses the preserved evaluation files. An explicit runtime update uses the server evaluation files.
 The source manifests identify their exact bytes.

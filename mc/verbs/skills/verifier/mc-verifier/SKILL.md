@@ -152,7 +152,7 @@ Continue the assigned work after connection recovery; leave connection reports t
 
 ## Project role customization
 
-For a custom instruction that conflicts with the Culler contract, use this terminal:
+For a custom instruction that conflicts with the S-Horizon contract, use this terminal:
 
 - `mc run customization-conflict --request <json>`
 
