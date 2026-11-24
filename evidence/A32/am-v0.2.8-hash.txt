@@ -1,0 +1,10 @@
+AM v0.2.8 双面哈希登记（轮三十四终窗：所有者六裁执行波收口——S4b＋S3 两票落地全道绿＋F1 残留分类表呈报三尾面）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 9ae2a430229534a876b301032d1b1bf0ba2b7c68d1dcc16932a4df2928dd0370
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-25 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 203c45769ca5fe7306e1a1542f1e990e851698d1fb9369cc9fd764aadaeda6d3，与 am-v0.2.7-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.7 = 203c45769ca5fe7306e1a1542f1e990e851698d1fb9369cc9fd764aadaeda6d3（evidence/A32/am-v0.2.7-hash.txt 实读）；再前 v0.2.6 = f742897cd5761cf47366465dfd88b998df3f11404de4110d4a50fa175788249c（同件记载）
+- 同轮并入 dev 的提交: b93b953(S4b token 前缀面 50 token/33 文件+长度形状断言自纠) / 2468f9a(S3 单元身份面 16 文件+2 新平台文件+双代守卫+四身份识别) / 97d921e(F1 残留分类表)
+- 关键事实: 六裁=Q1 S4b 方案 A 直接改名 / Q2 O9 域名根=s / Q3 linux 单元文法=shorizon-<suffix>-<unit>.service / Q4 uninstall 识别面保留 legacy com.culler. / Q5=(iii) Docker 镜像身份标签保留+F1 不覆盖镜像内嵌面 / Q6=(a) D1/D2 40 列折行登记 kept-face。S4b 行为语义=token 总长 56→53、验证面只认新前缀、磁盘零存量⇒今日影响零。S3 行为语义=新部署 darwin label=com.s.shorizon.<12hex>.<unit>、linux 单元文件=shorizon-<12hex>-<unit>.service；防御/操纵面两代识别（新+legacy）＝行为增强；uninstall 四身份（含 mission-control legacy 先例）。F1 严格验收余量=三尾面候点名（Q-S skill 语义尾面=R2 表"R2 末尾单独 commit+三件套同步"；Q-K Keychain darwin 名面=R2 表 Keychain 行终值，Linux state tree=ADR-0 SIGNED 域不动；Q-W worktree 路径一行工单）+F1 干净机走查候域指定。A09 R2 表用户可见身份五行（CLI/home/env/units/token）全闭合。
+- 账: dev tip=97d921e（本登记轮提交随后）/ ledger A09=IN_PROGRESS 不变（余 S5 候 B02 窗+三尾面+F1 走查）/ worktrees=main+dev（a09s4b+a09s3 用毕回收）/ 无新外发（ci/routing-base 探针支停在 3444103＝S4a 时代；S4b/S3 面不涉 CI 被测面，下一次 push 候所有者或 F1 走查需要）/ Mimosa scanner_enobufs 继续按兼容策略，不构成安全声明
+- 登记轮自纠: 无（链自检+entry count=1+line-count 不变三重断言，脚本一次性 SPLICE_OK；changelog line LENGTH=134191）
