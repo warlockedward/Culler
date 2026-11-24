@@ -45,7 +45,7 @@ describe("Claude native SessionStore", () => {
 
   test("signed records and credentials survive append, load, and resume intact", async () => {
     const dir = root();
-    const token = "culler_proxy_" + "c".repeat(43);
+    const token = "shz_proxy_" + "c".repeat(43);
     const signature = Buffer.from("sk-" + "a".repeat(80)).toString("base64");
     const entries = [
       { type: "user", uuid: "u-1", message: { content: `tool result: ${token}` } },

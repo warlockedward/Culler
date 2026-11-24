@@ -75,7 +75,7 @@ test("the SDK evidence requires a successful result for the exact MCP call ident
 
 test("the resident access response rejects provider secrets and another connection", () => {
   const access = { version: 1, harness: "codex", authMode: "account", url: "https://host.docker.internal:7444",
-    token: "culler_proxy_" + "c".repeat(43), ca: "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----" };
+    token: "shz_proxy_" + "c".repeat(43), ca: "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----" };
   const value = { version: 1, status: "ok", credential: "selected", nonce: "a".repeat(32), proxy_config: access };
   const parse = (input: unknown) => parseProfileAccess(JSON.stringify(input) + "\n", "selected", value.nonce, "codex");
   expect(parse(value)).toEqual(access);

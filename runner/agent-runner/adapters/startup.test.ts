@@ -131,7 +131,7 @@ async function codexFixture(script: string, signal?: AbortSignal) {
   const thread = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
   const original = JSON.stringify({ type: "response_item", payload: {
     type: "reasoning", id: "reasoning-1", encrypted_content: "AAAA-sk-" + "a".repeat(160),
-    token: "culler_proxy_" + "c".repeat(43),
+    token: "shz_proxy_" + "c".repeat(43),
   } }) + "\n";
   await writeFile(join(root, `${thread}.jsonl`), original);
   const proc = Bun.spawn([process.execPath, "-e", `
@@ -330,7 +330,7 @@ test("Codex preserves native identity and redacts Culler access after its file i
   await writeFile(accessPath, JSON.stringify({ token }));
   const original = JSON.stringify({ type: "response_item", payload: {
     type: "reasoning", id: "reasoning-1", encrypted_content: "AAAA-sk-" + "a".repeat(160),
-    token: "culler_proxy_" + "c".repeat(43),
+    token: "shz_proxy_" + "c".repeat(43),
   } }) + "\n";
   await writeFile(join(root, `${thread}.jsonl`), original);
   const proc = Bun.spawn([process.execPath, "-e", `
@@ -362,7 +362,7 @@ test("Codex preserves native identity and redacts Culler access after its file i
 
 test("both adapters preserve existing originals during startup and shutdown", async () => {
   const root = await mkdtemp(join(tmpdir(), "mc-original-lifecycle-")); roots.push(root);
-  const token = "culler_proxy_" + "c".repeat(43);
+  const token = "shz_proxy_" + "c".repeat(43);
   const native = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
   const original = JSON.stringify({ type: "assistant", uuid: "signed-1", message: { content: [
     { type: "thinking", thinking: token, signature: Buffer.from("sk-" + "a".repeat(80)).toString("base64") },

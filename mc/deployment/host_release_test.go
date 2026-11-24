@@ -88,7 +88,7 @@ func TestReleaseInstallationPreservesOriginalSessions(t *testing.T) {
 	if err := os.Chmod(home, 0o700); err != nil {
 		t.Fatal(err)
 	}
-	original := []byte(`{"type":"response_item","payload":{"type":"reasoning","id":"r1","encrypted_content":"AAAA-sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","token":"culler_proxy_ccccccccccccccccccccccccccccccccccccccccccc"}}
+	original := []byte(`{"type":"response_item","payload":{"type":"reasoning","id":"r1","encrypted_content":"AAAA-sk-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","token":"shz_proxy_ccccccccccccccccccccccccccccccccccccccccccc"}}
 {"type":"assistant","message":{"content":[{"type":"thinking","thinking":"context","signature":"c2stYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh"},{"type":"redacted_thinking","data":"c2stYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh"}]}}
 `)
 	paths := []string{"sessions/run/native.jsonl", "sessions/run/subagents/agent-1.jsonl", "sessions/collie/rollout.jsonl", "environment-runs/setup/session/native.jsonl", "sessions/run/opencode/native.db"}

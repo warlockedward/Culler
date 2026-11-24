@@ -12,7 +12,7 @@ try {
   const skills = runSkillsFrom([{ name: "mc-packager", body: "Fixed skill fixture" }], reason => { throw new Error(reason); });
   const installed = await installRunSkills(`${root}/skills`, skills);
   if (await Bun.file(installed[0]!).text() !== "Fixed skill fixture") throw new Error("The product skill installation differs.");
-  const access = { version: 1 as const, url: "https://host.docker.internal:12345", token: "culler_proxy_" + "x".repeat(43),
+  const access = { version: 1 as const, url: "https://host.docker.internal:12345", token: "shz_proxy_" + "x".repeat(43),
     ca: "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----", harness: "codex" as const, authMode: "account" as const };
   const codexEnv = codexAdapterEnv({ CODEX_HOME: `${root}/auth`, CODEX_REFRESH_TOKEN_URL_OVERRIDE: "http://127.0.0.1:9/oauth/token", ANTHROPIC_AUTH_TOKEN: "fixture-token" }, access, `${root}/ca.pem`, `${root}/auth`);
   if (codexEnv.ANTHROPIC_AUTH_TOKEN !== undefined) throw new Error("The product environment retained another credential channel.");

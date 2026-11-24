@@ -74,7 +74,7 @@ const path = process.env.MC_PROVIDER_ACCESS_FILE;
 if (path !== "/mc/provider-access.json") fail();
 const access = JSON.parse(readFileSync(path, "utf8"));
 if (Object.keys(access).sort().join(",") !== "authMode,ca,harness,token,url,version") fail();
-if (!/^culler_proxy_[A-Za-z0-9_-]{43}$/.test(access.token) || !access.url.startsWith("https://")) fail();
+if (!/^shz_proxy_[A-Za-z0-9_-]{43}$/.test(access.token) || !access.url.startsWith("https://")) fail();
 if (access.ca.includes("PRIVATE KEY") || !access.ca.includes("BEGIN CERTIFICATE")) fail();
 for (const key of ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "MC_CREDENTIAL_REFRESH_URL", "CODEX_REFRESH_TOKEN_URL_OVERRIDE", "SHZ_TEST_HOST_SECRET_DIR"]) {
   if (process.env[key]) fail();
@@ -83,7 +83,7 @@ for (const file of ["/mc/codex/auth.json", "/home/agent/.codex/auth.json", "/hom
   if (existsSync(file)) fail();
 }
 const deniedToken = ` + fmt.Sprint(invalidToken) + `;
-const token = deniedToken ? "culler_proxy_" + "x".repeat(43) : access.token;
+const token = deniedToken ? "shz_proxy_" + "x".repeat(43) : access.token;
 const response = await fetch(access.url + (access.harness === "codex" ? "/responses" : "/v1/messages"), {
   method: "POST", headers: { authorization: "Bearer " + token, "content-type": "application/json" },
   body: JSON.stringify({ model: "outside-authorized-model", input: "synthetic", messages: [] }), tls: { ca: access.ca },

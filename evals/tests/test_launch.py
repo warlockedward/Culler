@@ -31,7 +31,7 @@ def test_launch_preserves_branch_after_the_harness_exits(tmp_path, detached, cha
                  + json.dumps(git_args) + "} export async function executeCodexProcess(child){return await child.exited}",
         "claude": "export function claudeAdapterEnv(){} export function claudeOptions(){} export async function executeClaudeQuery(){} export async function mirrorRoleSkill(){}",
         "store": "export class NativeSessionStore{}",
-        "access": "export async function loadProviderAccess(){return {token:'culler_proxy_'+'x'.repeat(43)}} export async function writeProviderCA(){return 'fixture-ca'} export function codexProviderArgs(){return []} export async function redactNativeAccess(){}",
+        "access": "export async function loadProviderAccess(){return {token:'shz_proxy_'+'x'.repeat(43)}} export async function writeProviderCA(){return 'fixture-ca'} export function codexProviderArgs(){return []} export async function redactNativeAccess(){}",
         "paths": "export function nativeSdkExecutable(){}",
         "tools": "export function judgeFileTool(){}",
         "fast-mode": "export function codexFastModeArgv(a){return a} export function configureClaudeFastMode(){}",
@@ -95,7 +95,7 @@ def test_claude_launch_uses_the_structured_result_and_keeps_the_native_response(
                   + "emit({type:'system',subtype:'init'});emit(" + json.dumps(native_result) + ");"
                   + "emit({event:'turn-complete',status:'success',output:" + json.dumps(raw) + "});return 0;}",
         "store": "export class NativeSessionStore{}",
-        "access": "export async function loadProviderAccess(){return {token:'culler_proxy_'+'x'.repeat(43)}} export async function writeProviderCA(){return 'fixture-ca'} export function codexProviderArgs(){return []} export async function redactNativeAccess(){}",
+        "access": "export async function loadProviderAccess(){return {token:'shz_proxy_'+'x'.repeat(43)}} export async function writeProviderCA(){return 'fixture-ca'} export function codexProviderArgs(){return []} export async function redactNativeAccess(){}",
         "paths": "export async function nativeSdkExecutable(){return process.execPath}",
         "tools": "export function judgeFileTool(){}",
     }

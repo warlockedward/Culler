@@ -640,7 +640,7 @@ for (const harness of ["fake", "codex"] as const) {
     deps.config = { ...deps.config, runtimeVolume: "runtime-test", projectImage: "project-test" };
     deps.hostZone = () => "America/Los_Angeles";
     deps.credentials = { project: () => ({ env: {}, proxyConfig: JSON.stringify({ version: 1,
-      url: "https://host.docker.internal:7444", token: "culler_proxy_" + "c".repeat(43),
+      url: "https://host.docker.internal:7444", token: "shz_proxy_" + "c".repeat(43),
       ca: "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----", harness: "codex", authMode: "account" }) }) };
     const op = operation("setup");
     op.runtime_binding = { ...op.runtime_binding!, harness, channel: harness === "codex" ? "codex" : "", credential: harness === "codex" ? "account" : "" };

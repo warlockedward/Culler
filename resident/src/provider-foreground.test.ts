@@ -58,7 +58,7 @@ test("a temporary host provides isolated Culler authority and checks a saved key
   const response = await control(path, { op: "profile_authorize", credential: "account", profile: "profile", profile_revision: "revision",
     run_id: "run", launch_id: "launch", model: "small-model", max_requests: 1, expires_at_ms: Date.now() + 60_000 });
   expect(response.status).toBe("ok");
-  expect(response.proxy_config.token).toMatch(/^culler_proxy_[A-Za-z0-9_-]{43}$/);
+  expect(response.proxy_config.token).toMatch(/^shz_proxy_[A-Za-z0-9_-]{43}$/);
   expect(JSON.stringify(response)).not.toContain("synthetic-provider-secret");
   expect(JSON.stringify(response)).not.toContain("PRIVATE KEY");
   const status = await control(path, { op: "profile_status", run_id: "run", launch_id: "launch" });

@@ -1138,7 +1138,7 @@ test("inspection exposes masked copies and availability without original access"
   const secret = "exact-private-credential";
   const r = rig({ credentials: () => [secret] });
   r.rows = [claudeRow("r-copy"), codexRow("h-copy")];
-  const token = "culler_proxy_" + "c".repeat(43);
+  const token = "shz_proxy_" + "c".repeat(43);
   const original = JSON.stringify({ type: "assistant", signature: "sk-" + "a".repeat(80), text: `${secret} ${token}` }) + "\n";
   const native = await r.write("r-copy", "native.jsonl", original);
   const child = await r.write("r-copy", "subagents/agent-a.jsonl", original);

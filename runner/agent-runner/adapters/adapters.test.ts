@@ -24,7 +24,7 @@ import {
 import { NativeSessionStore } from "./session-store";
 import type { ProviderAccess } from "./provider-access";
 
-const proxyAccess: ProviderAccess = { version: 1, url: "https://host.docker.internal:7444", token: "culler_proxy_" + "c".repeat(43),
+const proxyAccess: ProviderAccess = { version: 1, url: "https://host.docker.internal:7444", token: "shz_proxy_" + "c".repeat(43),
   ca: "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----", harness: "codex", authMode: "api-key" };
 const claudeAccess: ProviderAccess = { ...proxyAccess, harness: "claude-sdk" };
 

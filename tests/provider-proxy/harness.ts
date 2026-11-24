@@ -65,7 +65,7 @@ try {
       state.requests++;
       if (state.requests > 3) return new Response("The request limit is exhausted.", { status: 429 });
       if (state.rejectedRequest) {
-        return Response.json({ error: { type: "culler_proxy_error", code: "proxy_token_expired",
+        return Response.json({ error: { type: "shz_proxy_error", code: "proxy_token_expired",
           message: "The host could not authorize or complete this request." }, request_id: state.rejectedRequest },
         { status: 401, headers: { "request-id": state.rejectedRequest, "x-request-id": state.rejectedRequest,
           "x-culler-request-id": state.rejectedRequest, "x-culler-origin": "proxy" } });
@@ -137,7 +137,7 @@ try {
   const host = process.platform === "darwin" ? "host.docker.internal" : "127.0.0.1";
   const address = `https://${host}:${server.port}`;
   async function scenario(label: string, rejected = false) {
-    const state: Scenario = { label, token: "culler_proxy_" + randomBytes(32).toString("base64url"), requests: 0, preliminaryObserved: false, responseOpen: false };
+    const state: Scenario = { label, token: "shz_proxy_" + randomBytes(32).toString("base64url"), requests: 0, preliminaryObserved: false, responseOpen: false };
     if (rejected) state.rejectedRequest = randomUUID();
     states.set(state.token, state);
     const work = join(root, label);

@@ -79,7 +79,7 @@ test("native copies preserve child identities and refuse a child as the main ses
 
 test("native masks preserve JSON content and prior credentials with literal mask characters", () => {
   const secret = "synthetic*credential";
-  const token = "culler_proxy_" + "a".repeat(43);
+  const token = "shz_proxy_" + "a".repeat(43);
   const original = { [secret]: secret, stable: "synthetic and credential remain separate words",
     attachment: { mime: "text/plain", data: Buffer.from(`before ${secret} ${token} after`).toString("base64") } };
   const first = nativeMask([secret], []);

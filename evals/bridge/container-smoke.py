@@ -63,7 +63,7 @@ with SyntheticRuntime(source, source_manifest=manifest, product_manifest=product
                                       {"harness": "codex", "model": "fixture-model", "effort": "high", "fast_mode": True, "image": args.image, "timeout_seconds": 60,
                                        "channel": "codex", "base_url": "",
                                        "credentials": {"provider_access": {"version": 1, "harness": "codex", "authMode": "account",
-                                         "url": "https://host.docker.internal:12345", "token": "culler_proxy_" + "x" * 43,
+                                         "url": "https://host.docker.internal:12345", "token": "shz_proxy_" + "x" * 43,
                                          "ca": "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----"}}})
 if result["terminal"]["status"] != "packaged" or not Path(result["packet_path"]).is_file():
     raise RuntimeError("The token-free container failed its packet contract.")

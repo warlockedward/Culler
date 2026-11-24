@@ -593,7 +593,7 @@ func TestProviderAccessAcceptsALiveModelOnlyAtAReleaseCatalogOrigin(t *testing.T
 		if !ok {
 			t.Fatalf("The model list lacks %s.", model)
 		}
-		return ProviderContainerAccess{Version: 1, URL: "https://host.docker.internal:4443" + path, Token: "culler_proxy_" + strings.Repeat("c", 43), CA: bundle.CA,
+		return ProviderContainerAccess{Version: 1, URL: "https://host.docker.internal:4443" + path, Token: "shz_proxy_" + strings.Repeat("c", 43), CA: bundle.CA,
 			Harness: "opencode", AuthMode: "api-key", OpenCode: &OpenCodeContainerAccess{Provider: "moonshotai", KeyVariable: provider.KeyVariable, WebSearch: provider.WebSearch, Model: selected}}
 	}
 	for _, valid := range []ProviderContainerAccess{access("kimi-fixture-new", "/v1"), access("kimi-fixture-path", "/v2"), access("kimi-k3", "/v1"), access("kimi-k2.6", "/v1")} {

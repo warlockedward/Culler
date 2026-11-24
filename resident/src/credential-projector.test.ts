@@ -59,7 +59,7 @@ test("the private projection contains a Culler token and a public certificate on
   expect(projection).toEqual({ env: {}, proxyConfig: JSON.stringify(config) });
   expect(config.authMode).toBe("api-key");
   expect(config.ca).toBe(tls.ca);
-  expect(config.token).toHaveLength(56);
+  expect(config.token).toHaveLength(53);
   expect(JSON.stringify(projection)).not.toContain("PRIVATE KEY");
   expect(f.reads).toEqual([]);
   expect(f.launches()).toEqual([{ runId: "run-1", launchId: "launch-1" }]);

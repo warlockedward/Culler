@@ -25,7 +25,7 @@ try {
   const codex = join(root, "codex");
   for (const folder of [copies, archive, home, codex]) await mkdir(folder, { recursive: true });
   const credential = "synthetic-provider-credential-acceptance";
-  const temporary = "culler_proxy_" + "T".repeat(43);
+  const temporary = "shz_proxy_" + "T".repeat(43);
   db = nativeFixture(join(source, OPENCODE_DATABASE), `Native answer ${credential} ${temporary}`);
   db.exec("INSERT INTO session_v2 SELECT 'ses_child',project_id,'ses_main','Child session',directory,time_created,time_updated,time_idle,agent,model FROM session_v2");
   db.exec("INSERT INTO session_message SELECT 'msg_child','ses_child',type,seq,time_created,time_updated,data FROM session_message WHERE id='msg_reply'");

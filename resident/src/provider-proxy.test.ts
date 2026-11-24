@@ -181,8 +181,8 @@ describe("provider proxy authorization", () => {
     const { handle, sent, observations } = proxy();
     const issued = handle.issue(authorization());
     expect(handle.url).toMatch(/^https:\/\/host\.docker\.internal:/);
-    expect(issued.token).toMatch(/^culler_proxy_[A-Za-z0-9_-]{43}$/);
-    expect(Buffer.from(issued.token.slice("culler_proxy_".length), "base64url").byteLength).toBe(32);
+    expect(issued.token).toMatch(/^shz_proxy_[A-Za-z0-9_-]{43}$/);
+    expect(Buffer.from(issued.token.slice("shz_proxy_".length), "base64url").byteLength).toBe(32);
     const response = await call(handle, issued.token);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ output: "ok" });

@@ -35,7 +35,7 @@ type ProviderContainerAccess struct {
 	AuthMode string                   `json:"authMode"`
 }
 
-var providerAccessTokenPattern = regexp.MustCompile(`^culler_proxy_[A-Za-z0-9_-]{43}$`)
+var providerAccessTokenPattern = regexp.MustCompile(`^shz_proxy_[A-Za-z0-9_-]{43}$`)
 
 type providerAccessLease struct {
 	Config ProviderContainerAccess

@@ -37,7 +37,7 @@ import (
 
 const (
 	agentProject   = "ws-agent"
-	agentToken     = "culler_proxy_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	agentToken     = "shz_proxy_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	agentEndpoint  = "https://127.0.0.1:18080"
 	agentBinding   = "fixture-static"
 	agentTitle     = "Quote \" and 'single' — é 漢字 🚀 $(touch /tmp/owned) `id` $HOME ; | && > <"

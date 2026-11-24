@@ -315,7 +315,7 @@ class Runtime:
             if (not isinstance(access, dict) or set(access) != {"version", "url", "token", "ca", "harness", "authMode"}
                     or access.get("version") != 1 or access.get("harness") != family
                     or access.get("authMode") not in ("account", "api-key")
-                    or not isinstance(access.get("token"), str) or re.fullmatch(r"culler_proxy_[A-Za-z0-9_-]{43}", access["token"]) is None
+                    or not isinstance(access.get("token"), str) or re.fullmatch(r"shz_proxy_[A-Za-z0-9_-]{43}", access["token"]) is None
                     or not isinstance(access.get("ca"), str) or "-----BEGIN CERTIFICATE-----" not in access["ca"]
                     or "PRIVATE KEY" in access["ca"] or not isinstance(access.get("url"), str)
                     or not re.fullmatch(r"https://[^/@?#]+(?::[0-9]+)?/[^?#]*|https://[^/@?#]+(?::[0-9]+)?", access["url"])):

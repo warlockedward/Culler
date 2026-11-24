@@ -4,7 +4,7 @@ export function cleanShellEnvironment(env) {
   for (const name of Object.keys(env)) {
     if (name.startsWith("OPENCODE_") || name.startsWith("SHZ_OPENCODE_") ||
         name === "SHZ_PROXY_TOKEN" || name === "MC_PROVIDER_ACCESS_FILE" ||
-        (typeof env[name] === "string" && env[name].includes("culler_proxy_"))) delete env[name];
+        (typeof env[name] === "string" && env[name].includes("shz_proxy_"))) delete env[name];
   }
   return env;
 }

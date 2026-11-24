@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadProviderAccess, parseProviderAccess, writeProviderCA } from "./provider-access";
 
-const access = { version: 1, url: "https://host.docker.internal:4433", token: "culler_proxy_" + "c".repeat(43),
+const access = { version: 1, url: "https://host.docker.internal:4433", token: "shz_proxy_" + "c".repeat(43),
   ca: "-----BEGIN CERTIFICATE-----\nsynthetic\n-----END CERTIFICATE-----", harness: "codex", authMode: "api-key" };
 
 test("the access file rejects provider secrets and caller-selected transport controls", () => {

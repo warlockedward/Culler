@@ -95,7 +95,7 @@ try {
     await command(["git", "-C", workspace, "init", "--quiet", "--template=", "-b", "main"]);
     await command(["git", "-C", workspace, "add", "."]);
     await command(["git", "-C", workspace, "-c", "user.name=Synthetic fixture", "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", "commit", "--quiet", "-m", "Create the fixture"]);
-    const token = "culler_proxy_" + randomBytes(32).toString("base64url");
+    const token = "shz_proxy_" + randomBytes(32).toString("base64url");
     const state = { harness, requests: 0, workspace }; states.set(token, state);
     const result = await runNativeHarness({ image, access: { version: 1, harness, authMode: "api-key", token, ca,
       url: `https://${process.platform === "darwin" ? "host.docker.internal" : "127.0.0.1"}:${server.port}` },

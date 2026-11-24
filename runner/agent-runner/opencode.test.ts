@@ -9,7 +9,7 @@ import control, { cleanShellEnvironment, waitForOpenWiki } from "../opencode/con
 
 const roots: string[] = [];
 afterEach(async () => { for (const root of roots.splice(0)) await rm(root, { recursive: true, force: true }); });
-const token = "culler_proxy_" + "a".repeat(43);
+const token = "shz_proxy_" + "a".repeat(43);
 const access: ProviderAccess = { version: 1, url: "https://host.docker.internal:4000/v1", token, ca: "-----BEGIN CERTIFICATE-----\nfixture", harness: "opencode", authMode: "api-key",
   opencode: { provider: "fixture", keyVariable: "FIXTURE_API_KEY", webSearch: true, model: { id: "fixture-model", address: "https://provider.invalid/v1", package: "@opencode/ai/providers/openai-compatible", variants: ["low", "high", "max"], key_placement: "bearer", model_location: "body" } } };
 

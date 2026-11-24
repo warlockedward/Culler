@@ -1,12 +1,12 @@
-export const PROVIDER_TOKEN_PREFIX = "culler_proxy_";
+export const PROVIDER_TOKEN_PREFIX = "shz_proxy_";
 export const PROVIDER_TOKEN_LENGTH = PROVIDER_TOKEN_PREFIX.length + 43;
 
 export function isProviderToken(value: string): boolean {
-  return /^culler_proxy_[A-Za-z0-9_-]{43}$/.test(value);
+  return /^shz_proxy_[A-Za-z0-9_-]{43}$/.test(value);
 }
 
 export function redactProviderTokens(value: string): string {
-  return value.replace(/culler_proxy_[A-Za-z0-9_-]{43}/g, token => "*".repeat(token.length));
+  return value.replace(/shz_proxy_[A-Za-z0-9_-]{43}/g, token => "*".repeat(token.length));
 }
 
 /** Equal-length masks preserve the source offsets of trace copies. */

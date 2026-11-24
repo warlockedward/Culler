@@ -3,7 +3,7 @@ import { handleProviderAcceptanceRequest, type ProviderAcceptanceOps } from "./p
 
 const release = "a".repeat(40);
 const nonce = "b".repeat(32);
-const config = { version: 1, url: "https://host.docker.internal:1234", token: "culler_proxy_" + "c".repeat(43),
+const config = { version: 1, url: "https://host.docker.internal:1234", token: "shz_proxy_" + "c".repeat(43),
   ca: "-----BEGIN CERTIFICATE-----\nsynthetic\n-----END CERTIFICATE-----", harness: "codex", authMode: "api-key" };
 const authorize = () => ({ version: 1, op: "profile_authorize", credential: "test-connection", profile: "test-profile",
   profile_revision: "revision-1", run_id: "run-1", launch_id: "launch-1", model: "test-model", nonce,

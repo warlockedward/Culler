@@ -36,7 +36,7 @@ const read = (path: string) => readFile(path, "utf8");
 
 describe("copyTrace", () => {
   test("masks a deliberate Culler token across read boundaries before export", async () => {
-    const token = "culler_proxy_" + "c".repeat(43);
+    const token = "shz_proxy_" + "c".repeat(43);
     const body = JSON.stringify({ type: "user", uuid: "same-native-id", message: `tool result: ${token}` }) + "\n";
     await writeFile(source, body);
     expect(await read(source)).toContain(token);
@@ -50,7 +50,7 @@ describe("copyTrace", () => {
   });
 
   test("a restart verifies a masked token across the tail boundary and retains native context", async () => {
-    const token = "culler_proxy_" + "d".repeat(43);
+    const token = "shz_proxy_" + "d".repeat(43);
     const body = JSON.stringify({ type: "user", body: token + "x".repeat(4080) }) + "\n";
     await writeFile(source, body);
     await copyTrace(state(), 1);
@@ -404,7 +404,7 @@ test("credential discovery masks the entire copy, including a prefix before the 
 });
 
 test("encoded tokens cross reads and incomplete lines without changes to originals", async () => {
-  const token = "culler_proxy_" + "x".repeat(43);
+  const token = "shz_proxy_" + "x".repeat(43);
   const secret = "exact-private-value";
   const values = [token, Buffer.from(token).toString("base64"), secret, Buffer.from(secret).toString("base64")];
   const body = values.map(text => JSON.stringify({ text }) + "\n").join("");

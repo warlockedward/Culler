@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { createTraceMask } from "./trace-mask";
 
-const token = "culler_proxy_" + "Az09_-".repeat(8).slice(0, 43);
+const token = "shz_proxy_" + "Az09_-".repeat(8).slice(0, 43);
 const unicode = (s: string) => [...s].map(c => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`).join("");
 const percent = (s: string) => [...Buffer.from(s)].map(b => `%${b.toString(16).padStart(2, "0")}`).join("");
 

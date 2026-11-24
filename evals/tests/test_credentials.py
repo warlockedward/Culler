@@ -34,7 +34,7 @@ def resident_owner(tmp_path):
                 state["grants"][key] = request
                 response |= {"credential": "fixture", "proxy_config": {
                     "version": 1, "harness": state["harness"], "url": "https://host.docker.internal:12345",
-                    "token": "culler_proxy_" + "x" * 43, "ca": "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----",
+                    "token": "shz_proxy_" + "x" * 43, "ca": "-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----",
                     "authMode": "api-key" if state["kind"].endswith("-api-key") else "account"}}
                 if state["raw_response"]:
                     response["access_token"] = "synthetic-provider-secret"

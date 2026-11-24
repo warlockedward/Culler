@@ -510,7 +510,7 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
       async function refuse(status: number, origin: ProviderFailureOrigin, code: string): Promise<Response> {
         release();
         await observe(origin, "rejected", { http_status: status });
-        return Response.json({ error: { type: "culler_proxy_error", code, message: "The host could not authorize or complete this request." }, request_id: requestId }, {
+        return Response.json({ error: { type: "shz_proxy_error", code, message: "The host could not authorize or complete this request." }, request_id: requestId }, {
           status, headers: { "x-culler-request-id": requestId, "x-request-id": requestId, "request-id": requestId, "x-culler-origin": origin, "cache-control": "no-store" },
         });
       }
@@ -520,8 +520,8 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
         const key = request.headers.get("x-api-key");
         const googleKey = request.headers.get("x-goog-api-key");
         const supplied = [bearer, key, googleKey].filter(value => value !== null);
-        const token = bearer?.match(/^Bearer (culler_proxy_[A-Za-z0-9_-]{43})$/)?.[1] ?? key ?? googleKey;
-        if (stopped || !token || !/^culler_proxy_[A-Za-z0-9_-]{43}$/.test(token) || supplied.length !== 1) {
+        const token = bearer?.match(/^Bearer (shz_proxy_[A-Za-z0-9_-]{43})$/)?.[1] ?? key ?? googleKey;
+        if (stopped || !token || !/^shz_proxy_[A-Za-z0-9_-]{43}$/.test(token) || supplied.length !== 1) {
           return await refuse(401, "proxy_authorization", "invalid_token");
         }
         held = byDigest.get(digest(token));
@@ -661,7 +661,7 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
           if (controller.signal.aborted) throw error;
           release();
           await observe("provider_network", "interrupted", { network_error: networkErrorFromFetch(error) });
-          return Response.json({ error: { type: "culler_proxy_error", code: "provider_unreachable" }, request_id: requestId }, {
+          return Response.json({ error: { type: "shz_proxy_error", code: "provider_unreachable" }, request_id: requestId }, {
             status: 502, headers: { "x-culler-request-id": requestId, "x-request-id": requestId, "request-id": requestId, "x-culler-origin": "provider_network" },
           });
         }
@@ -767,7 +767,7 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
         if (sent && !controller.signal.aborted) {
           release();
           await observe("provider_network", "interrupted", { network_error: networkErrorFromFetch(error) });
-          return Response.json({ error: { type: "culler_proxy_error", code: "provider_response_interrupted" }, request_id: requestId }, {
+          return Response.json({ error: { type: "shz_proxy_error", code: "provider_response_interrupted" }, request_id: requestId }, {
             status: 502, headers: { "x-culler-request-id": requestId, "x-request-id": requestId, "request-id": requestId, "x-culler-origin": "provider_network" },
           });
         }
@@ -835,7 +835,7 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
       }
       const prior = byLaunch.get(spec.launchId);
       if (prior) revoke(prior);
-      const token = `culler_proxy_${randomBytes(32).toString("base64url")}`;
+      const token = `shz_proxy_${randomBytes(32).toString("base64url")}`;
       const authorizationId = randomUUID();
       const held: Authorization = { id: authorizationId, digest: digest(token), spec, active: new Set(), arrivals: [], requests: 0, modelRequests: 0 };
       byDigest.set(held.digest, held);

@@ -28,7 +28,7 @@ const artifactEntry = {
 
 function accessProjection(harness = "codex"): CredentialProjection {
   return { env: {}, proxyConfig: JSON.stringify({ version: 1, harness, authMode: harness === "opencode" ? "api-key" : "account",
-    url: "https://host.docker.internal:7444", token: "culler_proxy_" + "c".repeat(43),
+    url: "https://host.docker.internal:7444", token: "shz_proxy_" + "c".repeat(43),
     ...(harness === "opencode" ? { opencode: {
       provider: "catalog-provider", keyVariable: "CATALOG_KEY", webSearch: true,
       model: { id: "catalog-model", address: "https://provider.invalid", package: "@opencode/ai/providers/openai-compatible",
