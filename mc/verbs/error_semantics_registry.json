@@ -1,0 +1,617 @@
+{
+  "protocol_version": 1,
+  "a_busy_behavior": "Every write open carries the DSN pragma busy_timeout(5000) (substrate.go Open): a statement blocked by another writer waits up to 5 seconds, then returns the driver's SQLITE_BUSY error, which each path classifies through its own error path (classify/Domainf). No process-level wait exists.",
+  "e_exit_codes": "CLI contract: 0 success, 1 domain rejection, 2 usage or environment error. Coded domain errors carry their code in the JSON envelope {\"error\":{\"code\",\"message\"}}; uncoded domain refusals classify as \"domain-rejection\"; usage/environment refusals classify as \"usage\".",
+  "paths": [
+    {
+      "verb": "TaskAdd",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none: a birth path with autoincrement primary key; no concurrent-loser business result",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: validation and identity checks are read-only; the insert is transactional"},
+        {"stage": "after-commit", "verdict": "unsafe: retrying after commit births a second task row; the verb is not idempotent"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write, no external effect",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["reason-required", "invalid-request", "not-found", "illegal-transition", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "TaskBlock",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "last writer wins on blocked_reason/blocked_kind (domain.Block: a later block replaces the reason and the type); the conflict case is an operator block over a report-kind block, refused with illegal-transition",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: fence and permission checks are read-only"},
+        {"stage": "after-commit", "verdict": "state-convergent but event-duplicating: re-blocking rewrites reason/type and appends another activity row; the activity table has no unique key on this event"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write; no container effect belongs to this verb",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["reason-required", "already-decided", "illegal-transition", "not-found", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "TaskResume",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none observed: a conditional update requiring the stalled state; a task without it is refused with a domain refusal",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: read-only preconditions"},
+        {"stage": "after-commit", "verdict": "idempotent convergence: the second resume is refused because the task is no longer stalled"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["reason-required", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "TaskUnblock",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "refused with illegal-transition when the block kind is a report (must resolve through a task revision or cancel) or when an allowance condition is unresolved",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: read-only preconditions"},
+        {"stage": "after-commit", "verdict": "refused second time with not-blocked: the record has no Decision Pending condition"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["reason-required", "already-decided", "illegal-transition", "not-blocked", "usage"]
+    },
+    {
+      "verb": "TaskCancel",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "refused with already-decided when the task carries a decision, or archived when already archived",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: read-only preconditions"},
+        {"stage": "after-commit", "verdict": "refused second time: the task is archived and decided"}
+      ],
+      "d_side_effect_uncertainty": "the container stop is NOT an effect of this verb: the cancellation marker is the durable fact and the next dispatch tick reaps the run (decide-then-effect); the stop is owed to the tick, not to this transaction",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["reason-required", "not-found", "archived", "already-decided", "usage"]
+    },
+    {
+      "verb": "TaskInterrupt",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "refused with a domain refusal when the task is not the live lease subject (nothing to interrupt)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: the lease read is read-only"},
+        {"stage": "after-commit", "verdict": "refused second time through domain.Cancel's already-decided/archived checks"}
+      ],
+      "d_side_effect_uncertainty": "same as task cancel: the lease stays HELD deliberately; the stop is owed to the next tick's reap machinery",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection", "archived", "already-decided", "reason-required", "usage"]
+    },
+    {
+      "verb": "DispatchWithObserver",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "the claim stays a CAS on the Project's free lease row; a losing racer stales at commit before any effect data and commits nothing, so exactly one racer's effect lands",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: prepare runs under the mc.dispatch flock plus BEGIN IMMEDIATE; Decide is a pure function of the selected state, so re-deciding at commit is idempotent"},
+        {"stage": "after-commit", "verdict": "a committed effect (claim-and-spawn or health refusal) is one-shot; the next tick observes the new state rather than replaying the effect"}
+      ],
+      "d_side_effect_uncertainty": "the verb writes spine state only; the container spawn is the resident's effect applied to the committed tick stdout (decide-then-effect), so no external effect is indeterminate inside this transaction",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection", "stale-run", "lease-held", "wip-cap", "correction-required", "blocked", "wiki-check-failed"]
+    },
+    {
+      "verb": "Heartbeat",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "fenced by domain.Fence: a zombie run can neither renew its old lease nor touch the new holder's; the loser gets the stale-run refusal",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: fence check is read-only"},
+        {"stage": "after-commit", "verdict": "safe: stamping the heartbeat again is harmless (last stamp wins)"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write; it can never extend the deadline",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["stale-run", "role-mismatch", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "Complete",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "endRun stamps runs SET ended_at WHERE ended_at IS NULL AND outcome IS NULL; a second terminal loses the conditional update (RowsAffected != 1) and gets stale-run (run already has a final outcome)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: fence, subject, and supersession checks are read-only; artifact snapshots are atomic-link published and digest-named, so retrying converges to the same file"},
+        {"stage": "after-commit", "verdict": "refused: the run already has a final outcome"}
+      ],
+      "d_side_effect_uncertainty": "possible, file-plane only: evidence/correction snapshot bytes are published to the durable artifact plane before the spine transaction commits; a later refusal leaves the snapshot present (idempotent, digest-named) without any spine state pointing at it",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "stale-run", "domain-rejection", "correction-required", "wiki-check-failed"]
+    },
+    {
+      "verb": "ArbiterDecide",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "batch coverage must equal the run's snapshotted pool or the whole batch is refused with pool-mismatch; proposals superseded by a pending revision are skipped with a proposal.superseded activity note; promoting nothing is refused with zero-promotion unless the exception criteria hold",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: payload validation and pool coverage are read-only"},
+        {"stage": "after-commit", "verdict": "refused: the run ended (endRun) and the lease released, so the fence fails on retry"}
+      ],
+      "d_side_effect_uncertainty": "none: one transaction, spine writes only",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["role-mismatch", "stale-run", "pool-mismatch", "zero-promotion", "reason-required", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "StrategistPropose",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "refused when the run carries a task subject: a Strategist requires the subjectless lease",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: payload validation (max two proposals, required rationale) is read-only"},
+        {"stage": "after-commit", "verdict": "refused: the run ended and the lease released"}
+      ],
+      "d_side_effect_uncertainty": "none: one transaction, spine writes only",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["role-mismatch", "stale-run", "reason-required", "invalid-request", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "VerifierVerdict",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "the judged tree must equal the run's input_commit or the verdict is refused (must assess its exact assigned commit); the lease fence plus subject match refuse a run that lost its lease",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: every pre-transaction fence is read-only by design, so a refusal moves nothing; artifact snapshots are atomic-link published and digest-named"},
+        {"stage": "after-commit", "verdict": "refused: the run ended and the lease released"}
+      ],
+      "d_side_effect_uncertainty": "possible, file-plane only: snapshot bytes may publish to the artifact plane before the spine transaction commits; a later refusal leaves orphaned-but-idempotent digest-named files",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "role-mismatch", "stale-run", "domain-rejection", "correction-required"]
+    },
+    {
+      "verb": "PacketDecide",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "approve requires the packet to still be the active reviewed version with a merged candidate; an obsolete packet is refused with stale-run; a pending requirements revision holds the decision with revision-pending",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: all preconditions are read-only"},
+        {"stage": "after-commit", "verdict": "refused: the task is decided/archived"}
+      ],
+      "d_side_effect_uncertainty": "none: one transaction, spine writes only; operator verbs never dispatch",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "stale-run", "revision-pending", "record-conflict", "already-decided", "reason-required", "domain-rejection"]
+    },
+    {
+      "verb": "CollieStart",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a surface:channel_ref already bound to an active session is refused (already bound to active Collie session); a model request that already selected another profile is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session/binding existence checks are read-only"},
+        {"stage": "after-commit", "verdict": "refused: the surface is now bound"}
+      ],
+      "d_side_effect_uncertainty": "none from this verb: it writes the session and launch record to the spine; the container launch is the resident's effect on the committed launch state",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "record-conflict", "domain-rejection"]
+    },
+    {
+      "verb": "CollieTitle",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none: a single UPDATE of the session title",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: conversation existence and own-session checks are read-only"},
+        {"stage": "after-commit", "verdict": "safe: setting the title again overwrites with the same semantics"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "CollieDelete",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none observed on the soft-delete itself; a Vision conversation is refused (clear through the Vision page)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session existence check is read-only"},
+        {"stage": "after-commit", "verdict": "refused: the session is gone (unknown Collie session)"}
+      ],
+      "d_side_effect_uncertainty": "none: soft delete (deleted_at stamp), spine only",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection"]
+    },
+    {
+      "verb": "CollieBind",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a surface already bound to another active session is refused; a retired Discord thread destination is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: binding and thread checks are read-only"},
+        {"stage": "after-commit", "verdict": "refused: the surface is now bound"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection"]
+    },
+    {
+      "verb": "CollieResume",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "resuming an already-active session is refused (already active, use bind)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session state read"},
+        {"stage": "after-commit", "verdict": "refused: the session is active"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection"]
+    },
+    {
+      "verb": "CollieSend",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a source_message_id already carrying a different session/channel/body is refused as an idempotency conflict; the exact same replay returns the duplicate marker without re-inserting",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session, binding, and dedup checks are read-only"},
+        {"stage": "after-commit", "verdict": "safe for Discord-originated sends: the source_message_id dedup makes the replay converge to the original row"}
+      ],
+      "d_side_effect_uncertainty": "none from this verb: it inserts the conversation message and the echo outbox rows; posting to Discord is the resident's outbox-drain effect",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "session-inactive", "record-conflict", "domain-rejection"]
+    },
+    {
+      "verb": "CollieLaunchFailure",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a launch whose recorded identity moved is refused (The Collie launch changed.); a connection-authorization change is refused with runtime-changed",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: identity checks are read-only"},
+        {"stage": "after-commit", "verdict": "refused: the launch is already terminal"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["runtime-changed", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "CollieLaunchCheck",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "same launch-identity CAS as launch-failure: a changed launch or changed connection authorization is refused (runtime-changed)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: identity checks are read-only"},
+        {"stage": "after-commit", "verdict": "idempotent: re-checking the same launch state reports the same result"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["runtime-changed", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "CollieModelResponse",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a reply attempt whose launch identity changed is refused (The reply belongs to another launch.)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: attempt/launch reads"},
+        {"stage": "after-commit", "verdict": "refused: the attempt already carries its model response"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["runtime-changed", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "CollieReplyFailure",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a reply whose launch identity changed is refused (The reply belongs to another launch.)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: attempt reads"},
+        {"stage": "after-commit", "verdict": "refused: the reply is already terminal"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection", "usage"]
+    },
+    {
+      "verb": "CollieReplyRetry",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "refused when the retry identity belongs to another message, when no retry is owed, or when the previous Collie process has not stopped",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: attempt state reads"},
+        {"stage": "after-commit", "verdict": "refused: the retry is already recorded"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection", "usage"]
+    },
+    {
+      "verb": "CollieClaim",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "the K3 claim-row CAS on collie_reply_attempts: a message already claimed (or whose reply failed without a retry) yields an empty attempt, which the verb reports as an ordinary poll outcome (no message), not an error",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session activity check is read-only"},
+        {"stage": "after-commit", "verdict": "safe: claiming the next pending message is the intended polling behavior; reclaiming the same message preserves the claim"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 0,
+      "f_json_error_classes": ["session-inactive", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "CollieReply",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "an inbound turn already carrying its one logical reply is refused; a completed turn without a reply row is refused (refusing to guess)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: message/direction/claim checks are read-only"},
+        {"stage": "after-commit", "verdict": "refused: the turn already has its reply"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "CollieDraft",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a draft on a turn that already has its reply is refused (a draft is meaningless); an unclaimed inbound turn is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: message checks are read-only"},
+        {"stage": "after-commit", "verdict": "safe: the draft is a provisional overwrite; replacing it again is the intended behavior"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "CollieEnd",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none observed: ending is a transition to the ended state",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session state read"},
+        {"stage": "after-commit", "verdict": "refused: the session is no longer active"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "stale-run", "domain-rejection"]
+    },
+    {
+      "verb": "CollieLaunchBind",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "the launch/container identity pair must match the recorded launch or the bind is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session/launch reads"},
+        {"stage": "after-commit", "verdict": "idempotent: binding the same identity pair again reports the existing binding"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "CollieRunnerStarted",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "same launch-identity CAS as launch-bind: a changed launch is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session/launch reads"},
+        {"stage": "after-commit", "verdict": "idempotent: the started fact is already recorded"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "CollieExit",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "same launch-identity CAS; a reason is required (usage)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session/launch reads"},
+        {"stage": "after-commit", "verdict": "refused: the launch is already exited"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write; stopping the container is the resident's effect on the recorded exit",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "OutboxAck",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "the conditional UPDATE ... WHERE delivered_at IS NULL makes the ack idempotent: the loser of a concurrent double-ack reads delivered and returns success with acked=false, never an error",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: row lookup is read-only"},
+        {"stage": "after-commit", "verdict": "safe: re-ack returns the stored delivered_at (idempotent)"}
+      ],
+      "d_side_effect_uncertainty": "none: the message send happened earlier at drain time; the ack only records delivery",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "OutboxAckRendered",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "idempotent rendered-marking: confirming the same records again is a no-op success",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: payload validation is read-only"},
+        {"stage": "after-commit", "verdict": "safe: the rendered state is already set"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "ProjectAdd",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "projects.id is unique: a concurrent add of the same id fails the INSERT with the driver constraint error; the id is the container-name source, so its alphabet is pre-validated",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: profile lookup and workspace-root attestation are read-only; git repository adoption/init at the workspace root is idempotent (an existing repository is adopted, not re-initialized)"},
+        {"stage": "after-commit", "verdict": "refused: the id is now taken"}
+      ],
+      "d_side_effect_uncertainty": "possible, host-filesystem only: ensureWorkspaceRepository may run git init in the profile's workspace root INSIDE the transaction closure before the projects row inserts; if the insert then fails (duplicate id), the initialized repository remains without a row",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection", "not-found"]
+    },
+    {
+      "verb": "ProjectDelete",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none: the deletion is a staged two-pass (identify rows into project_deletion_records, delete in reverse table order with deferred foreign keys) inside one transaction",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: the deletion view is read-only"},
+        {"stage": "after-commit", "verdict": "refused: the project no longer exists"}
+      ],
+      "d_side_effect_uncertainty": "none from this verb: spine rows only; host containers listed by container-targets are removed by a separate operator action",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection", "not-found"]
+    },
+    {
+      "verb": "ProjectDeletePreview",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none: a read-only view of what ProjectDelete would remove",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: read-only"}
+      ],
+      "d_side_effect_uncertainty": "none: performs no write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection", "not-found"]
+    },
+    {
+      "verb": "ProjectSetStatus",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "current==target is an idempotent no-op success (documented: operator/surface retry is idempotent); an archived project is terminal and refuses further transitions",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: status read"},
+        {"stage": "after-commit", "verdict": "safe: idempotent when the target equals the current status"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "RegisterSession",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "same-value replay of the locator pair is an idempotent no-op; a conflicting locator is refused (session locators are immutable once registered)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: runs-row read"},
+        {"stage": "after-commit", "verdict": "safe for identical locators; refused for different ones"}
+      ],
+      "d_side_effect_uncertainty": "none: deliberately not lease-fenced (the registration races the terminal verb by design and must not lose the locators)",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "RegisterSetupSession",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "the setup trace identity is immutable after registration: a conflicting registration is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: operation-identity checks"},
+        {"stage": "after-commit", "verdict": "idempotent for the same identity; refused for a different one"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "RunInfrastructureFailure",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none observed: appends the failure fact and updates the retry allowance counters",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: run-identity validation"},
+        {"stage": "after-commit", "verdict": "unsafe without care: a duplicate report appends another infrastructure_failures row and re-decrements the allowance"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "role-mismatch", "domain-rejection"]
+    },
+    {
+      "verb": "RunModelResponse",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "fenced by domain.FenceAgentRun on the live lease; a zombie run is refused with stale-run",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: fence check"},
+        {"stage": "after-commit", "verdict": "safe: RecoverNetworkAttempt is a recovery fact, convergent on replay"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["role-mismatch", "stale-run", "domain-rejection", "usage"]
+    },
+    {
+      "verb": "RunProcessStarted",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none observed: records the agent-started fact on the run",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: run-identity validation"},
+        {"stage": "after-commit", "verdict": "convergent: the started fact is already recorded"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection", "usage"]
+    },
+    {
+      "verb": "RunStopped",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "the stop acknowledgment is a conditional transition on the run's stop-pending state; a run without that state is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: host-scope check"},
+        {"stage": "after-commit", "verdict": "refused: the stop is already acknowledged"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection", "stale-run"]
+    },
+    {
+      "verb": "RunList",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none: a read reachable through the write-open helper",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: read-only"}
+      ],
+      "d_side_effect_uncertainty": "none: performs no write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection"]
+    },
+    {
+      "verb": "SetEveryProjectPause",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none: a bulk conditional UPDATE (paused projects whose setup is ready resume; active projects pause); pipeline agents cannot change a pause (operator verb only)",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: authorization read"},
+        {"stage": "after-commit", "verdict": "idempotent: the UPDATE condition already matches the target state"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write plus the mount-projection validation",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["domain-rejection", "usage"]
+    },
+    {
+      "verb": "AttachmentIngressEnqueue",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "exact-key replay (session, binding, surface, external_message_id) with identical body/manifest digests returns the original row, including its consumed receipt when terminal; a changed declaration under the same key is an idempotency conflict refused as sealed-content mismatch, never a new upload",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: binding/session validation is read-only"},
+        {"stage": "after-commit", "verdict": "safe: replay converges to the original row"}
+      ],
+      "d_side_effect_uncertainty": "none: durably records the event before any file work; file bytes arrive later through reserve/publish",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "AttachmentIngressReserve",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "an attempt already active under another native generation is refused; a stored manifest digest that changed is refused (refusing reservation); the batch allocation losing its monotonic id fence is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: session/ingress reads"},
+        {"stage": "after-commit", "verdict": "refused: the attempt is already reserved"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "AttachmentPublicationRenew",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a publication lease whose capability is stale, expired, or fenced is refused; losing the ownership CAS on the lease is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: capability validation"},
+        {"stage": "after-commit", "verdict": "safe: renewing an already-renewed lease extends it again"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "AttachmentAttemptAbort",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "an attempt terminal that belongs to another capability is refused; the terminal write is fenced across batch/ingress/attempt CAS or refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: capability validation"},
+        {"stage": "after-commit", "verdict": "refused: the attempt is already terminal"}
+      ],
+      "d_side_effect_uncertainty": "none: pure spine write",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "AttachmentPublicationPublish",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "a publication not at a resumable publisher boundary is refused; a digest that changed across an ingress retry is refused; losing the live stage ownership CAS or the publication CAS is refused",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: materialization checks and receipt validation are read-only"},
+        {"stage": "after-commit", "verdict": "safe: publishing the same declared size/digest again converges through the journal recovery (temp plus final names)"}
+      ],
+      "d_side_effect_uncertainty": "possible, file-plane: the byte stream stages files on the attachment plane with a temp-name-then-final-name journal; a crash between staging and the spine commit is recoverable through the journal, but partial stage bytes can exist without spine state naming them",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    },
+    {
+      "verb": "UninstallWorkspaceRoots",
+      "entrypoint": "withSpine",
+      "b_cas_loser_result": "none observed",
+      "c_retryability": [
+        {"stage": "before-write", "verdict": "safe: inventory read"},
+        {"stage": "after-commit", "verdict": "unsafe: the removed rows are gone; the verb records which workspace roots were cleaned"}
+      ],
+      "d_side_effect_uncertainty": "possible, host-filesystem: the cleanup removes branches and paths under the workspace roots (refusing the filesystem root itself); removal is irreversible on the file plane even though the spine row is a single transaction",
+      "e_exit_code": 1,
+      "f_json_error_classes": ["usage", "domain-rejection"]
+    }
+  ]
+}
