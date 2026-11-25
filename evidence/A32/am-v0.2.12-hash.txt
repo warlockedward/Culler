@@ -1,0 +1,10 @@
+AM v0.2.12 双面哈希登记（轮三十八收口窗：B01 迁移器落地⇒EVIDENCED[域限定]＋S1 identity churn 登记＋inspect 面回归自纠＋T9 负控补落）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 216088c94f24cff4c154ae749c7f6b1483f9be0135b9375872836868846e2684
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-25 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = c10b34427af9354e765ea9e2270bd71ae215703208e29cc87e0f68affd73ce54，与 am-v0.2.11-hash.txt 登记值逐字相等（零漂移后方可登记）；双面基线副本（主工作树）实测同值＝零漂移
+- 前轮: v0.2.11 = c10b34427af9354e765ea9e2270bd71ae215703208e29cc87e0f68affd73ce54（evidence/A32/am-v0.2.11-hash.txt 实读）；再前 v0.2.10 = 8c7bb7f7bf14e3fd9ec2197fde4dff653effddffc0bcd46addb1f4f494df39b5（同件记载）
+- 同轮并入 dev 的提交: 0b38e11（B01 迁移器全变更集：schema_history DDL＋四态 runner＋S1 步骤＋OnboardSpine 迁移分支＋T1–T9＋AGENTS.md 不变量行＋evidence/B01/diff-plan-001.md）；status.json B01=EVIDENCED 随本登记轮提交
+- 关键事实: S1 = add-schema-history-ledger，preLedgerBaseline 5c56d3132ea33fb85f9204462df94396c9dfb5c4801271b9b6019ff108ba0963 ⇒ 362e88eaaed576fc0ef26d80403069c911f2c9b1017461d8988618d3d1cbd87a（B01 树实测）；B01 F1 票面"四态检查点＋verify 窗证据"＝库内 T1–T9 覆盖；证据边界＝agent E1，今日零已部署 spine⇒迁移路径无活对象；S5 两 token（schema.sql:1/:2068）候 B02 v1 基线预冻结窗；最终干净 lane B01_FINAL_MC_EXIT=0（覆盖 T9 终态树）
+- 账: dev tip＝0b38e11（本登记轮提交随后）/ worktrees＝main+dev（b01 收口后回收）/ 无新外发（不 push；main PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）
+- 登记轮自纠: 无（链自检＋entry 未存在断言＋L1/L4 双锚实测字节＋line-count 不变＋双面 cmp 五重断言，脚本一次性 SPLICE_OK；changelog line LENGTH=149792）
