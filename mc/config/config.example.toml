@@ -1,4 +1,4 @@
-# Culler operator configuration.
+# S-Horizon operator configuration.
 # Onboarding copies this into MC_HOME/config.toml. Edit the MC_HOME copy only.
 
 config_version = 4
@@ -139,7 +139,7 @@ blocked = ["dashboard"]
 health = ["dashboard"]
 
 [git]
-author_name = "Culler"
+author_name = "S-Horizon"
 author_email = "mc@localhost"
 
 [development]

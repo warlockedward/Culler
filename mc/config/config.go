@@ -527,7 +527,7 @@ func Default() Config {
 				Health:  []string{"dashboard"},
 			},
 		},
-		Git: Git{AuthorName: "Culler", AuthorEmail: "mc@localhost"},
+		Git: Git{AuthorName: "S-Horizon", AuthorEmail: "mc@localhost"},
 	}
 }
 
@@ -883,7 +883,7 @@ func Marshal(c Config) ([]byte, error) {
 		return nil, err
 	}
 	var out bytes.Buffer
-	out.WriteString("# Culler operator configuration.\n")
+	out.WriteString("# S-Horizon operator configuration.\n")
 	out.WriteString("# This file is local to MC_HOME and must never be committed.\n\n")
 	if err := toml.NewEncoder(&out).Encode(c); err != nil {
 		return nil, err

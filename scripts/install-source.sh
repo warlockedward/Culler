@@ -1,5 +1,5 @@
 #!/bin/sh
-# Culler setup
+# S-Horizon setup
 #
 # Usage: sh scripts/install-source.sh [options]
 #
@@ -9,7 +9,7 @@
 #
 # The development tier uses a scratch deployment home.
 # Shared host tools remain after either uninstall mode.
-# Culler removes its private libraries and images.
+# S-Horizon removes its private libraries and images.
 #
 # Options:
 #   --dev  Use the development tier with the fake harness.
@@ -24,7 +24,7 @@
 #   --runtime-bindings <ids>  Select agent profiles, separated by commas. One profile is enough.
 #     Each profile must exist in MC_HOME/config.toml.
 #     An absent configuration offers chatgpt and claude.
-#   --acquire-runtime-auth  Start a separate Culler sign-in for each selected account type.
+#   --acquire-runtime-auth  Start a separate S-Horizon sign-in for each selected account type.
 #   --confirm-live-spend  Run live acceptance for each selected agent profile after final verification.
 #   --accept-default-routing  Accept the recommended role assignments.
 #   --routing-file <path>  Select an explicit file for role assignments.
@@ -36,7 +36,7 @@
 #   --heartbeat-interval-s <n>  Set the agent heartbeat interval in seconds.
 #   --spawn-grace-s <n>  Set the first heartbeat grace in seconds.
 #   --hard-deadline-minutes <n>  Set the maximum agent run in minutes.
-#   --accept-default-git-identity  Accept Culler <mc@localhost> as the commit author.
+#   --accept-default-git-identity  Accept S-Horizon <mc@localhost> as the commit author.
 #   --git-author-name <name>  Set the default commit author name.
 #   --git-author-email <email>  Set the default commit author email.
 #   --accept-default-dashboard-bind  Accept the dashboard address 127.0.0.1:7333.
@@ -410,7 +410,7 @@ add_runtime_binding() {
 
 # collect_runtime_inputs asks for the supported sign-in connections.
 collect_runtime_inputs() {
-  say "Culler supports Codex sign-in and Claude Code sign-in."
+  say "S-Horizon supports Codex sign-in and Claude Code sign-in."
   say "One account is enough. You can add more accounts later."
   if [ -n "$RUNTIME_BINDINGS" ]; then
     return
@@ -431,9 +431,9 @@ state_workspace_git() {
   _git_root=$(CDPATH= cd -- "$WORKSPACE_ROOT" 2>/dev/null && pwd -P) ||
     fail "first Project workspace root must be an available directory"
   WORKSPACE_ROOT=$_git_root
-  say "Culler develops $WORKSPACE_ROOT with git."
+  say "S-Horizon develops $WORKSPACE_ROOT with git."
   say "An existing repository there is adopted."
-  say "If there is no repository, Culler runs \`git init\` in $WORKSPACE_ROOT."
+  say "If there is no repository, S-Horizon runs \`git init\` in $WORKSPACE_ROOT."
 }
 
 # The workspace supplies the vision.
@@ -445,7 +445,7 @@ ask_project_vision() {
   if [ -f "$WORKSPACE_ROOT/VISION.md" ]; then
     return 0
   fi
-  say "VISION.md describes your project's open-ended, high-level goal. Culler develops strategy and proposes high-leverage work to advance that vision as your project develops. This vision gives Culler the direction it requires before it can start work."
+  say "VISION.md describes your project's open-ended, high-level goal. S-Horizon develops strategy and proposes high-leverage work to advance that vision as your project develops. This vision gives S-Horizon the direction it requires before it can start work."
   say "Work cannot start: $WORKSPACE_ROOT/VISION.md is required. Your agent can help you write it."
   [ -z "$PROJECT_VISION" ] || return 0
   if ! interactive; then
@@ -501,7 +501,7 @@ collect_git_identity() {
   if [ "$ACCEPT_DEFAULT_GIT_IDENTITY" -eq 0 ] &&
     [ -z "$GIT_AUTHOR_NAME" ] && [ -z "$GIT_AUTHOR_EMAIL" ]; then
     if interactive; then
-      ask GIT_AUTHOR_NAME "role Git author name (non-personal recommended)" "Culler"
+      ask GIT_AUTHOR_NAME "role Git author name (non-personal recommended)" "S-Horizon"
       ask GIT_AUTHOR_EMAIL "role Git author email" "mc@localhost"
     else
       fail "Git identity choice is required (pass --accept-default-git-identity or both custom author flags)"
@@ -536,7 +536,7 @@ collect_surface_inputs() {
 # --- 1. Prerequisites -------------------------------------------------------
 
 if terminal_setup; then
-  bootstrap_note "Culler" \
+  bootstrap_note "S-Horizon" \
     "Welcome. First, let's prepare the setup tools."
 else
   say "== prerequisites"

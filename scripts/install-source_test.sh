@@ -205,7 +205,7 @@ expected=$(printf 'CALL\t__setup\t--bin-dir\t%s\t--workspace-root\t%s\t--runtime
   fail "The source installer lost the original shell search path."
 [ ! -e "$case_root/docker.log" ] || fail "terminal setup checked Docker before the interface"
 [ "$(cat "$case_root/install bin/mc")" = "existing deployment executable" ] || fail "terminal setup replaced the deployed executable before inspection"
-grep -F 'Culler' "$case_root/terminal.out" >/dev/null || \
+grep -F 'S-Horizon' "$case_root/terminal.out" >/dev/null || \
   fail "terminal setup omitted its identity"
 grep -F 'The setup program is ready' "$case_root/terminal.out" >/dev/null || \
   fail "terminal setup omitted the completed preparation"
@@ -558,12 +558,12 @@ env PATH="$case_root/bin:/usr/bin:/bin" HOME="$case_root/home" \
     >"$case_root/front-door.out" 2>&1 || fail "production defaults did not reach the whole wizard"
 for stated in \
   "VISION.md describes your project's open-ended, high-level goal." \
-  "Culler develops strategy and proposes high-leverage work to advance that vision as your project develops." \
-  "This vision gives Culler the direction it requires before it can start work." \
+  "S-Horizon develops strategy and proposes high-leverage work to advance that vision as your project develops." \
+  "This vision gives S-Horizon the direction it requires before it can start work." \
   "Work cannot start: $case_workspace/VISION.md is required. Your agent can help you write it." \
-  "Culler develops $case_workspace with git." \
+  "S-Horizon develops $case_workspace with git." \
   "An existing repository there is adopted." \
-  "If there is no repository, Culler runs \`git init\` in $case_workspace."
+  "If there is no repository, S-Horizon runs \`git init\` in $case_workspace."
 do
   grep -F -- "$stated" "$case_root/front-door.out" >/dev/null || {
     cat "$case_root/front-door.out" >&2
