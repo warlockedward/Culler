@@ -57,8 +57,8 @@ func recordedOnboardGitPosture(stored string) string {
 // ProjectGitStatement is the rule every surface that registers a Project
 // states before it acts, naming the workspace it applies to.
 func ProjectGitStatement(root string) string {
-	return fmt.Sprintf("Culler develops %s with git. An existing repository there is adopted. "+
-		"If there is no repository, Culler runs `git init` in %s.", root, root)
+	return fmt.Sprintf("S-Horizon develops %s with git. An existing repository there is adopted. "+
+		"If there is no repository, S-Horizon runs `git init` in %s.", root, root)
 }
 
 // AppendProjectGitDetail carries the rule and the taken half into a section
@@ -74,9 +74,9 @@ func AppendProjectGitDetail(detail, root string, initialized bool) string {
 // ProjectGitOutcome names which half of that rule the registration took.
 func ProjectGitOutcome(root string, initialized bool) string {
 	if initialized {
-		return fmt.Sprintf("There was no repository at %s, so Culler ran `git init` there.", root)
+		return fmt.Sprintf("There was no repository at %s, so S-Horizon ran `git init` there.", root)
 	}
-	return fmt.Sprintf("Culler adopted the existing repository at %s.", root)
+	return fmt.Sprintf("S-Horizon adopted the existing repository at %s.", root)
 }
 
 func onboardGitPosturePath(intent OnboardGitPostureIntent) (string, error) {

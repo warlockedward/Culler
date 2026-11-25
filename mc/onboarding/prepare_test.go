@@ -377,26 +377,34 @@ func (code prepareExitError) ExitCode() int { return int(code) }
 
 func TestPrepareImageRecognizesActiveServiceRefusal(t *testing.T) {
 	pinNativeArchitecture(t, "arm64")
-	for _, code := range []int{1, 3} {
-		t.Run(fmt.Sprint(code), func(t *testing.T) {
-			run := func(_ context.Context, _ string, _ []string, command string, _ ...string) ([]byte, error) {
-				if command == "docker" {
-					return imageFixture(""), nil
+	for _, generation := range []struct {
+		name    string
+		message string
+	}{
+		{"legacy", "build-prod.sh: a supervised Culler deployment is loaded."},
+		{"current", "build-prod.sh: a supervised S-Horizon deployment is loaded."},
+	} {
+		for _, code := range []int{1, 3} {
+			t.Run(generation.name+"-"+fmt.Sprint(code), func(t *testing.T) {
+				run := func(_ context.Context, _ string, _ []string, command string, _ ...string) ([]byte, error) {
+					if command == "docker" {
+						return imageFixture(""), nil
+					}
+					return []byte(generation.message + "\napi_key=SECRET_VALUE\n"), prepareExitError(code)
 				}
-				return []byte("build-prod.sh: a supervised Culler deployment is loaded.\napi_key=SECRET_VALUE\n"), prepareExitError(code)
-			}
-			err := prepareImage(context.Background(), t.TempDir(), strings.Repeat("b", 40), nil, run)
-			var failure *PreparationError
-			if !errors.As(err, &failure) || failure.ExitCode != code || failure.Operation != "Agent image build" {
-				t.Fatalf("error metadata = %+v", failure)
-			}
-			if got := strings.Contains(failure.Cause, "services are active"); got != (code == 3) {
-				t.Fatalf("cause = %s", failure.Cause)
-			}
-			if strings.Contains(strings.Join(failure.DiagnosticDetails(), " "), "SECRET_VALUE") {
-				t.Fatal("the diagnostic exposed command output")
-			}
-		})
+				err := prepareImage(context.Background(), t.TempDir(), strings.Repeat("b", 40), nil, run)
+				var failure *PreparationError
+				if !errors.As(err, &failure) || failure.ExitCode != code || failure.Operation != "Agent image build" {
+					t.Fatalf("error metadata = %+v", failure)
+				}
+				if got := strings.Contains(failure.Cause, "services are active"); got != (code == 3) {
+					t.Fatalf("cause = %s", failure.Cause)
+				}
+				if strings.Contains(strings.Join(failure.DiagnosticDetails(), " "), "SECRET_VALUE") {
+					t.Fatal("the diagnostic exposed command output")
+				}
+			})
+		}
 	}
 }
 

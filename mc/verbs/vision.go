@@ -15,8 +15,8 @@ import (
 const ProjectVisionFile = "VISION.md"
 
 const ProjectVisionExplanation = "VISION.md describes your project's open-ended, high-level goal. " +
-	"Culler develops strategy and proposes high-leverage work to advance that vision as your project develops. " +
-	"This vision gives Culler the direction it requires before it can start work."
+	"S-Horizon develops strategy and proposes high-leverage work to advance that vision as your project develops. " +
+	"This vision gives S-Horizon the direction it requires before it can start work."
 
 const (
 	ProjectVisionPresent    = "present"
@@ -37,8 +37,8 @@ const (
 const projectVisionTemplate = `# VISION.md
 
 <!-- VISION.md describes your project's open-ended, high-level goal.
-Culler develops strategy and proposes work that advances this vision.
-Describe your vision below before Culler can start work. -->
+S-Horizon develops strategy and proposes work that advances this vision.
+Describe your vision below before S-Horizon can start work. -->
 
 ## Purpose
 

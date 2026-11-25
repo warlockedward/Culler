@@ -1685,7 +1685,7 @@ func cmdProject(args []string, stdin io.Reader) (any, error) {
 	if len(args) == 0 {
 		return nil, verbs.Usagef("usage: mc project add|list|pause|resume|archive …\n" +
 			"mc project add --sandbox-profile <id> develops that profile's workspace root with git: " +
-			"an existing repository there is adopted, and if there is no repository Culler runs `git init` in it")
+			"an existing repository there is adopted, and if there is no repository S-Horizon runs `git init` in it")
 	}
 	switch args[0] {
 	case "role-show", "role-save", "role-unblock":

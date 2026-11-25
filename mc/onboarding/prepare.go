@@ -281,8 +281,8 @@ func prepareImageWithRebuild(ctx context.Context, sourceRoot, releaseBuildID str
 	defer cancel()
 	output, err := run(buildCtx, sourceRoot, []string{"MC_RELEASE_BUILD_ID=" + releaseBuildID}, "bash", filepath.Join(sourceRoot, "runner", "image", "build-prod.sh"))
 	if err != nil {
-		if preparationExitCode(err) == 3 && bytes.Contains(output, []byte("build-prod.sh: a supervised Culler deployment is loaded.")) {
-			return preparationFailure("Agent image build", "Culler services are active. Ask your coding harness to stop the services before this image rebuild. Select Retry after the services stop.", err)
+		if preparationExitCode(err) == 3 && (bytes.Contains(output, []byte("build-prod.sh: a supervised Culler deployment is loaded.")) || bytes.Contains(output, []byte("build-prod.sh: a supervised S-Horizon deployment is loaded."))) {
+			return preparationFailure("Agent image build", "S-Horizon services are active. Ask your coding harness to stop the services before this image rebuild. Select Retry after the services stop.", err)
 		}
 		if errors.Is(buildCtx.Err(), context.Canceled) {
 			return preparationFailure("Agent image build", "The agent image preparation stopped. Select Retry to continue.", err)
