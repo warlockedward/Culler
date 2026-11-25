@@ -1107,6 +1107,16 @@ func dispatchVerb(args []string, stdin io.Reader) (any, error) {
 			return nil, verbs.Usagef("usage: mc wiki-state list")
 		}
 		return withSpineRead(func(db *sql.DB) (any, error) { return verbs.WikiStateList(db) })
+	case "verify-chain":
+		// Pure read: the layer-1 chain verification plus the shz-merkle-v1
+		// root over the chain-head set. Findings travel in the JSON report;
+		// a corrupted chain is the result, not a refusal.
+		fs := newFlags("verify-chain")
+		aggregate := fs.String("aggregate", "", "verify only this aggregate's chain")
+		if err := parse(fs, rest); err != nil {
+			return nil, err
+		}
+		return withSpineRead(func(db *sql.DB) (any, error) { return verbs.VerifyChain(db, *aggregate) })
 	case "settings":
 		// Pure read: the one deployment-wide settings row.
 		if len(rest) != 1 || rest[0] != "get" {

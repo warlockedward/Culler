@@ -36,6 +36,84 @@ CREATE TABLE schema_history (
 );
 
 ------------------------------------------------------------------------------
+-- audit_events — the append-only chain ledger. Each row carries the
+-- canonical event fields, the chain digests, and the payload family's
+-- JSON. (aggregate_id, seq) is the chain ordering key; seq is assigned
+-- max(seq)+1 inside the single-writer transaction. The digest columns are
+-- computed by the writer before the insert and recomputed by the verifier:
+-- SQLite has no SHA-256, so chain integrity lives in those two paths while
+-- this table pins shape and append-only discipline.
+--
+-- The hex and time columns carry the same double fence as
+-- activity.dispatch_key: character length AND byte length must agree, so a
+-- NUL-terminated forgery (which a bare GLOB would read whole) is refused.
+------------------------------------------------------------------------------
+
+CREATE TABLE audit_events (
+    aggregate_id        TEXT NOT NULL,
+    seq                 INTEGER NOT NULL CHECK (seq >= 1),
+    event_id            TEXT NOT NULL UNIQUE
+                       CHECK (length(event_id) = 64 AND
+                              length(CAST(event_id AS BLOB)) = 64 AND
+                              event_id NOT GLOB '*[^0-9a-f]*'),
+    aggregate_type      TEXT NOT NULL,
+    event_type          TEXT NOT NULL,
+    serializer_id       TEXT NOT NULL
+                       CHECK (serializer_id IN ('shz-canon-v1', 'shz-canon-v0')),
+    occurred_at         TEXT NOT NULL
+                       CHECK (length(occurred_at) = 27 AND
+                              occurred_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    recorded_at         TEXT NOT NULL
+                       CHECK (length(recorded_at) = 27 AND
+                              recorded_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    effective_at        TEXT
+                       CHECK (effective_at IS NULL OR
+                              (length(effective_at) = 27 AND
+                               effective_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z')),
+    supersedes_event_id TEXT
+                       CHECK (supersedes_event_id IS NULL OR
+                              (length(supersedes_event_id) = 64 AND
+                               length(CAST(supersedes_event_id AS BLOB)) = 64 AND
+                               supersedes_event_id NOT GLOB '*[^0-9a-f]*')),
+    causation_id        TEXT,
+    correlation_id      TEXT,
+    prev_hash           TEXT NOT NULL
+                       CHECK (length(prev_hash) = 64 AND
+                              length(CAST(prev_hash AS BLOB)) = 64 AND
+                              prev_hash NOT GLOB '*[^0-9a-f]*'),
+    event_digest        TEXT NOT NULL
+                       CHECK (length(event_digest) = 64 AND
+                              length(CAST(event_digest AS BLOB)) = 64 AND
+                              event_digest NOT GLOB '*[^0-9a-f]*'),
+    chain_digest        TEXT NOT NULL
+                       CHECK (length(chain_digest) = 64 AND
+                              length(CAST(chain_digest AS BLOB)) = 64 AND
+                              chain_digest NOT GLOB '*[^0-9a-f]*'),
+    payload_family      TEXT NOT NULL,
+    payload_json        TEXT NOT NULL CHECK (json_valid(payload_json)),
+    PRIMARY KEY (aggregate_id, seq)
+);
+
+CREATE INDEX audit_events_event_type ON audit_events (event_type);
+
+-- Append-only discipline: any UPDATE or DELETE ABORTs.
+CREATE TRIGGER audit_events_no_update BEFORE UPDATE ON audit_events
+BEGIN SELECT RAISE(ABORT, 'audit_events is append-only'); END;
+
+CREATE TRIGGER audit_events_no_delete BEFORE DELETE ON audit_events
+BEGIN SELECT RAISE(ABORT, 'audit_events is append-only'); END;
+
+-- seq prefix integrity: inserting seq=k requires k=1 or the presence of
+-- seq=k-1 in the same aggregate (the database-side backstop for the
+-- verifier's missing-event detection).
+CREATE TRIGGER audit_events_seq_prefix BEFORE INSERT ON audit_events
+WHEN NEW.seq > 1 AND NOT EXISTS (
+    SELECT 1 FROM audit_events
+    WHERE aggregate_id = NEW.aggregate_id AND seq = NEW.seq - 1
+)
+BEGIN SELECT RAISE(ABORT, 'audit_events seq prefix gap'); END;
+
+------------------------------------------------------------------------------
 -- projects / sandbox_profiles — infrastructure records.
 ------------------------------------------------------------------------------
 

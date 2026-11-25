@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -134,6 +135,9 @@ func applyMigrationStep(db *sql.DB, step MigrationStep) (bool, error) {
 		"mc", "schema.migration.step", step.Name, detail); err != nil {
 		return false, fmt.Errorf("record migration event for step %s: %w", step.Name, err)
 	}
+	if err := appendMigrationAuditRow(tx, step); err != nil {
+		return false, fmt.Errorf("record migration chain event for step %s: %w", step.Name, err)
+	}
 	if _, err := tx.Exec(`UPDATE meta SET schema_id = ? WHERE id = 1`, step.ToSchemaID); err != nil {
 		return false, fmt.Errorf("stamp migrated schema identity for step %s: %w", step.Name, err)
 	}
@@ -141,4 +145,58 @@ func applyMigrationStep(db *sql.DB, step MigrationStep) (bool, error) {
 		return false, fmt.Errorf("commit migration step %s: %w", step.Name, err)
 	}
 	return true, nil
+}
+
+// appendMigrationAuditRow lands the step's chain event in the same
+// transaction as the step statement, the ledger row, and the stamp: the
+// schema's current value and its evidence commit together, so the spine can
+// never show a migrated identity whose migration evidence is missing.
+// Steps that run before the audit_events table exists (the first two on a
+// legacy spine) have no chain to record into; the chain begins at the step
+// that creates the table.
+func appendMigrationAuditRow(tx *sql.Tx, step MigrationStep) error {
+	var exists int
+	if err := tx.QueryRow(`SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'audit_events'`).Scan(&exists); err != nil {
+		return fmt.Errorf("probe audit chain table: %w", err)
+	}
+	if exists == 0 {
+		return nil
+	}
+	// The schema aggregate's predecessor: the genesis value when this step
+	// starts the aggregate's chain, the stored head's chain_digest when it
+	// extends one.
+	var headSeq int
+	if err := tx.QueryRow(`SELECT COALESCE(MAX(seq), 0) FROM audit_events WHERE aggregate_id = 'schema'`).Scan(&headSeq); err != nil {
+		return fmt.Errorf("read schema aggregate head: %w", err)
+	}
+	var prevHash string
+	if headSeq == 0 {
+		prevHash = GenesisHash("schema")
+	} else {
+		if err := tx.QueryRow(`SELECT chain_digest FROM audit_events WHERE aggregate_id = 'schema' AND seq = ?`, headSeq).Scan(&prevHash); err != nil {
+			return fmt.Errorf("read schema aggregate predecessor: %w", err)
+		}
+	}
+	eventID, err := NewEventID()
+	if err != nil {
+		return err
+	}
+	now := canonNow()
+	return AppendAuditEvent(tx, map[string]any{
+		"serializer_id":  canonicalSerializerID,
+		"event_id":       eventID,
+		"aggregate_id":   "schema",
+		"aggregate_type": "schema",
+		"event_type":     "schema.migration.step",
+		"occurred_at":    now,
+		"recorded_at":    now,
+		"prev_hash":      prevHash,
+		"payload_family": "migration",
+		"payload": map[string]any{
+			"step_name":      step.Name,
+			"from_schema_id": step.FromSchemaID,
+			"to_schema_id":   step.ToSchemaID,
+			"version":        strconv.Itoa(step.Version),
+		},
+	})
 }
