@@ -1,5 +1,5 @@
 #!/bin/sh
-# Culler installs the latest complete release from GitHub.
+# S-Horizon installs the latest complete release from GitHub.
 # Run this script again to check for updates.
 # Production requires macOS on Apple silicon, or Linux on x86_64.
 # --dev uses the local source checkout and a scratch deployment home.
@@ -27,11 +27,11 @@ for argument do
       fail "Static credentials are unsupported. Use the Codex or Claude Code sign-in." ;;
     -h|--help)
       cat <<'HELP'
-Culler installation and updates
+S-Horizon installation and updates
 
 Usage: sh install.sh [options]
 
-Run install.sh to install or update Culler.
+Run install.sh to install or update S-Horizon.
 Each invocation selects a complete release.
 Production requires macOS on Apple silicon or Linux on x86_64.
 
@@ -67,14 +67,14 @@ for argument do
   case "$argument" in
     --dev)
       source_script=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/scripts/install-source.sh
-      [ -f "$source_script" ] || fail "Development setup requires a Culler checkout."
+      [ -f "$source_script" ] || fail "Development setup requires a S-Horizon checkout."
       exec sh "$source_script" "$@" ;;
   esac
 done
 case "$(uname -s):$(uname -m)" in
   Darwin:arm64) SHZ_PLATFORM=darwin-arm64 ;;
   Linux:x86_64) SHZ_PLATFORM=linux-amd64 ;;
-  *) fail "Culler runs on a Mac with Apple silicon or on Linux for x86_64." ;;
+  *) fail "S-Horizon runs on a Mac with Apple silicon or on Linux for x86_64." ;;
 esac
 for tool in curl tar unzip; do
   command -v "$tool" >/dev/null 2>&1 || fail "The required tool $tool is absent from the PATH. Add /usr/bin to the PATH, then run install.sh again."
@@ -152,7 +152,7 @@ recovery_record=$recovery_home/updates/transaction.json
 if [ -e "$recovery_record" ] || [ -L "$recovery_record" ]; then
   [ -f "$recovery_record" ] && [ ! -L "$recovery_record" ] || fail "The update record requires a private regular file."
   [ "$(stat_identity "$recovery_record")" = "$(id -u) 600 1" ] || fail "The update record requires owner-only access."
-  recovery_phase=$(json "$recovery_record" phase) || fail "The update record is unreadable. Keep Culler stopped and repair it."
+  recovery_phase=$(json "$recovery_record" phase) || fail "The update record is unreadable. Keep S-Horizon stopped and repair it."
   case "$recovery_phase" in
     complete|restored) ;;
     stop|prepare|checkpoint|replace|verify|committed|restore)
@@ -163,9 +163,9 @@ if [ -e "$recovery_record" ] || [ -L "$recovery_record" ]; then
       recovery_root=$(json "$recovery_record" candidate_root)
       [ "$recovery_root" = "$recovery_home/updates/$recovery_id/candidate" ] || fail "The retained update path is invalid."
       recovery_program=$recovery_root/bin/mc
-      [ -f "$recovery_program" ] && [ ! -L "$recovery_program" ] && [ -x "$recovery_program" ] || fail "The retained update command is absent. Keep Culler stopped and repair the recovery files."
+      [ -f "$recovery_program" ] && [ ! -L "$recovery_program" ] && [ -x "$recovery_program" ] || fail "The retained update command is absent. Keep S-Horizon stopped and repair the recovery files."
       recovery_checksum=$(json "$recovery_record" candidate_sha256)
-      [ "$(sha256_of "$recovery_program")" = "$recovery_checksum" ] || fail "The retained update command failed verification. Keep Culler stopped and repair the recovery files."
+      [ "$(sha256_of "$recovery_program")" = "$recovery_checksum" ] || fail "The retained update command failed verification. Keep S-Horizon stopped and repair the recovery files."
       MC_HOME=$recovery_home
       MC_BIN_DIR=$(json "$recovery_record" bin_dir)
       SHZ_PACKAGE_ROOT=$recovery_root
@@ -175,7 +175,7 @@ if [ -e "$recovery_record" ] || [ -L "$recovery_record" ]; then
         exec "$recovery_program" __setup "$@" --release-source "$recovery_root/runner" --host-release-source "$recovery_root/host" </dev/tty
       fi
       exec "$recovery_program" __setup "$@" --release-source "$recovery_root/runner" --host-release-source "$recovery_root/host" ;;
-    *) fail "The update phase is invalid. Keep Culler stopped and repair the update record." ;;
+    *) fail "The update phase is invalid. Keep S-Horizon stopped and repair the update record." ;;
   esac
 fi
 [ "$recovery_restore" = false ] || fail "This deployment has no incomplete update to restore."
@@ -240,7 +240,7 @@ asset_id() {
   case "$found" in ''|*[!0-9]*) fail "The release is incomplete. Run install.sh again after publication completes." ;; esac
   printf '%s\n' "$found"
 }
-say 'Culler'
+say 'S-Horizon'
 say 'Check the published release...'
 api="https://api.github.com/repos/$SHZ_REPOSITORY/releases"
 fetch "$api/latest" "$SHZ_BOOTSTRAP_DIR/github-release.json" application/vnd.github+json
