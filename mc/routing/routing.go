@@ -107,7 +107,7 @@ func UniformTable(binding string, registry Registry) (Table, error) {
 // Markdown renders the table in the routing.md form that Parse accepts.
 func (t Table) Markdown() string {
 	var out strings.Builder
-	out.WriteString("# Culler routing\n\n")
+	out.WriteString("# S-Horizon routing\n\n")
 	out.WriteString("| role | harness | binding |\n")
 	out.WriteString("| --- | --- | --- |\n")
 	for _, route := range t.Rows() {
