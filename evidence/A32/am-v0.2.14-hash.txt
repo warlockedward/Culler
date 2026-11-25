@@ -1,0 +1,10 @@
+AM v0.2.14 双面哈希登记（轮四十收口窗：B05 六维错误语义登记表落地⇒EVIDENCED＝B-chain 第三票闭合；F1"CI 门拒绝测试（缺登记必红）"达成）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = b20c8241af2de182816d5cd7aa7ea4165b2875e78a8d321966ea5adf8774f84e
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-25 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = bc9c1bee5ca8a40e51caf6a3fd65f55eb152dc191307fe914348fe347fe05d87，与 am-v0.2.13-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.13 = bc9c1bee5ca8a40e51caf6a3fd65f55eb152dc191307fe914348fe347fe05d87（evidence/A32/am-v0.2.13-hash.txt 实读）；再前 v0.2.12 = 216088c94f24cff4c154ae749c7f6b1483f9be0135b9375872836868846e2684（同件记载）
+- 同轮并入 dev 的提交: be45b4c（B05：mc/verbs/error_semantics_registry.json 51 条写路径六维登记表＋mc/verbs/errorsemantics_test.go gate[两阶段源文本枚举＋fail-closed 锚点＋G1-G4＋N1/N2 内存负控]；纯新增零生产代码改动）；status.json B05=EVIDENCED 随本登记轮提交
+- 关键事实: 写路径权威集＝51 条（gate 解析器自 main.go 源文本枚举；withSpine=写／withSpineRead=query_only 构造性只读）；F1 红→绿轨迹实证＝空 registry 时 G1 逐名列出全部 51 条缺失路径（缺登记必红）；registry hash 并入 AM＝DC §1.1②"登记表随 F1 生成并入 AM"；首个真 (d) 分裂态条目＝ProjectAdd（事务闭包内 git init 先于 INSERT）；唯一 e_exit_code=0 条目＝CollieClaim（K3 认领行 CAS loser＝普通轮询空结果）；最终干净 lane B05_FINAL_MC_EXIT=0（shell gate 六项 ok＋mc/verbs 479.026s 非缓存实跑＋零 FAIL 零 UNVERIFIED）
+- 账: dev tip＝be45b4c（本登记轮提交随后）/ worktrees＝main+dev（b05 收口后回收）/ 无新外发（不 push；main PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）/ **B-chain 状态：B01＝B02＝B05＝EVIDENCED**
+- 登记轮自纠: L4 尾锚首跑断言失配（锚字符串漏结尾 ** 两字符）⇒按实测字节修正后一次性 SPLICE_OK（链自检＋entry 未存在断言＋L1/L4 双锚＋line-count 不变＋双面 cmp 五重断言；changelog line LENGTH=156019）
