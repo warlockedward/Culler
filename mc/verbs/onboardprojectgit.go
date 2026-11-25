@@ -336,7 +336,7 @@ func ensureWorkspaceInput(root string, mutate OnboardGitMutation) (bool, error) 
 			}
 			only = "--no-only"
 		}
-		if err := mutate(root, "-c", "user.name=Culler", "-c", "user.email=culler@localhost", "-c", "core.hooksPath=/dev/null", "-c", "commit.gpgSign=false",
+		if err := mutate(root, "-c", "user.name=S-Horizon", "-c", "user.email=shorizon@localhost", "-c", "core.hooksPath=/dev/null", "-c", "commit.gpgSign=false",
 			"commit", "--allow-empty", only, "--quiet", "-m", "Initialize the project history"); err != nil {
 			return false, err
 		}
@@ -357,7 +357,7 @@ func ensureWorkspaceInput(root string, mutate OnboardGitMutation) (bool, error) 
 			return false, Domainf("the repository did not retain its initial commit")
 		}
 	default:
-		return false, Domainf("Culler starts the culler branch from main. This repository has no main branch.")
+		return false, Domainf("S-Horizon starts the culler branch from main. This repository has no main branch.")
 	}
 	commit, previous := strings.TrimSpace(string(start)), strings.Repeat("0", len(strings.TrimSpace(string(start))))
 	if cullerErr == nil {

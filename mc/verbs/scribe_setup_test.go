@@ -216,7 +216,7 @@ func TestRepositoryWithoutMainCannotStartTheCullerBranch(t *testing.T) {
 	srcGit(t, root, "init", "--quiet", "--initial-branch=trunk")
 	commitOn(t, root, "Start trunk")
 	_, err := ensureWorkspaceInput(root, hostOnboardGitMutation)
-	if err == nil || err.Error() != "Culler starts the culler branch from main. This repository has no main branch." {
+	if err == nil || err.Error() != "S-Horizon starts the culler branch from main. This repository has no main branch." {
 		t.Fatalf("a repository without main = %v", err)
 	}
 	if out, err := gitAtSource(root, "rev-parse", "--verify", "--quiet", "refs/heads/culler"); err == nil {

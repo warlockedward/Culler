@@ -29,7 +29,7 @@ var postDiscordOnboardingTest = func(token, channelID string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	body, err := json.Marshal(map[string]any{
-		"content":          "Culler Discord onboarding test. Confirm this message with --confirm-discord-test.",
+		"content":          "S-Horizon Discord onboarding test. Confirm this message with --confirm-discord-test.",
 		"allowed_mentions": map[string]any{"parse": []string{}},
 	})
 	if err != nil {

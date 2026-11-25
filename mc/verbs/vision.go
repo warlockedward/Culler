@@ -80,7 +80,7 @@ func ProjectVisionResult(root, state string) ProjectVisionCheck {
 	default:
 		result.State = ProjectVisionUnknown
 		result.Ready = false
-		result.Reason = "Culler must check VISION.md before work can start."
+		result.Reason = "S-Horizon must check VISION.md before work can start."
 	}
 	return result
 }
@@ -144,7 +144,7 @@ func checkProjectVisionContent(root string, body []byte) ProjectVisionCheck {
 
 const maxProjectVisionBytes = 64 * 1024
 
-const generatedVisionPurpose = `This file is the North Star of this project for Culler. The
+const generatedVisionPurpose = `This file is the North Star of this project for S-Horizon. The
 Strategist and Arbiter read it to seek, propose, and approve new work. It
 states where the software should go, broad enough to point at a direction and
 declarative when it points at work; it carries no implementation detail.`
