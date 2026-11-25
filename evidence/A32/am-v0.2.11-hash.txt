@@ -1,0 +1,10 @@
+AM v0.2.11 双面哈希登记（轮三十七收口窗：V1+P1-P4 点名裁定执行波落地全道绿＋V1 闭环实证（走查域 Culler 产物清零）＋A09→EVIDENCED（域限定）状态翻转⇒B-chain 解锁）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = c10b34427af9354e765ea9e2270bd71ae215703208e29cc87e0f68affd73ce54
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-25 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 8c7bb7f7bf14e3fd9ec2197fde4dff653effddffc0bcd46addb1f4f494df39b5，与 am-v0.2.10-hash.txt 登记值逐字相等（零漂移后方可登记）；双面基线副本（主工作树）实测同值＝零漂移
+- 前轮: v0.2.10 = 8c7bb7f7bf14e3fd9ec2197fde4dff653effddffc0bcd46addb1f4f494df39b5（evidence/A32/am-v0.2.10-hash.txt 实读）；再前 v0.2.9 = b177fbc3f39c365b69ddf1a94a4c5bd46437698b12c26cdb4237f90a85a96438（同件记载）
+- 同轮并入 dev 的提交: 4c3e535（V1 workspace bootstrap git 身份终值 S-Horizon <shorizon@localhost>＋P1 Discord 测试消息 prose＋P2 缺 main 分支诊断 prose＋断言随改 1 pin＋P3 vision Unknown Reason＋P4 generatedVisionPurpose）；status.json A09=EVIDENCED 随本登记轮提交
+- 关键事实: 所有者 grill-me"全按推荐"裁定五问：Q1=(ii) V1 终值（作者区分保留）／Q2=P1-P4 随波／Q3=prod-tier 60 行登记具名后续（不阻塞；R2 验收句程序=fake-harness 流水线⇒dev tier 域⇒不在 F1 证据域；执行触发 AGENTS.md 终端 setup 对抗审查义务⇒单独一波候执行窗）／Q4=amd64 半边登记不阻塞（UNVERIFIED 候所有者触发）／Q5=EVIDENCED 域限定⇒破 A09⇄S5⇄B02⇄B01 循环依赖⇒**B01 迁移器即刻解锁**；V1 闭环实证＝step1c 重装 workspace git log 署名="S-Horizon <shorizon@localhost>"＋stdout/home 文本面零命中⇒走查域 Culler 产物清零；lane #4 V1WAVE_MC_EXIT=0（shell gate 六项 ok＋26 包 ok＋零 FAIL 零 UNVERIFIED）；A09 证据基＝R2 表用户可见身份八行全落地＋F1 三面 GREEN＋缺陷⑤⑥⑦⑧全落；域限定残留五面具名候后续（S5 搭 B02 窗／prod-tier 面／amd64 半边／openwiki Scribe 域／collie main.ts:508+:920）
+- 账: dev tip=4c3e535（本登记轮提交随后）/ worktrees=main+dev（a09f9 回收）/ 无新外发（不 push；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）/ **B-chain 状态翻转：B01 依赖边 A09 EVIDENCED 已满足⇒可进工单 READY 流程**
+- 登记轮自纠: 无（链自检+entry count=1+line-count 不变三重断言，脚本一次性 SPLICE_OK；changelog line LENGTH=146812）
