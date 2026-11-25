@@ -1,0 +1,10 @@
+AM v0.2.13 双面哈希登记（轮三十九收口窗：B02 v1 基线冻结落地⇒EVIDENCED＋v1 基线 identity X 登记[=B02 F1"登记完成=AM 事件"]＋S5 补记入 A09 证据记录⇒A09 域限定残留收窄为四面）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = bc9c1bee5ca8a40e51caf6a3fd65f55eb152dc191307fe914348fe347fe05d87
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-25 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 216088c94f24cff4c154ae749c7f6b1483f9be0135b9375872836868846e2684，与 am-v0.2.12-hash.txt 登记值逐字相等（零漂移后方可登记）；双面基线副本（主工作树）实测同值＝零漂移
+- 前轮: v0.2.12 = 216088c94f24cff4c154ae749c7f6b1483f9be0135b9375872836868846e2684（evidence/A32/am-v0.2.12-hash.txt 实读）；再前 v0.2.11 = c10b34427af9354e765ea9e2270bd71ae215703208e29cc87e0f68affd73ce54（同件记载）
+- 同轮并入 dev 的提交: 6e31b1a（B02 v1 基线冻结：S5 两 token＋S2 registry 步骤 rename-health-alert-body＋S1.to 字面量钉定 b01BaselineIdentity=362e88ea…＋U1/U3/U5＋U4 测试族＋T1 全链重写＋T7 断言更新＋evidence/B02/diff-plan-001.md）；status.json B02=EVIDENCED 随本登记轮提交
+- 关键事实: **v1 基线 identity X = eb7ebcf932c3f52895412c9aef0b3c5f38e43c06d8ef64a6e0e33f273b243bcd**（双探针实测：pre 探针＝内存还原两 token⇒恰 362e88eaaed576fc0ef26d80403069c911f2c9b1017461d8988618d3d1cbd87a＝B01 基线自校验过；post 探针＝S5 后 schema.sql+delivery.sql+environments.sql 拼接 SHA-256）；S2 语句的 CREATE TRIGGER 文本逐字节匹配新 schema.sql trigger 块（迁移后 sqlite_schema 行与参考侧哈希同型）；registry＝[S1 add-schema-history-ledger 5c56d313…⇒362e88ea…，S2 rename-health-alert-body 362e88ea…⇒CurrentSchemaID(符号)]；U5 负控实测 ErrMigrationSequenceAnomaly（diff-plan 初稿误写 ErrSchemaUnknown⇒按实测更正）；最终干净 lane B02_FINAL_MC_EXIT=0（shell gate 六项 ok＋mc/substrate 19.750s＋mc/verbs 471.025s 均非缓存实跑＋零 FAIL 零 UNVERIFIED）；S5 补记⇒A09 域限定残留五面收窄为四面（prod-tier 面／amd64 半边／openwiki Scribe 域／collie main.ts:508+:920）
+- 账: dev tip＝6e31b1a（本登记轮提交随后）/ worktrees＝main+dev（b02 收口后回收）/ 无新外发（不 push；main PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）/ **B-chain 状态：B01＝B02＝EVIDENCED⇒B-chain 前两票闭合**
+- 登记轮自纠: 无（链自检＋v0.2.13 未存在断言＋L1/L4 双锚实测字节＋line-count 不变＋双面 cmp 五重断言，脚本一次性 SPLICE_OK；重复执行第二次被 L1 锚断言正确拒绝[文件已更新⇒不二次追加]；changelog line LENGTH=152608）
