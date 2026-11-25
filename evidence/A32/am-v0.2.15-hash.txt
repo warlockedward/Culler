@@ -1,0 +1,9 @@
+AM v0.2.15 双面哈希登记（轮四十一收口窗：B07 审计链实现落地⇒EVIDENCED＝B-chain 第四票闭合；F1"链测试全套"达成）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 3fa40847dbfba1f1103dfcffbd4b30e39aa5c24a99fe68585ca331ee642811f4
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = b20c8241af2de182816d5cd7aa7ea4165b2875e78a8d321966ea5adf8774f84e，与 am-v0.2.14-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.14 = b20c8241af2de182816d5cd7aa7ea4165b2875e78a8d321966ea5adf8774f84e（evidence/A32/am-v0.2.14-hash.txt 实读）；再前 v0.2.13 = bc9c1bee5ca8a40e51caf6a3fd65f55eb152dc191307fe914348fe347fe05d87（同件记载）
+- 同轮并入 dev 的提交: 75527b5（B07：mc/substrate/schema.sql audit_events 载体表＋三触发器；mc/substrate/auchain.go shz-canon-v1 序列化器＋AppendAuditEvent＋VerifyAuditChain＋ComputeRoot(shz-merkle-v1)＋OpenAggregate；S3 add-audit-events-chain 迁移步骤＋S2.to 字面量钉定＋b02BaselineIdentity 常量；applyMigrationStep 五元组原子＝DC §3.2 映射表首行；shz verify-chain 只读 verb；W1-W12 链测试族＋vectors.json 30 例＋root_vectors.json 11 例符合性；check.sh -count=1 行）；status.json B07=EVIDENCED 随本登记轮提交
+- 关键事实: W1 30/30＋W2 11/11 向量符合性逐字节 PASS；W3-W12 链机制测试全绿（substrate 9/9＋verbs 9/9）；最终干净 lane＝check.sh set -eu 全阶段输毕（shell 契约六项 ok＋Go 26 包 ok＋零 FAIL；mc/substrate 21.894s＋mc/verbs 474.663s 非缓存实跑）——诚实登记：lane 退出码捕获行在 zsh 下展开为空，绿判定依据＝set -eu 语义＋完整阶段输出；新基线 identity Y = 4a3159e3cef11986fd68eac67c0d53f7cadc6a992664b9f61b7c5a266150bf9a（方法自校验＝对 B02 时代文件复现 X 逐字节相等）；自纠×3（R7 错误消息形状／Mimosa 五次启发式误报形态调整／登记轮 append 条目被并行重放三倍化⇒git checkout 恢复后逐次重放修正）
+- 账: dev tip＝75527b5（本登记轮提交随后）/ worktrees＝main+dev（b07 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）/ **B-chain 状态：B01＝B02＝B05＝B07＝EVIDENCED**
