@@ -134,7 +134,7 @@ Run an opt-in lane when your change touches what the lane proves:
 
 - `mc` is the only program that opens the spine. Production TypeScript spawns `mc` and reads one JSON object from stdout. Exit codes: 0 success, 1 domain rejection, 2 usage or environment error.
 - `mc` gets its verb scope only from the presence of `/mc/run.json`, never from flags.
-- `mc/substrate/schema.sql`, `delivery.sql`, and `environments.sql` are the schema. Their SHA-256 hash is the schema identity. A change to one of them makes each deployed spine incompatible, and no converter exists.
+- `mc/substrate/schema.sql`, `delivery.sql`, and `environments.sql` are the schema. Their SHA-256 hash is the schema identity. A change to one of them makes each deployed spine incompatible unless the release registers a migration step crossing that boundary (`mc/substrate` migration registry); an unregistered boundary still refuses, and a checksum conflict or ledger anomaly stops the migration fail-closed.
 - `dispatch.Decide` (`mc/dispatch/dispatch.go`) is a pure function. The prepare/attest/commit seam (`mc/verbs/dispatchseam.go`) freezes canonical JSON. A change to a wire shape is a design decision, not a refactor.
 - Production runs only the files that `mc/deployment/host_release.go` and `mc/deployment/runner_release.go` list. Add each new resident, dashboard, or runner file to the matching list. The closure tests in `./mc/check.sh` fail on a missing or an unused entry.
 - `runner/shared/` stays under `runner/`, because the runner list cannot address `../`.

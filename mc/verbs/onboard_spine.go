@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -81,7 +82,7 @@ func FinalizeOnboardHome(result OnboardSpineResult) (string, string, error) {
 	}
 	validStatus := map[string]bool{
 		"ok": true, "initialized": true, "repair-mirror": true,
-		"reset": true,
+		"reset": true, "migrated": true,
 	}
 	if !validStatus[result.Status] {
 		return "", "", Domainf("helper onboard-spine response has invalid status %q", result.Status)
@@ -114,6 +115,9 @@ func FinalizeOnboardHome(result OnboardSpineResult) (string, string, error) {
 	detail := fmt.Sprintf("deployment %s provisioned through helper (schema %s)", result.DeploymentUUID, result.SchemaID)
 	if result.Status == "reset" {
 		detail += "; the database is a new empty database"
+	}
+	if result.Status == "migrated" {
+		detail += "; the database was migrated to the current schema"
 	}
 	return status, detail, nil
 }
@@ -207,6 +211,23 @@ func OnboardSpine(spine string, req OnboardSpineRequest) (OnboardSpineResult, er
 		if req.MirrorState == "present" && req.MirrorUUID != inspection.uuid {
 			return OnboardSpineResult{}, Domainf("deployment identity mismatch: host mirror has %s but spine has %s", req.MirrorUUID, inspection.uuid)
 		}
+		if !req.Reset && !inspection.compatible {
+			// A schema-differing spine is migrated when this release carries a
+			// registered path from its recorded identity; an explicit Reset
+			// still replaces. A blocked ledger (checksum conflict or sequence
+			// anomaly) refuses even under AllowReset: an untrustworthy
+			// migration history must not be papered over by wiping data.
+			report, migrateErr := migrateSpine(spine)
+			switch {
+			case migrateErr == nil && report.Migrated:
+				status = "migrated"
+				return OnboardSpineResult{ProtocolVersion: 1, Status: status, DeploymentUUID: inspection.uuid, SchemaID: substrate.CurrentSchemaID}, nil
+			case errors.Is(migrateErr, substrate.ErrMigrationChecksumConflict), errors.Is(migrateErr, substrate.ErrMigrationSequenceAnomaly):
+				return OnboardSpineResult{}, &DomainError{Code: "database-migration-blocked", Msg: "the database migration ledger is blocked (" + migrateErr.Error() + "); manual diagnosis is required"}
+			}
+			// Unknown identity, or identity already current with differing
+			// objects: fall through to the reset-or-refuse behavior below.
+		}
 		if replace := req.Reset || (req.AllowReset && !inspection.compatible); !replace {
 			if !inspection.compatible {
 				return OnboardSpineResult{}, &DomainError{Code: "database-schema-differs", Msg: "the database schema differs from this release; redeploy.sh --reset-database replaces the database with an empty database"}
@@ -277,6 +298,30 @@ func OnboardSpine(spine string, req OnboardSpineRequest) (OnboardSpineResult, er
 		DeploymentUUID:  uuid,
 		SchemaID:        substrate.CurrentSchemaID,
 	}, nil
+}
+
+// migrateSpine runs the registered migration steps over a spine whose schema
+// differs from this release. The caller holds the spine flock, so the
+// migration is serialized against every other database operation.
+func migrateSpine(spine string) (substrate.MigrationReport, error) {
+	db, err := substrate.Open(spine)
+	if err != nil {
+		return substrate.MigrationReport{}, err
+	}
+	defer db.Close()
+	report, err := substrate.Migrate(db, substrate.ProductionMigrationRegistry(), substrate.CurrentSchemaID)
+	if err != nil {
+		return report, err
+	}
+	if !report.Migrated {
+		return report, nil
+	}
+	// The runner proves the ledger and the stamp; the deployment flow proves
+	// the whole schema state before the spine is handed back.
+	if err := substrate.CheckSchema(db); err != nil {
+		return report, fmt.Errorf("post-migration schema verification failed: %w", err)
+	}
+	return report, nil
 }
 
 func (r OnboardSpineResult) String() string {

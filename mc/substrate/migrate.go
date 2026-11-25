@@ -1,0 +1,181 @@
+package substrate
+
+import (
+	"crypto/sha256"
+	"fmt"
+	"sort"
+)
+
+// MigrationStep is one registered schema boundary crossing. Statement is the
+// exact statement text the step executes; Checksum is derived from the step
+// name and that text, never written by hand, so a later edit of the statement
+// under an unchanged name changes the checksum and any spine that already
+// applied the old text stops fail-closed at the conflict state.
+type MigrationStep struct {
+	Name         string
+	Version      int
+	FromSchemaID string
+	ToSchemaID   string
+	Checksum     string
+	Statement    string
+}
+
+func newMigrationStep(version int, name, fromSchemaID, toSchemaID, statement string) MigrationStep {
+	sum := sha256.Sum256([]byte(name + "\n" + statement))
+	return MigrationStep{
+		Name:         name,
+		Version:      version,
+		FromSchemaID: fromSchemaID,
+		ToSchemaID:   toSchemaID,
+		Checksum:     fmt.Sprintf("%x", sum),
+		Statement:    statement,
+	}
+}
+
+// preLedgerBaselineIdentity is the schema identity of spines provisioned by
+// releases before the migration ledger existed in the baseline schema.
+const preLedgerBaselineIdentity = "5c56d3132ea33fb85f9204462df94396c9dfb5c4801271b9b6019ff108ba0963"
+
+// ProductionMigrationRegistry returns the ordered step registry this release
+// carries. The registry always terminates at CurrentSchemaID: a release that
+// changes the schema text must register the step that crosses that boundary,
+// so a spine at any previously published identity can reach this release.
+func ProductionMigrationRegistry() []MigrationStep {
+	return []MigrationStep{
+		newMigrationStep(1, "add-schema-history-ledger", preLedgerBaselineIdentity, CurrentSchemaID, schemaHistoryDDL),
+	}
+}
+
+// MigrationReport describes one runner pass over a spine.
+type MigrationReport struct {
+	Migrated     bool
+	FromSchemaID string
+	ToSchemaID   string
+	Applied      []string
+	Skipped      []string
+}
+
+type recordedStep struct {
+	Version      int
+	StepName     string
+	StepChecksum string
+	FromID       string
+	ToID         string
+}
+
+func validateRegistry(registry []MigrationStep) error {
+	if len(registry) == 0 {
+		return fmt.Errorf("%w: registry is empty", ErrMigrationSequenceAnomaly)
+	}
+	seen := map[string]bool{}
+	for i, step := range registry {
+		if step.Version != i+1 {
+			return fmt.Errorf("%w: registry version %d out of order at position %d", ErrMigrationSequenceAnomaly, step.Version, i+1)
+		}
+		if seen[step.Name] {
+			return fmt.Errorf("%w: registry step %q appears twice", ErrMigrationSequenceAnomaly, step.Name)
+		}
+		seen[step.Name] = true
+		want := sha256.Sum256([]byte(step.Name + "\n" + step.Statement))
+		if fmt.Sprintf("%x", want) != step.Checksum {
+			return fmt.Errorf("%w: registry step %q checksum does not match its definition", ErrMigrationSequenceAnomaly, step.Name)
+		}
+		if i > 0 && registry[i-1].ToSchemaID != step.FromSchemaID {
+			return fmt.Errorf("%w: registry steps %q and %q do not chain", ErrMigrationSequenceAnomaly, registry[i-1].Name, step.Name)
+		}
+	}
+	return nil
+}
+
+func recordedStepByName(rows []recordedStep, name string) (recordedStep, bool) {
+	for _, r := range rows {
+		if r.StepName == name {
+			return r, true
+		}
+	}
+	return recordedStep{}, false
+}
+
+// planMigrationSteps resolves the four-state semantics (DC §4):
+//   - a step absent from the ledger is planned (execute);
+//   - a recorded step whose checksum matches is never planned (skip);
+//   - a recorded step whose checksum differs returns
+//     ErrMigrationChecksumConflict (fail-closed stop);
+//   - a structurally unsound ledger returns ErrMigrationSequenceAnomaly
+//     (stop and diagnose).
+//
+// It also resolves the starting point: a spine without the ledger table is a
+// pre-history baseline and must sit exactly at the first step's source
+// identity; a spine with ledger rows must sit at the terminal recorded
+// identity. Any other identity is unknown (ErrSchemaUnknown).
+func planMigrationSteps(registry []MigrationStep, recorded []recordedStep, ledgerExists bool, deployedID, targetSchemaID string) ([]MigrationStep, error) {
+	byName := map[string]MigrationStep{}
+	for _, s := range registry {
+		byName[s.Name] = s
+	}
+
+	var terminalID string
+	if !ledgerExists {
+		terminalID = registry[0].FromSchemaID
+	} else {
+		if len(recorded) == 0 {
+			// Ledger table present but empty: a spine created by this
+			// release's baseline. Its identity must already be current.
+			if deployedID != targetSchemaID {
+				return nil, fmt.Errorf("%w: empty ledger at identity %s", ErrSchemaUnknown, deployedID)
+			}
+			return nil, nil
+		}
+		// State 3 takes precedence: a tampered historical step stops the
+		// migration before any structural reasoning.
+		for _, r := range recorded {
+			step, known := byName[r.StepName]
+			if !known {
+				continue
+			}
+			if r.StepChecksum != step.Checksum {
+				return nil, fmt.Errorf("%w: step %q recorded %s, this release carries %s", ErrMigrationChecksumConflict, r.StepName, r.StepChecksum, step.Checksum)
+			}
+		}
+		versions := make([]int, 0, len(recorded))
+		for _, r := range recorded {
+			step, known := byName[r.StepName]
+			if !known {
+				return nil, fmt.Errorf("%w: ledger records unknown step %q", ErrMigrationSequenceAnomaly, r.StepName)
+			}
+			if r.Version != step.Version {
+				return nil, fmt.Errorf("%w: step %q recorded at version %d, defined at %d", ErrMigrationSequenceAnomaly, r.StepName, r.Version, step.Version)
+			}
+			if r.FromID != step.FromSchemaID || r.ToID != step.ToSchemaID {
+				return nil, fmt.Errorf("%w: step %q records identities that this release does not define", ErrMigrationSequenceAnomaly, r.StepName)
+			}
+			versions = append(versions, r.Version)
+		}
+		sort.Ints(versions)
+		for i, v := range versions {
+			if v != i+1 {
+				return nil, fmt.Errorf("%w: ledger versions are not a prefix of the registry (have %v)", ErrMigrationSequenceAnomaly, versions)
+			}
+		}
+		terminalID = byName[recorded[len(recorded)-1].StepName].ToSchemaID
+	}
+
+	if deployedID != terminalID {
+		return nil, fmt.Errorf("%w: meta.schema_id %s is not the identity the ledger evidences (%s)", ErrSchemaUnknown, deployedID, terminalID)
+	}
+
+	plan := []MigrationStep{}
+	for _, step := range registry {
+		if _, already := recordedStepByName(recorded, step.Name); already {
+			continue
+		}
+		if len(plan) == 0 && step.FromSchemaID != deployedID {
+			return nil, fmt.Errorf("%w: step %q does not start from the deployed identity", ErrSchemaUnknown, step.Name)
+		}
+		plan = append(plan, step)
+		if step.ToSchemaID == targetSchemaID {
+			return plan, nil
+		}
+	}
+	return nil, fmt.Errorf("%w: registry does not reach %s", ErrSchemaUnknown, targetSchemaID)
+}

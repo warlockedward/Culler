@@ -387,14 +387,19 @@ func inspectSpineReadOnly(spine string) (spineInspection, error) {
 		return spineInspection{}, Domainf("spine at %q has no singleton identity: %v", spine, err)
 	}
 	inspection.hasMeta = true
+	// The recorded identity is read even when the schema objects differ:
+	// the migration path is selected from it. A meta table whose identity
+	// column is absent or whose identity row is missing carries no recorded
+	// identity; the schema-object comparison below classifies such a spine
+	// as incompatible, exactly as before the ledger existed.
+	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&inspection.schemaID); err != nil {
+		inspection.schemaID = ""
+	}
 	schemaErr := substrate.CheckSchema(db)
 	if schemaErr != nil && !errors.Is(schemaErr, substrate.ErrSchemaMismatch) {
 		return spineInspection{}, schemaErr
 	}
 	inspection.compatible = schemaErr == nil
-	if inspection.compatible {
-		inspection.schemaID = substrate.CurrentSchemaID
-	}
 
 	return inspection, nil
 }
@@ -455,14 +460,19 @@ func inspectSpineSettled(spine string) (spineInspection, error) {
 		return spineInspection{}, Domainf("spine at %q has no singleton identity: %v", spine, err)
 	}
 	inspection.hasMeta = true
+	// The recorded identity is read even when the schema objects differ:
+	// the migration path is selected from it. A meta table whose identity
+	// column is absent or whose identity row is missing carries no recorded
+	// identity; the schema-object comparison below classifies such a spine
+	// as incompatible, exactly as before the ledger existed.
+	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&inspection.schemaID); err != nil {
+		inspection.schemaID = ""
+	}
 	schemaErr := substrate.CheckSchema(db)
 	if schemaErr != nil && !errors.Is(schemaErr, substrate.ErrSchemaMismatch) {
 		return spineInspection{}, schemaErr
 	}
 	inspection.compatible = schemaErr == nil
-	if inspection.compatible {
-		inspection.schemaID = substrate.CurrentSchemaID
-	}
 
 	return inspection, nil
 }
