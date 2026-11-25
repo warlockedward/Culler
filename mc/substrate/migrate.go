@@ -36,13 +36,20 @@ func newMigrationStep(version int, name, fromSchemaID, toSchemaID, statement str
 // releases before the migration ledger existed in the baseline schema.
 const preLedgerBaselineIdentity = "5c56d3132ea33fb85f9204462df94396c9dfb5c4801271b9b6019ff108ba0963"
 
+// b01BaselineIdentity is the schema identity the first step produced: the
+// baseline schema with the ledger table and before the health alert body was
+// renamed. It is pinned as a historical fact; a step's endpoints never follow
+// CurrentSchemaID, only the last step's target does.
+const b01BaselineIdentity = "362e88eaaed576fc0ef26d80403069c911f2c9b1017461d8988618d3d1cbd87a"
+
 // ProductionMigrationRegistry returns the ordered step registry this release
 // carries. The registry always terminates at CurrentSchemaID: a release that
 // changes the schema text must register the step that crosses that boundary,
 // so a spine at any previously published identity can reach this release.
 func ProductionMigrationRegistry() []MigrationStep {
 	return []MigrationStep{
-		newMigrationStep(1, "add-schema-history-ledger", preLedgerBaselineIdentity, CurrentSchemaID, schemaHistoryDDL),
+		newMigrationStep(1, "add-schema-history-ledger", preLedgerBaselineIdentity, b01BaselineIdentity, schemaHistoryDDL),
+		newMigrationStep(2, "rename-health-alert-body", b01BaselineIdentity, CurrentSchemaID, renameHealthAlertBodySQL),
 	}
 }
 

@@ -1,4 +1,4 @@
--- The spine stores Culler state. Constraints and triggers enforce
+-- The spine stores S-Horizon state. Constraints and triggers enforce
 -- the current state transitions. Each connection enables foreign keys and
 -- write-ahead logging. Each write transaction uses BEGIN IMMEDIATE.
 -- Each trigger writes its dependent state without recursive triggers.
@@ -2085,7 +2085,7 @@ BEGIN
                'activity_id', NEW.id,
                'subject', NEW.subject,
                'detail', NEW.detail,
-               'body', 'Culler health: ' || NEW.detail
+               'body', 'S-Horizon health: ' || NEW.detail
            )
     FROM alert_routes
     WHERE class = 'health'

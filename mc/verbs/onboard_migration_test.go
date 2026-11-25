@@ -67,8 +67,8 @@ func TestOnboardSpineMigratesPreLedgerSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 1 {
-		t.Fatalf("ledger rows = %d (%v); want 1", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 2 {
+		t.Fatalf("ledger rows = %d (%v); want 2", ledgerRows, err)
 	}
 	db.Close()
 
@@ -236,8 +236,8 @@ func TestBlockedMigrationKeepsRestoreAvailable(t *testing.T) {
 	}
 
 	// The database is untouched by the refusal: the stamp still predates
-	// the ledger, the tampered row is still the only recorded history, and
-	// the crossing wrote no migration event of its own.
+	// the ledger's baseline, the tampered row still carries its forged
+	// checksum, and the crossing wrote no migration event of its own.
 	ro, err := substrate.OpenReadOnly(spine)
 	if err != nil {
 		t.Fatalf("reopen spine: %v", err)
@@ -277,4 +277,58 @@ func TestBlockedMigrationKeepsRestoreAvailable(t *testing.T) {
 	if restoreErr == nil || !strings.Contains(restoreErr.Error(), "no complete checkpoint") {
 		t.Fatalf("RestoreUpdateCheckpoint = %v; want the uncommitted journal to pass the committed gate", restoreErr)
 	}
+}
+
+// buildFirstStepSpineFile reproduces the spine state a release carrying only
+// the first step would have left: this baseline's objects, the ledger
+// recording step one, and the meta stamp at step one's target identity.
+func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
+	t.Helper()
+	db, err := substrate.Open(path)
+	if err != nil {
+		t.Fatalf("open spine: %v", err)
+	}
+	if err := substrate.Init(db); err != nil {
+		db.Close()
+		t.Fatalf("init spine: %v", err)
+	}
+	step1 := substrate.ProductionMigrationRegistry()[0]
+	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, step1.ToSchemaID); err != nil {
+		db.Close()
+		t.Fatalf("stamp first step identity: %v", err)
+	}
+	if _, err := db.Exec(`INSERT INTO schema_history (version, step_name, step_checksum, from_schema_id, to_schema_id, applied_at) VALUES (?, ?, ?, ?, ?, 'now')`, step1.Version, step1.Name, step1.Checksum, step1.FromSchemaID, step1.ToSchemaID); err != nil {
+		db.Close()
+		t.Fatalf("record first step: %v", err)
+	}
+	db.Close()
+}
+
+// U4: OnboardSpine crosses a spine left at the first step's target identity:
+// the recorded first step is skipped, the second step lands, the deployment
+// UUID is preserved, and the schema check passes on the result.
+func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
+	spine := filepath.Join(t.TempDir(), "spine.db")
+	buildFirstStepSpineFile(t, spine, migrationTestUUID)
+
+	req := OnboardSpineRequest{ProtocolVersion: 1, SchemaID: substrate.CurrentSchemaID, MirrorState: "present", MirrorUUID: migrationTestUUID}
+	result, err := OnboardSpine(spine, req)
+	if err != nil {
+		t.Fatalf("OnboardSpine = %v", err)
+	}
+	if result.Status != "migrated" || result.DeploymentUUID != migrationTestUUID {
+		t.Fatalf("result = %+v; want status migrated with the preserved UUID", result)
+	}
+	db, err := substrate.OpenReadOnly(spine)
+	if err != nil {
+		t.Fatalf("reopen spine: %v", err)
+	}
+	if err := substrate.CheckSchema(db); err != nil {
+		t.Fatalf("migrated spine schema check: %v", err)
+	}
+	var ledgerRows int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 2 {
+		t.Fatalf("ledger rows = %d (%v); want 2", ledgerRows, err)
+	}
+	db.Close()
 }
