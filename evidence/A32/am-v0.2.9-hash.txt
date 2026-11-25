@@ -1,0 +1,10 @@
+AM v0.2.9 双面哈希登记（轮三十五收口窗：所有者二轮"全按推荐"执行波收口——三尾面＋installer 文案面落地全道绿＋登记轮发现候选残留面×2 候点名）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = b177fbc3f39c365b69ddf1a94a4c5bd46437698b12c26cdb4237f90a85a96438
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-25 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 9ae2a430229534a876b301032d1b1bf0ba2b7c68d1dcc16932a4df2928dd0370，与 am-v0.2.8-hash.txt 登记值逐字相等（零漂移后方可登记）；双面基线副本（主工作树）实测同值＝零漂移
+- 前轮: v0.2.8 = 9ae2a430229534a876b301032d1b1bf0ba2b7c68d1dcc16932a4df2928dd0370（evidence/A32/am-v0.2.8-hash.txt 实读）；再前 v0.2.7 = 203c45769ca5fe7306e1a1542f1e990e851698d1fb9369cc9fd764aadaeda6d3（同件记载）
+- 同轮并入 dev 的提交: 6c40355（三尾面：Q-S skill 语义面标识符面 12 点＋prose 面 101 token／Q-K Keychain darwin 名面平台前缀常量分派＋两代删除边界／Q-W worktree 路径面＋物理迁移）/ 8677d64（installer release-channel 前门文案 9 行）
+- 关键事实: 三尾面单提交落地（62 文件/318+/173-）＋installer 文案面枚举缺口（波级缺陷⑤）修复＋tails 轮本地缺陷①-④自抓修复＋双道全 lane 绿（tails 轮 mc 第 3 跑 MC3_EXIT=0/resident 774/0/agent-runner 160/0/collie-runner 55/0/evals pytest 20/20；dev-final lane shell gate 六项 ok＋DEV_FINAL_MC_EXIT=0 零 FAIL 零 UNVERIFIED⇒installer-gate 验证债务闭合）＋登记轮发现候选残留面×2（runner/collie-runner/main.ts:508 agent-input 信封文案/:920 错误路径日志；未列面默认纪律候所有者点名，零行为影响）＋F1 余量更新为仅干净机走查（域＝本机 dev tier scratch 所有者批准）＋A09 票面 IN_PROGRESS 不变（F1 走查绿后呈 EVIDENCED 候选；S5 2 token 候 B02 预冻结窗）
+- 账: dev tip=8677d64（本登记轮提交随后）/ worktrees=main+dev（a09tails 旧路径注册回收）/ 无新外发（不 push；ci/routing-base 探针支停在 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）
+- 登记轮自纠: 脚本首两跑断言失败（全宽括号形态＋"擅"码点实值 U+64C5 误写为 U+758F；均发生于文件写入前⇒AM 面零改动），修正后一次性 SPLICE_OK（链自检+entry count=1+line-count 不变三重断言通过）；changelog line LENGTH=139441
