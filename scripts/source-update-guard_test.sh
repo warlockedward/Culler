@@ -103,14 +103,14 @@ for script in redeploy.sh redeploy-dashboard.sh scripts/install-source.sh; do
   if MC_HOME="$GUARD_HOME" sh "$ROOT/$script" >"$TMP/output" 2>&1; then
     fail "$script permitted an incomplete update"
   fi
-  grep -q 'Culler has an incomplete update.' "$TMP/output" || fail "$script missed the update guard"
+  grep -q 'S-Horizon has an incomplete update.' "$TMP/output" || fail "$script missed the update guard"
   [ ! -e "$GUARD_TRACE" ] || fail "$script called a tool before the guard"
   [ "$(find "$GUARD_HOME" -type f | wc -l | tr -d ' ')" = 1 ] || fail "$script wrote deployment files"
 done
 if MC_HOME="$GUARD_HOME" sh "$ROOT/install.sh" --dev --mc-home "$GUARD_HOME" >"$TMP/output" 2>&1; then
   fail 'install.sh --dev permitted an incomplete update'
 fi
-grep -q 'Culler has an incomplete update.' "$TMP/output" || fail 'install.sh --dev missed the update guard'
+grep -q 'S-Horizon has an incomplete update.' "$TMP/output" || fail 'install.sh --dev missed the update guard'
 [ ! -e "$GUARD_TRACE" ] || fail 'install.sh --dev called a tool before the guard'
 if [ "$(uname -s)" = Darwin ]; then
   PATH=$SYSTEM_PATH
@@ -120,7 +120,7 @@ if [ "$(uname -s)" = Darwin ]; then
   done
   write_record replace
   expect_refusal 'system plutil with an incomplete update'
-  grep -q 'Culler has an incomplete update.' "$TMP/output" || fail 'system plutil did not read JSON'
+  grep -q 'S-Horizon has an incomplete update.' "$TMP/output" || fail 'system plutil did not read JSON'
   printf '{' >"$record"
   expect_refusal 'system plutil with a malformed journal'
 fi
