@@ -1,0 +1,10 @@
+AM v0.2.23 双面哈希登记（轮四十九收口窗：D04 break-glass 机制＋紧急单人操作清单冻结成文落地⇒EVIDENCED＝D-track 第五票；IG-T7 冻结清单恰含 session-revoke:global 一项；单人紧急例演练 B1-B4 全绿）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 2347755412e5750f5a65a69a921eed94103cb127e8794bf1dd12c3a81e71e2fb
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = e379d52e0dae825d798a24402e218b2a360835bb4a11d9c050c22c260761a70e，与 am-v0.2.22-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.22 = e379d52e0dae825d798a24402e218b2a360835bb4a11d9c050c22c260761a70e（evidence/A32/am-v0.2.22-hash.txt 实读）；再前 v0.2.21 = 78a72edc6f21accedcb6c58d47376a1a045ef136f9da524d98d13b7b9c8e70b3（同件记载）
+- 同轮并入 dev 的提交: 2cb6750（D04 设计面＋范围裁定 D0-D5：零 schema[identity 不变]／单人紧急清单冻结为恰含 session-revoke:global 一项[BREAK-GLASS.md 成文，扩缩类=所有者裁定]／guard 单平面 DecideBreakGlass[清单外 fail-closed deny]／global 五步路径[purpose 强制⇒guard⇒admin=true 绑定[唯一路径]⇒全局 UPDATE⇒专属审计 kind]）＋2b2f3d6（D04：docs/contracts/BREAK-GLASS.md[冻结清单＋D23 协议逐项映射＋变更规则＋演练引用]；identity.DecideBreakGlass＋DecideSessionLifecycle global 语义更正；verbs IdentitySessionRevoke global break-glass 路径＋派生 grant 同事务级联[IG §6 全局形态，只收紧]＋wire additive[purpose/break_glass]；B1-B4 演练族）；status.json D04=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（27 包 ok，verbs 539.379s 非缓存实跑，首跑无红点）；schema 基线 identity 不变＝f9d1090e71e57130bcb7821a25a7959177098bd435c9756fcef8a13c0681e615（S9，本票零 schema）
+- 诚实边界: D23 限时/到期自动撤销＝n-a（即时操作无委托凭据）；事后追认＋Authority 复审＝D08 signoffs 平面（本票审计行＝追认待办证据载体）；双人级（对象级读权类）＝D08（本平面 fail-closed deny 不预置档）；BREAK-GLASS.md 未入 anchors.bind 哈希绑定（独立治理动作候所有者）；清单恰一项＝合同面事实非能力上限
+- 账: dev tip＝2b2f3d6（本登记轮提交随后）/ worktrees＝main+dev+d04（d04 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明；完整审计重跑已候令）/ **D-chain 状态：D01＝D02＝D03＝D04＝D05＝EVIDENCED⇒D09 就绪（门 O9 候所有者裁）；D06 候 O11 裁决（deps 已齐）；D07/D08 需 D06；B-chain 余 B06（门 O3 硬件候所有者触发）＋B08 稳态后续票面候裁定**
