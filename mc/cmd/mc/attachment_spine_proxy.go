@@ -30,6 +30,11 @@ func (d *attachmentSpineProxyDriver) Open(string) (driver.Conn, error) {
 	return &attachmentSpineProxyConn{channel: channel}, nil
 }
 
+// ClosedSpineProxy marks this driver for the verb transaction lifecycle:
+// its connections forward every statement to the closed-spine RPC process
+// instead of executing it, so no SQL runs on the proxied connection.
+func (*attachmentSpineProxyDriver) ClosedSpineProxy() {}
+
 func openPrivateAttachmentSpineProxy() (*sql.DB, error) {
 	return openAttachmentSpineProxy(dialPrivateAttachmentSpineRPC)
 }

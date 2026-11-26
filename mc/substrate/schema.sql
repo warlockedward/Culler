@@ -267,6 +267,161 @@ CREATE TABLE activity_chain_map (
 );
 
 ------------------------------------------------------------------------------
+-- identity foundation (D01, IG §1-§3) — the P4 data-access identity plane,
+-- orthogonal to the run.json execution plane (I3: identity ≠ authority).
+--
+-- trusted_ctx is a per-connection TEMP table the guard binds inside the
+-- write transaction (CREATE TEMP TABLE trusted_ctx(actor TEXT PRIMARY KEY,
+-- admin INTEGER NOT NULL DEFAULT 0)); it is connection-local, so a context
+-- bound on one connection is invisible to every other (no cross-talk by
+-- construction), and its absence fails closed: the guards below REFUSE any
+-- insert/revocation that carries no bound actor or one that disagrees with
+-- the row's attribution. The guard is the ONLY allow/deny/require-signoff
+-- decision plane (D-IG-3); these triggers are the object-scope execution
+-- constraint, never a second authorization system.
+------------------------------------------------------------------------------
+
+CREATE TABLE users (
+    id            TEXT NOT NULL UNIQUE
+               CHECK (length(id) = 32 AND
+                      length(CAST(id AS BLOB)) = 32 AND
+                      id NOT GLOB '*[^0-9a-f]*'),
+    username      TEXT NOT NULL
+               CHECK (length(username) BETWEEN 3 AND 64 AND
+                      username NOT GLOB '*[^a-zA-Z0-9._-]*'),
+    password_hash TEXT NOT NULL
+               CHECK (length(password_hash) = 60 AND
+                      password_hash GLOB '$2[ab]$*'),
+    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (id)
+);
+
+CREATE UNIQUE INDEX users_username ON users (username);
+
+CREATE TABLE user_sessions (
+    session_id          TEXT NOT NULL UNIQUE
+                     CHECK (length(session_id) = 32 AND
+                            length(CAST(session_id AS BLOB)) = 32 AND
+                            session_id NOT GLOB '*[^0-9a-f]*'),
+    token_hash          TEXT NOT NULL UNIQUE
+                     CHECK (length(token_hash) = 64 AND
+                            length(CAST(token_hash AS BLOB)) = 64 AND
+                            token_hash NOT GLOB '*[^0-9a-f]*'),
+    user_id             TEXT NOT NULL REFERENCES users (id),
+    state               TEXT NOT NULL CHECK (state IN ('active','revoked','expired')),
+    created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+    absolute_expires_at TEXT NOT NULL,
+    idle_expires_at     TEXT NOT NULL,
+    last_seen_at        TEXT NOT NULL,
+    revoked_by          TEXT
+                     CHECK (revoked_by IS NULL OR
+                            (length(revoked_by) = 32 AND
+                             length(CAST(revoked_by AS BLOB)) = 32 AND
+                             revoked_by NOT GLOB '*[^0-9a-f]*')),
+    PRIMARY KEY (session_id)
+);
+
+CREATE INDEX user_sessions_user ON user_sessions (user_id);
+
+CREATE TABLE teams (
+    id         TEXT NOT NULL UNIQUE
+            CHECK (length(id) = 32 AND
+                   length(CAST(id AS BLOB)) = 32 AND
+                   id NOT GLOB '*[^0-9a-f]*'),
+    name       TEXT NOT NULL
+            CHECK (length(name) BETWEEN 2 AND 64 AND
+                   name NOT GLOB '*[^a-zA-Z0-9._-]*'),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (id)
+);
+
+CREATE UNIQUE INDEX teams_name ON teams (name);
+
+CREATE TABLE team_members (
+    team_id   TEXT NOT NULL REFERENCES teams (id),
+    user_id   TEXT NOT NULL REFERENCES users (id),
+    joined_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (team_id, user_id)
+);
+
+-- Capability grants (I2: permission comes only from an explicit grant —
+-- bounded, time-limited, revocable, evented). expires_at is mandatory; a
+-- grant without an expiry cannot be expressed. Durations are computed in
+-- the spine's clock (datetime('now', '+N ...')); no host time ever enters.
+CREATE TABLE grants (
+    grant_id           TEXT NOT NULL UNIQUE
+                    CHECK (length(grant_id) = 32 AND
+                           length(CAST(grant_id AS BLOB)) = 32 AND
+                           grant_id NOT GLOB '*[^0-9a-f]*'),
+    grantee_user_id    TEXT NOT NULL REFERENCES users (id),
+    scope              TEXT NOT NULL
+                    CHECK (length(scope) BETWEEN 1 AND 128),
+    resource           TEXT
+                    CHECK (resource IS NULL OR length(resource) <= 256),
+    granted_by_user_id TEXT NOT NULL REFERENCES users (id),
+    created_at         TEXT NOT NULL DEFAULT (datetime('now')),
+    effective_at       TEXT NOT NULL,
+    expires_at         TEXT NOT NULL,
+    revoked_at         TEXT,
+    PRIMARY KEY (grant_id)
+);
+
+CREATE INDEX grants_grantee ON grants (grantee_user_id, scope);
+
+-- trusted_ctx — the guard's bound acting party (D01). The guard inserts its
+-- single row inside the write transaction; the object-scope triggers below
+-- read it; inTx clears it at the entry and the terminus of every write
+-- transaction. The write lock serializes writers, so at the moment any of
+-- those triggers fires, the row (if present) was bound by the same
+-- in-transaction flow — a writer that never bound one fails closed.
+CREATE TABLE trusted_ctx (
+    actor TEXT PRIMARY KEY
+        CHECK (length(actor) = 32 AND
+               length(CAST(actor AS BLOB)) = 32 AND
+               actor NOT GLOB '*[^0-9a-f]*'),
+    admin INTEGER NOT NULL DEFAULT 0
+);
+
+-- Object-scope execution constraints (D-IG-3): these triggers do not decide
+-- allow/deny — the guard does, in Go, before the write. They enforce that a
+-- guarded write's attribution agrees with the guard-bound trusted context,
+-- and fail closed when no context is bound.
+CREATE TRIGGER grants_guarded_insert BEFORE INSERT ON grants
+BEGIN
+    SELECT RAISE(ABORT, 'grant insert requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'grant attribution disagrees with the trusted context')
+    WHERE NEW.granted_by_user_id NOT IN (SELECT actor FROM trusted_ctx);
+END;
+
+CREATE TRIGGER user_sessions_guarded_insert BEFORE INSERT ON user_sessions
+BEGIN
+    SELECT RAISE(ABORT, 'session insert requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'session ownership disagrees with the trusted context')
+    WHERE NEW.user_id NOT IN (SELECT actor FROM trusted_ctx);
+END;
+
+CREATE TRIGGER user_sessions_guarded_revoke BEFORE UPDATE OF state ON user_sessions
+WHEN NEW.state IN ('revoked','expired') AND OLD.state = 'active'
+BEGIN
+    SELECT RAISE(ABORT, 'session state change requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'session state actor disagrees with the trusted context')
+    WHERE NEW.user_id NOT IN (SELECT actor FROM trusted_ctx)
+      AND NOT EXISTS (SELECT 1 FROM trusted_ctx WHERE admin = 1);
+END;
+
+-- Session states move one way only (active -> revoked|expired); a revoked or
+-- expired session never reactivates. This is the state-legality constraint,
+-- not an authorization decision (D-IG-3).
+CREATE TRIGGER user_sessions_state_machine BEFORE UPDATE OF state ON user_sessions
+WHEN NEW.state = 'active' AND OLD.state IN ('revoked','expired')
+BEGIN
+    SELECT RAISE(ABORT, 'a session that left active cannot re-enter it');
+END;
+
+------------------------------------------------------------------------------
 -- projects / sandbox_profiles — infrastructure records.
 ------------------------------------------------------------------------------
 

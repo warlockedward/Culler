@@ -105,6 +105,62 @@ func buildPreLedgerSpineFile(t *testing.T, path, uuid string) {
 		db.Close()
 		t.Fatalf("strip activity chain map: %v", err)
 	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS user_sessions_state_machine`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions state machine: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS user_sessions_guarded_revoke`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions guarded revoke: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS user_sessions_guarded_insert`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions guarded insert: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS grants_guarded_insert`); err != nil {
+		db.Close()
+		t.Fatalf("strip grants guarded insert: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS grants_grantee`); err != nil {
+		db.Close()
+		t.Fatalf("strip grants grantee index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS grants`); err != nil {
+		db.Close()
+		t.Fatalf("strip grants table: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS team_members`); err != nil {
+		db.Close()
+		t.Fatalf("strip team members: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS teams_name`); err != nil {
+		db.Close()
+		t.Fatalf("strip teams name index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS teams`); err != nil {
+		db.Close()
+		t.Fatalf("strip teams table: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS user_sessions_user`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions user index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS user_sessions`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions table: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS users_username`); err != nil {
+		db.Close()
+		t.Fatalf("strip users username index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS users`); err != nil {
+		db.Close()
+		t.Fatalf("strip users table: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS trusted_ctx`); err != nil {
+		db.Close()
+		t.Fatalf("strip trusted context table: %v", err)
+	}
 	preID := substrate.ProductionMigrationRegistry()[0].FromSchemaID
 	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, preID); err != nil {
 		db.Close()
@@ -139,8 +195,8 @@ func TestOnboardSpineMigratesPreLedgerSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 6 {
-		t.Fatalf("ledger rows = %d (%v); want 6", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 7 {
+		t.Fatalf("ledger rows = %d (%v); want 7", ledgerRows, err)
 	}
 	db.Close()
 
@@ -437,6 +493,62 @@ func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
 		db.Close()
 		t.Fatalf("strip activity chain map: %v", err)
 	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS user_sessions_state_machine`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions state machine: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS user_sessions_guarded_revoke`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions guarded revoke: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS user_sessions_guarded_insert`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions guarded insert: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS grants_guarded_insert`); err != nil {
+		db.Close()
+		t.Fatalf("strip grants guarded insert: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS grants_grantee`); err != nil {
+		db.Close()
+		t.Fatalf("strip grants grantee index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS grants`); err != nil {
+		db.Close()
+		t.Fatalf("strip grants table: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS team_members`); err != nil {
+		db.Close()
+		t.Fatalf("strip team members: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS teams_name`); err != nil {
+		db.Close()
+		t.Fatalf("strip teams name index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS teams`); err != nil {
+		db.Close()
+		t.Fatalf("strip teams table: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS user_sessions_user`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions user index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS user_sessions`); err != nil {
+		db.Close()
+		t.Fatalf("strip user sessions table: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS users_username`); err != nil {
+		db.Close()
+		t.Fatalf("strip users username index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS users`); err != nil {
+		db.Close()
+		t.Fatalf("strip users table: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS trusted_ctx`); err != nil {
+		db.Close()
+		t.Fatalf("strip trusted context table: %v", err)
+	}
 	step1 := substrate.ProductionMigrationRegistry()[0]
 	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, step1.ToSchemaID); err != nil {
 		db.Close()
@@ -450,7 +562,7 @@ func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
 }
 
 // U4: OnboardSpine crosses a spine left at the first step's target identity:
-// the recorded first step is skipped, the second through sixth steps
+// the recorded first step is skipped, the second through seventh steps
 // land, the deployment UUID is preserved, and the schema check passes on
 // the result.
 func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
@@ -473,8 +585,8 @@ func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 6 {
-		t.Fatalf("ledger rows = %d (%v); want 6", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 7 {
+		t.Fatalf("ledger rows = %d (%v); want 7", ledgerRows, err)
 	}
 	db.Close()
 }

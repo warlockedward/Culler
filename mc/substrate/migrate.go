@@ -96,6 +96,11 @@ const c03UsageIdentity = "6ce879af3bbea92540934d467976d8a0356b5285919193dde4eff1
 // Pinned as a historical fact like c03UsageIdentity.
 const b09ChainIdentity = "93f0515ee82941d3c884a21732c9ee4afebd569b027d18b408f5f20066b87fa8"
 
+// b08MapIdentity is the schema identity the sixth step produced: the
+// activity chain mapping table, before the identity foundation existed.
+// Pinned as a historical fact like b09ChainIdentity.
+const b08MapIdentity = "bc32d91b58a17aaa81217c11b8dc26a24e2c355842e2ca43e2fe717327d9da0c"
+
 // ProductionMigrationRegistry returns the ordered step registry this release
 // carries. The registry always terminates at CurrentSchemaID: a release that
 // changes the schema text must register the step that crosses that boundary,
@@ -110,10 +115,12 @@ func ProductionMigrationRegistry() []MigrationStep {
 	last := newMigrationStep(5, "migrate-usage-to-v2", c03UsageIdentity, b09ChainIdentity, usageV2DDL)
 	last.Verify = VerifyUsageBackfill
 	registry = append(registry, last)
-	sixth := newMigrationStep(6, "migrate-activity-to-chain", b09ChainIdentity, CurrentSchemaID, activityChainMapDDL)
+	sixth := newMigrationStep(6, "migrate-activity-to-chain", b09ChainIdentity, b08MapIdentity, activityChainMapDDL)
 	sixth.Migrate = migrateActivityToChain
 	sixth.Verify = VerifyActivityBackfill
-	return append(registry, sixth)
+	registry = append(registry, sixth)
+	seventh := newMigrationStep(7, "add-identity-foundation", b08MapIdentity, CurrentSchemaID, identityFoundationDDL)
+	return append(registry, seventh)
 }
 
 // MigrationReport describes one runner pass over a spine.

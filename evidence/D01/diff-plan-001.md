@@ -71,3 +71,14 @@
 ## 7. 登记与收尾
 
 实施＝少提交于 shz/TD01；全道绿后 ff dev；登记轮＝AM v0.2.19＋status.json D01=EVIDENCED＋blcheck；D02-D09 解锁呈报。
+
+## 8. 实施补记（先列后改的追加登记）
+
+- **D3′ trusted_ctx 载体转向（实验实证，覆盖 §1-D3 的 temp 表方案）**：初案以 per-connection TEMP 表承载可信上下文（连接局部＝结构性免串扰）。实测 sqlite3 CLI：`trigger ... cannot reference objects in database temp`（temp 禁引）；再试 ATTACH ':memory:' 亦报 `cannot reference objects in database t`（attached 禁引）——**SQLite trigger 只能引用其目标表所在库（main）**。故转向＝main 库 `trusted_ctx(actor TEXT PRIMARY KEY, admin INTEGER)` 生命周期表：guard 在写事务内 INSERT 单行（绑定），inTx 在**每个写事务入口**清除（丢弃崩溃前驱遗留行，恒从空版开始）＋**终结**清除（丢弃刚提交事务的绑定，池化连接不带 actor 进下一用）；回滚结构性丢弃绑定（它在事务内）。安全性由"写锁串行化（BEGIN IMMEDIATE 单写者）＋入口/终结清除"共同承载：任一 trigger 触发瞬间，trusted_ctx 若有行必为同一 inTx 流的 guard 所绑。IG §3 原文"连接级绑定、同一写事务内设置、异常/复用即清除"的语义由"inTx 写事务级绑定"兑现（SQLite 无 trigger 可见的连接级存储，此为可达最近形）。
+- **D3″ 崩溃窗残余（诚实边界）**：提交后、终结清除前进程崩溃⇒绑定行残留；但下一 inTx 入口清除先行，且非 inTx 裸写者须同时命中该微秒窗＋归属恰为残留 actor 方可蒙混——残余面登记，不冒充"零窗"。
+- **N2/N3 测试语义随载体调整**：N2 从"跨连接不可见"改为"跨写事务不持久"（inTx#1 绑定+写+提交⇒inTx#2 无绑定⇒拒）；N3 保持"失败/复用清除"（inTx 绑定后注入失败⇒回滚⇒下一 inTx 无绑定⇒拒），去 SetMaxOpenConns（隔离不再依赖连接复用）。
+- **S7 语句集**＝5 表（users/user_sessions/teams/team_members/grants）＋trusted_ctx＋4 trigger（grants_guarded_insert／user_sessions_guarded_insert／user_sessions_guarded_revoke／user_sessions_state_machine 单向态机）＋4 索引；trusted_ctx 与状态机 trigger 为 §1-D1 之外的实施增补（对象范围＋状态合法性，D-IG-3 执行约束面，非第二决策体系）。
+- **bcrypt 依赖面**：x/crypto 钉 v0.44.0（GoVersion 1.24，兼容仓库 pin go1.25.12；v0.59 要求 go1.26 拒收）；传递升级 x/sys v0.50.0／x/text v0.44.0。
+- **时钟纪律**：identity 表时间列＝SpineTime（datetime('now') 域，TTL 经 datetime('now','+N') SQL 内计算），非 27 字符规范形——verbs 包文档"脊钟为唯一钟，宿主不传时间"优先于链式规范形（identity 时间不入链载荷；Class A 事件走 activity 行的既有 SpineTime 惯例）。
+- **依赖面更正（全道红点①，§6-S3 触发后化解）**：上述 x/sys v0.50.0 传递升级本身要求 go≥1.26，tidy 随即将 go.mod 抬到 `go 1.26.0`⇒mc 模块内所有 go 命令经 GOTOOLCHAIN=auto 切到 go1.26.x⇒culler-package 二进制身份测试（`validateBuildInfo` 比对 fixture 二进制 go1.25.12 与测试进程自身 `runtime.Version()`=go1.26.x）三架构全红。裁定＝零传递升级：go.mod 恢复原 pin（x/sys v0.44.0／x/text v0.37.0，均满足 x/crypto v0.44.0 的 v0.38.0/v0.31.0 下限），最终模块 diff 仅 `+ golang.org/x/crypto v0.44.0`（go.sum +2 行）。教训登记：依赖升级面必须连带检查其 go directive 是否抬升宿主工具链，而不只查编译通过。
+- **闭脊代理生命周期豁免（全道红点②）**：inTx 入口/终结清除在 attachment closed-spine proxy 连接上被代理 allowlist 拒（"statement is not in the publisher/terminal allowlist"）⇒既有 attachment 两测试红。根因＝该代理连接**不执行任何 SQL**：所有语句转发至持有脊的 RPC 进程，写事务在进程侧连接上运行；清除语句既无意义（代理侧无本地执行）又破协议（非 allowlist 语句）。裁定＝inTx 经 `db.Driver()` 断言导出标记 `ClosedSpineProxy()`（attachmentSpineProxyDriver 实现）识别闭脊代理驱动，命中则豁免入口/终结清除；普通脊连接（含 dispatchseam）清除面不变。威胁模型注记＝guard 写路径永不走代理（identity verb 仅经 systemSpineCall 直连脊），代理平面不存在可被残余行利用的 guard 写；RPC 进程侧事务的自有生命周期＝D0 范围外诚实边界（随附件面后续票）。

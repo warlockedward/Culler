@@ -431,6 +431,36 @@ func commandSystemSpine(action string, stdin io.Reader) (any, error) {
 			return nil, err
 		}
 		return withSpineRead(func(db *sql.DB) (any, error) { return verbs.UsagePending(db, id, a) })
+	case "identity-user-create":
+		var a verbs.IdentityUserCreateRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityUserCreate(db, id, a) })
+	case "identity-session-create":
+		var a verbs.IdentitySessionCreateRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentitySessionCreate(db, id, a) })
+	case "identity-session-revoke":
+		var a verbs.IdentitySessionRevokeRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentitySessionRevoke(db, id, a) })
+	case "identity-grant-issue":
+		var a verbs.IdentityGrantIssueRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityGrantIssue(db, id, a) })
+	case "identity-grant-revoke":
+		var a verbs.IdentityGrantRevokeRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityGrantRevoke(db, id, a) })
 	case "launch-check":
 		var a struct {
 			Run          string                    `json:"run"`

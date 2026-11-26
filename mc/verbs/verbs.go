@@ -27,6 +27,7 @@ import (
 	"modernc.org/sqlite"
 
 	"mc/domain"
+	"mc/identity"
 )
 
 // DomainError is a domain rejection: exit 1. It is mc/domain's coded error,
@@ -61,17 +62,51 @@ type SpineInfrastructureError interface {
 // mc/domain and re-exported.
 type Q = domain.Q
 
+// closedSpineProxy is satisfied by a driver whose connections forward every
+// statement to a closed-spine RPC process instead of executing it.
+type closedSpineProxy interface{ ClosedSpineProxy() }
+
 // inTx runs fn under BEGIN IMMEDIATE on a single connection. Any error from
 // fn rolls the transaction back and is returned;
 // raw SQL errors (the substrate's trigger/CHECK aborts among them) are
 // wrapped as DomainError unless already typed.
-func inTx(db *sql.DB, fn func(ctx context.Context, q Q) error) error {
+func inTx(db *sql.DB, fn func(ctx context.Context, q Q) error) (err error) {
 	ctx := context.Background()
+	// Over a closed-spine proxy no SQL executes on the proxied connection:
+	// every statement is forwarded to the RPC process that owns the spine,
+	// where the write transaction runs on its own connection. The guarded
+	// write path never runs over the proxy, so the trusted context has
+	// nothing to clear here and its statements would be refused by the
+	// proxy allowlist.
+	clearContext := true
+	if _, ok := db.Driver().(closedSpineProxy); ok {
+		clearContext = false
+	}
 	conn, err := db.Conn(ctx)
 	if err != nil {
 		return Usagef("acquire spine connection: %v", err)
 	}
 	defer conn.Close()
+	// The guard-bound trusted context is per write transaction (IG §3): the
+	// entry clear discards any row a crashed predecessor left committed, so
+	// every write transaction starts from an unbound slate; the terminus
+	// clear discards the row the finished transaction committed, so a pooled
+	// connection never carries an actor into its next use. Both are no-ops
+	// on spines without the table.
+	defer func() {
+		if !clearContext {
+			return
+		}
+		if clearErr := identity.ClearTrustedContextIfPresent(ctx, conn); clearErr != nil && err == nil {
+			err = Usagef("clear trusted context: %v", clearErr)
+		}
+	}()
+	if clearContext {
+		if clearErr := identity.ClearTrustedContextIfPresent(ctx, conn); clearErr != nil {
+			conn.Close()
+			return Usagef("clear trusted context: %v", clearErr)
+		}
+	}
 	if _, err := conn.ExecContext(ctx, "BEGIN IMMEDIATE"); err != nil {
 		return Usagef("begin immediate: %v", err)
 	}

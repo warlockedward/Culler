@@ -231,6 +231,123 @@ WHERE o.source_version = (
     SELECT MAX(o2.source_version) FROM usage_observations o2
     WHERE o2.request_identity = o.request_identity AND o2.event_seq = o.event_seq);`
 
+// identityFoundationDDL is the seventh step's object definitions: the P4
+// identity plane (users, sessions, teams, membership, grants) and its
+// object-scope guards. Every statement's text must stay byte-identical to
+// the identity block in schema.sql, so the sqlite_schema rows of a migrated
+// spine hash like the reference spine built from the baseline. The
+// trusted_ctx temp table is deliberately absent: it is per-connection and is
+// bound by the guard inside the write transaction, never by the schema.
+const identityFoundationDDL = `CREATE TABLE users (
+    id            TEXT NOT NULL UNIQUE
+               CHECK (length(id) = 32 AND
+                      length(CAST(id AS BLOB)) = 32 AND
+                      id NOT GLOB '*[^0-9a-f]*'),
+    username      TEXT NOT NULL
+               CHECK (length(username) BETWEEN 3 AND 64 AND
+                      username NOT GLOB '*[^a-zA-Z0-9._-]*'),
+    password_hash TEXT NOT NULL
+               CHECK (length(password_hash) = 60 AND
+                      password_hash GLOB '$2[ab]$*'),
+    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX users_username ON users (username);
+CREATE TABLE user_sessions (
+    session_id          TEXT NOT NULL UNIQUE
+                     CHECK (length(session_id) = 32 AND
+                            length(CAST(session_id AS BLOB)) = 32 AND
+                            session_id NOT GLOB '*[^0-9a-f]*'),
+    token_hash          TEXT NOT NULL UNIQUE
+                     CHECK (length(token_hash) = 64 AND
+                            length(CAST(token_hash AS BLOB)) = 64 AND
+                            token_hash NOT GLOB '*[^0-9a-f]*'),
+    user_id             TEXT NOT NULL REFERENCES users (id),
+    state               TEXT NOT NULL CHECK (state IN ('active','revoked','expired')),
+    created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+    absolute_expires_at TEXT NOT NULL,
+    idle_expires_at     TEXT NOT NULL,
+    last_seen_at        TEXT NOT NULL,
+    revoked_by          TEXT
+                     CHECK (revoked_by IS NULL OR
+                            (length(revoked_by) = 32 AND
+                             length(CAST(revoked_by AS BLOB)) = 32 AND
+                             revoked_by NOT GLOB '*[^0-9a-f]*')),
+    PRIMARY KEY (session_id)
+);
+CREATE INDEX user_sessions_user ON user_sessions (user_id);
+CREATE TABLE teams (
+    id         TEXT NOT NULL UNIQUE
+            CHECK (length(id) = 32 AND
+                   length(CAST(id AS BLOB)) = 32 AND
+                   id NOT GLOB '*[^0-9a-f]*'),
+    name       TEXT NOT NULL
+            CHECK (length(name) BETWEEN 2 AND 64 AND
+                   name NOT GLOB '*[^a-zA-Z0-9._-]*'),
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX teams_name ON teams (name);
+CREATE TABLE team_members (
+    team_id   TEXT NOT NULL REFERENCES teams (id),
+    user_id   TEXT NOT NULL REFERENCES users (id),
+    joined_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (team_id, user_id)
+);
+CREATE TABLE grants (
+    grant_id           TEXT NOT NULL UNIQUE
+                    CHECK (length(grant_id) = 32 AND
+                           length(CAST(grant_id AS BLOB)) = 32 AND
+                           grant_id NOT GLOB '*[^0-9a-f]*'),
+    grantee_user_id    TEXT NOT NULL REFERENCES users (id),
+    scope              TEXT NOT NULL
+                    CHECK (length(scope) BETWEEN 1 AND 128),
+    resource           TEXT
+                    CHECK (resource IS NULL OR length(resource) <= 256),
+    granted_by_user_id TEXT NOT NULL REFERENCES users (id),
+    created_at         TEXT NOT NULL DEFAULT (datetime('now')),
+    effective_at       TEXT NOT NULL,
+    expires_at         TEXT NOT NULL,
+    revoked_at         TEXT,
+    PRIMARY KEY (grant_id)
+);
+CREATE INDEX grants_grantee ON grants (grantee_user_id, scope);
+CREATE TABLE trusted_ctx (
+    actor TEXT PRIMARY KEY
+        CHECK (length(actor) = 32 AND
+               length(CAST(actor AS BLOB)) = 32 AND
+               actor NOT GLOB '*[^0-9a-f]*'),
+    admin INTEGER NOT NULL DEFAULT 0
+);
+CREATE TRIGGER grants_guarded_insert BEFORE INSERT ON grants
+BEGIN
+    SELECT RAISE(ABORT, 'grant insert requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'grant attribution disagrees with the trusted context')
+    WHERE NEW.granted_by_user_id NOT IN (SELECT actor FROM trusted_ctx);
+END;
+CREATE TRIGGER user_sessions_guarded_insert BEFORE INSERT ON user_sessions
+BEGIN
+    SELECT RAISE(ABORT, 'session insert requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'session ownership disagrees with the trusted context')
+    WHERE NEW.user_id NOT IN (SELECT actor FROM trusted_ctx);
+END;
+CREATE TRIGGER user_sessions_guarded_revoke BEFORE UPDATE OF state ON user_sessions
+WHEN NEW.state IN ('revoked','expired') AND OLD.state = 'active'
+BEGIN
+    SELECT RAISE(ABORT, 'session state change requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'session state actor disagrees with the trusted context')
+    WHERE NEW.user_id NOT IN (SELECT actor FROM trusted_ctx)
+      AND NOT EXISTS (SELECT 1 FROM trusted_ctx WHERE admin = 1);
+END;
+CREATE TRIGGER user_sessions_state_machine BEFORE UPDATE OF state ON user_sessions
+WHEN NEW.state = 'active' AND OLD.state IN ('revoked','expired')
+BEGIN
+    SELECT RAISE(ABORT, 'a session that left active cannot re-enter it');
+END;`
+
 // activityChainMapDDL is the sixth step's object definition: the
 // cross-reference between the activity ledger and its chain projection. The
 // data movement itself (the backfill) runs as the step's same-transaction
