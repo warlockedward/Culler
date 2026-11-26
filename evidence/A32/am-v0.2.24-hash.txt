@@ -1,0 +1,9 @@
+AM v0.2.24 双面哈希登记（轮四十八八裁落档窗：所有者"全按推荐"八裁逐条落定＋D06 设计面立件＝O11 裁决包候所有者一言；B10 入图 tickets 72⇒73；BREAK-GLASS.md 入 anchors.bind）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = a987bbb398f122fe4978d302daeadc1ef4eff0b03ff7be2011b56851a85514fa
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 2347755412e5750f5a65a69a921eed94103cb127e8794bf1dd12c3a81e71e2fb，与 am-v0.2.23-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.23 = 2347755412e5750f5a65a69a921eed94103cb127e8794bf1dd12c3a81e71e2fb（evidence/A32/am-v0.2.23-hash.txt 实读）；再前 v0.2.22 = e379d52e0dae825d798a24402e218b2a360835bb4a11d9c050c22c260761a70e（同件记载）
+- 同轮并入 dev 的提交: 14e26b0（D06 设计面＝O11 裁决包：P1 wire／P2 节点账本 fencing／P3 ed25519 receipt 验证／P4 C 形过渡参考节点＋IG §5.4 载体批准件／P5 per-invocation 进程；S10 sign_requests 状态机＋对账四分支；五证 F1-F5＋IG-T3 三崩溃点；STOP S1-S4[O11 未裁决不进码]）＋B10 票面入 DEV-BASELINE[activity 稳态写入链，deps B08+B07，tickets 72⇒73]＋BREAK-GLASS.md 入 anchors.bind[64b15fd5…ab08]；status.json 无翻转（D06 候 O11，B10 BACKLOG 缺省）
+- 关键事实: 八裁＝Q1 'owner' 值面确认（D03 转已裁）／Q2 D09 缓行／Q3 D06 设计先行（本包）／Q4 B10 批准入图／Q5 B06 候 218／Q6 bind 入册／Q7 Mimosa 审计绑 push 门／Q8 下一波＝D06 设计面（已立）；本登记轮无 lane（零 mc 代码面：仅 evidence/docs/tools 面）
+- 账: dev tip＝14e26b0（本登记轮提交随后）/ worktrees＝main+dev+d06（d06 保留候 O11 裁决后进码）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ schema 基线 identity 不变＝f9d1090e71e57130bcb7821a25a7959177098bd435c9756fcef8a13c0681e615（S9；D06 S10 候进码）/ **D-chain 状态：D01＝D02＝D03＝D04＝D05＝EVIDENCED；D06＝design-complete 候 O11 裁决（裁决包＝14e26b0 §1 P1-P5）；D07/D08 需 D06；D09 缓行（Q2）；B-chain：B10 入图可立，余 B06（门 O3 硬件候 218）**
