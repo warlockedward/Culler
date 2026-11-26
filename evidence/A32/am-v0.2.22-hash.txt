@@ -1,0 +1,10 @@
+AM v0.2.22 双面哈希登记（轮四十八收口窗：D05 degraded_grants 五要件表＋per-operation 拒语义落地⇒EVIDENCED＝D-track 第四票；验收句"五要件缺项=拒"五子例＋判定矩阵全绿）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = e379d52e0dae825d798a24402e218b2a360835bb4a11d9c050c22c260761a70e
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 78a72edc6f21accedcb6c58d47376a1a045ef136f9da524d98d13b7b9c8e70b3，与 am-v0.2.21-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.21 = 78a72edc6f21accedcb6c58d47376a1a045ef136f9da524d98d13b7b9c8e70b3（evidence/A32/am-v0.2.21-hash.txt 实读）；再前 v0.2.20 = 257bec3da6fd49277fd6fe714a3841bdcefb327c225ac2b8e35ab3cb0b30f72f（同件记载）
+- 同轮并入 dev 的提交: e173590（D05 设计面＋范围裁定 D0–D5：S9 schema 面／五要件全 NOT NULL＝结构性缺项拒／判定实时读精确匹配／降级操作业务接线＝具名后续票）＋fa765cf（D05：schema.sql S9 块[degraded_grants 五要件表＋索引＋guarded insert trigger]；migrate.go d03SealIdentity 钉定＋S8.to 钉＋S9；identity.DegradedAllows 决策平面＋Guard.DecideDegradedIssue；verbs IdentityDegradedGrantIssue/Revoke；cmd/mc 路由；M1/M2 substrate 族＋G1-G5 verbs 验收族；registry 9 步全族更新）；status.json D05=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（27 包 ok；verbs 首跑 601.2s 非缓存 ok；首跑一红点＝环境 flake[host Bun fixture mise 解析并行负载失败，单独复跑 PASS 154s，本票不触 deployment/bun 面，前三票同环境全绿]⇒二跑全绿）；新基线 identity＝f9d1090e71e57130bcb7821a25a7959177098bd435c9756fcef8a13c0681e615（shell 三文件拼接＝Go 探针逐字节相等）
+- 诚实边界: 补偿控制实效验证＝治理义务（撤销通道是机制）；具名授权主体选择＝治理行为（不建 Authority 表）；SoD＝D04/D08 平面；risk 值＝自由文本（无 RR 表 FK）；降级操作业务接线＝具名后续票（各准入点调 DegradedAllows）
+- 账: dev tip＝fa765cf（本登记轮提交随后）/ worktrees＝main+dev+d05（d05 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明；完整审计重跑已候令）/ **D-chain 状态：D01＝D02＝D03＝D05＝EVIDENCED⇒D04/D09 就绪；D06 候 O11 裁决（deps 已齐）；D07/D08 需 D06；B-chain 余 B06（门 O3 硬件候所有者触发）＋B08 稳态后续票面候裁定**
