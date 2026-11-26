@@ -1,0 +1,9 @@
+AM v0.2.16 双面哈希登记（轮四十二收口窗：C03 usage 家族实现落地⇒EVIDENCED＝C-track 首票闭合；PS-F1① 崩溃窗验收达成；新基线 identity Z）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 2fcda6641a6729011754a46317e85891bf655ccfbe8da5aba7c9dd4d68de6987
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 3fa40847dbfba1f1103dfcffbd4b30e39aa5c24a99fe68585ca331ee642811f4，与 am-v0.2.15-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.15 = 3fa40847dbfba1f1103dfcffbd4b30e39aa5c24a99fe68585ca331ee642811f4（evidence/A32/am-v0.2.15-hash.txt 实读）；再前 v0.2.14 = b20c8241af2de182816d5cd7aa7ea4165b2875e78a8d321966ea5adf8774f84e（同件记载）
+- 同轮并入 dev 的提交: 6fbbf66（C03：mc/substrate/schema.sql usage_events＋usage_observations 载体＋append-only 纪律；migrate.go b07BaselineIdentity Y 钉定＋S4 add-usage-observations；substrate/usage_observation.go 两相持久（首落赋号/重投递重入不重号/origin 红线/版本冲突禁 LWW/reconciliation 内容判据/聚合自开同事务链行）＋EncodeUsageObservationPayload（B03 冻结表）＋PendingUsageEvents；auchain.go AppendAuditEvent *sql.Conn 支；verbs 两写一读 verb＋cmd/mc usage 命令族；resident/src/usage-observation.ts 五家族解析器＋两相持久＋启动恢复；provider-proxy.ts SSE/JSON 旁路 parse 执行位＋onUsageEvents 缝；main.ts 接线＋log EVENTS 注册册 2 事件；U1-U15 测试族＋CLI 端到端＋check.sh 向量行＋host_release 登记）；status.json C03=EVIDENCED 随本登记轮提交
+- 关键事实: U15 25 例向量逐字节 PASS（13 例生产者面等价）；最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（27 包 ok，verbs 546.515s 非缓存）＋resident 788/0＋runner/shared 120/0＋六组件 lane 全绿（agent-runner/image 两红＝新 worktree 缺锁定依赖⇒按 AGENTS.md 工具链安装后复跑绿）；新基线 identity Z = 6ce879af3bbea92540934d467976d8a0356b5285919193dde4eff15513d3d085
+- 账: dev tip＝6fbbf66（本登记轮提交随后）/ worktrees＝main+dev+c03（c03 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）/ **C-track 状态：C01＝C02＝C03＝EVIDENCED；解锁 B09/C05/C08**
