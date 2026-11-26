@@ -1,0 +1,10 @@
+AM v0.2.25 双面哈希登记（轮五十收口窗：O11 裁决批准[所有者"批准"一言，对 D06 设计面 14e26b0 §1 P1-P5＋IG §5.4 载体件]＋D06 签名请求状态机落地⇒EVIDENCED＝D-track 第六票；IG-T9 五证含并发竞/重启迟到全绿；D07/D08 解锁）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 6729276b27c1738b9384f4caf587297d40e40d597023f8ff341540a06be7ac13
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = a987bbb398f122fe4978d302daeadc1ef4eff0b03ff7be2011b56851a85514fa，与 am-v0.2.24-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.24 = a987bbb398f122fe4978d302daeadc1ef4eff0b03ff7be2011b56851a85514fa（evidence/A32/am-v0.2.24-hash.txt 实读）；再前 v0.2.23 = 2347755412e5750f5a65a69a921eed94103cb127e8794bf1dd12c3a81e71e2fb（同件记载）
+- 同轮并入 dev 的提交: 14e26b0（D06 设计面＝O11 裁决包，八裁轮已 ff dev，SHA 保留原值）＋997e93c（D06 实施：schema.sql S10 sign_requests[单向态机+guarded 出生]；migrate.go d05RegistryIdentity 钉定+S9.to 钉+S10；mc/signnode 过渡参考节点[ledger.jsonl+flock+ed25519+A02 seed 缝+公钥环]；__sign-node 私有命令[文件交接]；verbs 五 verb[create 能力门/execute 三重验/reconcile 四分支 UNKNOWN 保守/cancel fence/supersede 单后继]；shz-sign-v1 规范形；F 族×8 节点级+C/F 族×7 verbs 级+S10 步骤族；registry 10 步全族更新）；status.json D06=EVIDENCED 随本登记轮提交
+- 关键事实: O11 批准事件＝所有者对呈出形态（P1 wire／P2 ledger+fencing／P3 ed25519 receipt／P4 C 形过渡+§5.4 载体件／P5 per-invocation）一言"批准"（批准绑定 14e26b0 呈出形态）；最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（28 包 ok[新 signnode 包]，verbs 487.503s 非缓存实跑，零 FAIL 零 UNVERIFIED，首跑无红点）；新基线 identity＝9e322e35834ccffe95c6205252af12552b414596e7194c3a507d48456f9001a0（shell 三文件拼接＝Go 探针逐字节相等）
+- 诚实边界: 参考节点 C 形 transitional（生产锚定门在 D07 消费侧按 §5.4：B 优先/A 受限候 IG-T4 六项/C 禁生产锚定）；"处理中"分支 per-invocation 原子形态下不持久化（登记）；verb 进程内 serve＝等价快路径（P5 修正登记 §8，子进程形态保留 __sign-node）；节点 ledger＝JSONL+flock 非第二 SQLite
+- 账: dev tip＝997e93c（本登记轮提交随后）/ worktrees＝main+dev+d06（d06 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa 完整审计重跑候 push 门（Q7 裁定）/ **D-chain 状态：D01＝D02＝D03＝D04＝D05＝D06＝EVIDENCED⇒D07（锚定发布）/D08（signoffs+SoD）解锁；D09 缓行（Q2）；B-chain：B10 入图可立，余 B06（门 O3 硬件候 218）**
