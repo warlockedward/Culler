@@ -138,6 +138,22 @@ var payloadSchemas = map[string][]fieldSpec{
 		{"to_schema_id", "str", false},
 		{"version", "dec_int", false},
 	},
+	// B08: the activity ledger's chain projection. Field values are the
+	// activity row's own values, verbatim (history is read, never
+	// re-authored, IG §7); created_at is converted to the canonical time
+	// form deterministically.
+	"activity": {
+		{"id", "dec_int", false},
+		{"actor", "str", false},
+		{"kind", "str", false},
+		{"created_at", "time", false},
+		{"subject", "str", true},
+		{"detail", "str", true},
+		{"dispatch_key", "str", true},
+		{"dispatch_request_id", "str", true},
+		{"dispatch_result", "str", true},
+		{"project", "str", true},
+	},
 }
 
 // encLengthPrefixed appends the u64be byte-length prefix and the raw UTF-8

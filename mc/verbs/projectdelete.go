@@ -20,6 +20,11 @@ type ProjectDeletion struct {
 const projectSessions = `SELECT id FROM collie_sessions WHERE vision_project_id=:project
 	OR packet_id IN (SELECT id FROM review_versions WHERE task_id IN (SELECT id FROM tasks WHERE project=:project))`
 
+// projectActivityWhere identifies the activity records of the selected
+// Project: its own rows plus the project-unscoped rows that name one of its
+// tasks, runs, or sessions as their subject.
+const projectActivityWhere = "project=:project OR (project IS NULL AND (subject IN (SELECT id FROM tasks WHERE project=:project) OR subject IN (SELECT id FROM runs WHERE project=:project) OR subject IN (" + projectSessions + ")))"
+
 // Each predicate identifies records that belong to the selected Project.
 // Shared profiles, image sources, and connection access remain intact.
 var projectDeletionTables = []struct{ table, where string }{
@@ -27,7 +32,11 @@ var projectDeletionTables = []struct{ table, where string }{
 	{"tasks", "project=:project"},
 	{"runs", "project=:project"},
 	{"collie_sessions", "id IN (" + projectSessions + ")"},
-	{"activity", "project=:project OR (project IS NULL AND (subject IN (SELECT id FROM tasks WHERE project=:project) OR subject IN (SELECT id FROM runs WHERE project=:project) OR subject IN (" + projectSessions + ")))"},
+	{"activity", projectActivityWhere},
+	// The chain projection of the activity rows goes with them: this entry
+	// sits after activity, and deletion runs the list in reverse, so the
+	// mapping rows are removed before the rows they reference.
+	{"activity_chain_map", "activity_id IN (SELECT id FROM activity WHERE " + projectActivityWhere + ")"},
 	{"vision_drafts", "project_id=:project"},
 	{"vision_submissions", "project_id=:project"},
 	{"leases", "project=:project"},

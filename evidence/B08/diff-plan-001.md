@@ -87,6 +87,12 @@ CREATE TABLE activity_chain_map (
 
 ## 7. STOP 条件（STOP-1 呈报，不猜）
 
-- S1 35 处调用点中任一处改接改变其错误处理语义（非纯机械）⇒停，呈报该点。
-- S2 dispatchseam 冻结 JSON 面被改接波及⇒停（负清单红线）。
+- S1 35 处调用点中任一处改接改变其错误处理语义（非纯机械）⇒停，呈报该点。（随 D0 稳态移出本票，条件解除）
+- S2 dispatchseam 冻结 JSON 面被改接波及⇒停（负清单红线）。（随 D0 稳态移出本票，条件解除）
 - S3 payload 字段表与 B03 登记制冲突（如需改既有家族表）⇒停（addition-only 纪律）。
+
+## 8. 实施补记（先列后改的追加登记）
+
+- **D10 项目删除覆盖（测试门咬住的强制集成，非扩面）**：`activity_chain_map.activity_id REFERENCES activity(id)`＋`activity.project`⇒新表进入 projects 的 FK 传递闭包，`TestProjectDeleteCoversEveryDependentTable` 按设计变红。处置＝`verbs/projectdelete.go` 删除清单在 activity 条目**之后**增 `activity_chain_map`（删除逆序执行⇒map 行先于 activity 行移除，FK 无悬挂）；activity 的 where 谓词提为 `projectActivityWhere` 常量两处复用（零语义变化）。lane 第一跑唯一红点＝此门，修复后 projectdelete 族 8/8 绿。
+- **D11 fieldSpec 第三元＝optional 语义再确认**：activity 家族表初版把必填/可选写反（dispatch_key 等必填⇒首跑 NOT_CONFIRMED），B03 provider_request_id 同型教训第二次实证——新家族表落地必跑种子数据。
+- **D12 'activity' 聚合无 aggregate_open**（D1b）：与 'schema' 聚合同先例（首行即 genesis），覆盖证明一一对应更简；S6 步骤自身簿记 activity 行（kind=schema.migration.step）生成于回填之后，不入 'activity' 聚合（其证据在 'schema' 聚合 S6 行）——迁移时点快照语义，候稳态票（D0）统一。

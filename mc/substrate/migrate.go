@@ -26,6 +26,11 @@ type MigrationStep struct {
 	// not cover it: the ledger records what was applied, not how it was
 	// proven.
 	Verify func(tx *sql.Tx) error
+	// Migrate, when set, moves data inside the step's transaction after the
+	// statement and before Verify: the same-transaction hook for steps whose
+	// payload cannot be produced in SQL (chain digests). Like Verify, it is
+	// release code the ledger does not checksum.
+	Migrate func(tx *sql.Tx) error
 }
 
 // verifyStep runs the step's optional same-transaction proof: it must pass
@@ -36,6 +41,16 @@ func verifyStep(tx *sql.Tx, step MigrationStep) error {
 		return nil
 	}
 	return step.Verify(tx)
+}
+
+// runStepMigration runs the step's optional same-transaction data movement,
+// positioned between the statement and the proof so the proof covers the
+// moved state.
+func runStepMigration(tx *sql.Tx, step MigrationStep) error {
+	if step.Migrate == nil {
+		return nil
+	}
+	return step.Migrate(tx)
 }
 
 func newMigrationStep(version int, name, fromSchemaID, toSchemaID, statement string) MigrationStep {
@@ -76,6 +91,11 @@ const b07BaselineIdentity = "4a3159e3cef11986fd68eac67c0d53f7cadc6a992664b9f61b7
 // Pinned as a historical fact like b07BaselineIdentity.
 const c03UsageIdentity = "6ce879af3bbea92540934d467976d8a0356b5285919193dde4eff15513d3d085"
 
+// b09ChainIdentity is the schema identity the fifth step produced: the v2
+// usage projection, before the activity chain mapping table existed.
+// Pinned as a historical fact like c03UsageIdentity.
+const b09ChainIdentity = "93f0515ee82941d3c884a21732c9ee4afebd569b027d18b408f5f20066b87fa8"
+
 // ProductionMigrationRegistry returns the ordered step registry this release
 // carries. The registry always terminates at CurrentSchemaID: a release that
 // changes the schema text must register the step that crosses that boundary,
@@ -87,9 +107,13 @@ func ProductionMigrationRegistry() []MigrationStep {
 		newMigrationStep(3, "add-audit-events-chain", b02BaselineIdentity, b07BaselineIdentity, auditEventsDDL),
 		newMigrationStep(4, "add-usage-observations", b07BaselineIdentity, c03UsageIdentity, usageObservationsDDL),
 	}
-	last := newMigrationStep(5, "migrate-usage-to-v2", c03UsageIdentity, CurrentSchemaID, usageV2DDL)
+	last := newMigrationStep(5, "migrate-usage-to-v2", c03UsageIdentity, b09ChainIdentity, usageV2DDL)
 	last.Verify = VerifyUsageBackfill
-	return append(registry, last)
+	registry = append(registry, last)
+	sixth := newMigrationStep(6, "migrate-activity-to-chain", b09ChainIdentity, CurrentSchemaID, activityChainMapDDL)
+	sixth.Migrate = migrateActivityToChain
+	sixth.Verify = VerifyActivityBackfill
+	return append(registry, sixth)
 }
 
 // MigrationReport describes one runner pass over a spine.

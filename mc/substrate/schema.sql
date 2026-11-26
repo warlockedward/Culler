@@ -252,6 +252,20 @@ CREATE INDEX usage_request ON usage (request_identity, event_seq);
 
 CREATE INDEX usage_local ON usage (local_request_id);
 
+-- activity_chain_map — the cross-reference between the activity ledger and
+-- its chain projection (B08). One row per activity record: the activity id
+-- and the chain event id (deterministic per the chain implementation). The
+-- backfill is idempotent by the primary key; steady-state writes add one row
+-- per activity row in the same transaction (R-03). The activity table itself
+-- is never rewritten: history is read, not re-authored (IG §7).
+CREATE TABLE activity_chain_map (
+    activity_id INTEGER PRIMARY KEY REFERENCES activity (id),
+    event_id    TEXT NOT NULL UNIQUE
+               CHECK (length(event_id) = 64 AND
+                      length(CAST(event_id AS BLOB)) = 64 AND
+                      event_id NOT GLOB '*[^0-9a-f]*')
+);
+
 ------------------------------------------------------------------------------
 -- projects / sandbox_profiles — infrastructure records.
 ------------------------------------------------------------------------------

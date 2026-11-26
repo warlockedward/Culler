@@ -123,6 +123,9 @@ func applyMigrationStep(db *sql.DB, step MigrationStep) (bool, error) {
 	if _, err := tx.Exec(step.Statement); err != nil {
 		return false, fmt.Errorf("execute migration step %s: %w", step.Name, err)
 	}
+	if err := runStepMigration(tx, step); err != nil {
+		return false, fmt.Errorf("migrate step %s data: %w", step.Name, err)
+	}
 	if err := verifyStep(tx, step); err != nil {
 		return false, fmt.Errorf("verify migration step %s: %w", step.Name, err)
 	}

@@ -230,3 +230,15 @@ FROM usage_observations o
 WHERE o.source_version = (
     SELECT MAX(o2.source_version) FROM usage_observations o2
     WHERE o2.request_identity = o.request_identity AND o2.event_seq = o.event_seq);`
+
+// activityChainMapDDL is the sixth step's object definition: the
+// cross-reference between the activity ledger and its chain projection. The
+// data movement itself (the backfill) runs as the step's same-transaction
+// Go hook, because the chain digests cannot be computed in SQL.
+const activityChainMapDDL = `CREATE TABLE activity_chain_map (
+    activity_id INTEGER PRIMARY KEY REFERENCES activity (id),
+    event_id    TEXT NOT NULL UNIQUE
+               CHECK (length(event_id) = 64 AND
+                      length(CAST(event_id AS BLOB)) = 64 AND
+                      event_id NOT GLOB '*[^0-9a-f]*')
+);`

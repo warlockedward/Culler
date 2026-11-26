@@ -121,7 +121,7 @@ func TestUsageBackfillPromotesMaxVersionOnly(t *testing.T) {
 	}
 
 	registry := ProductionMigrationRegistry()
-	report, err := Migrate(db, registry, CurrentSchemaID)
+	report, err := Migrate(db, registry, b09ChainIdentity)
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
@@ -155,7 +155,7 @@ func TestUsageBackfillProofPasses(t *testing.T) {
 	seedUsageSlot(t, db, "id-a", "local-a", "model-a", "openai-chat", 1, []string{"1", "2", "3"})
 	seedUsageSlot(t, db, "id-b", "local-b", "model-b", "google", 2, []string{"1"})
 	registry := ProductionMigrationRegistry()
-	if _, err := Migrate(db, registry, CurrentSchemaID); err != nil {
+	if _, err := Migrate(db, registry, b09ChainIdentity); err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
 	tx, err := db.Begin()
@@ -182,11 +182,11 @@ func TestUsageBackfillProofFailureRollsBack(t *testing.T) {
 	// the proof's count check must fail and roll the step back.
 	registry := ProductionMigrationRegistry()
 	ddlOnly, _, _ := strings.Cut(registry[4].Statement, "INSERT INTO usage")
-	bad := newMigrationStep(5, "migrate-usage-to-v2", c03UsageIdentity, CurrentSchemaID, ddlOnly)
+	bad := newMigrationStep(5, "migrate-usage-to-v2", c03UsageIdentity, b09ChainIdentity, ddlOnly)
 	bad.Verify = VerifyUsageBackfill
 	registry[4] = bad
 
-	_, err := Migrate(db, registry, CurrentSchemaID)
+	_, err := Migrate(db, registry, b09ChainIdentity)
 	if err == nil || !errors.Is(err, ErrBackfillProof) {
 		t.Fatalf("migrate = %v; want the backfill proof refusal", err)
 	}
@@ -214,11 +214,11 @@ func TestUsageMigrationIsIdempotentOnReRun(t *testing.T) {
 	db := b09Spine(t)
 	seedUsageSlot(t, db, "id-a", "local-a", "model-a", "openai-chat", 1, []string{"1", "2"})
 	registry := ProductionMigrationRegistry()
-	first, err := Migrate(db, registry, CurrentSchemaID)
+	first, err := Migrate(db, registry, b09ChainIdentity)
 	if err != nil || !first.Migrated {
 		t.Fatalf("first migrate = (%+v, %v)", first, err)
 	}
-	again, err := Migrate(db, registry, CurrentSchemaID)
+	again, err := Migrate(db, registry, b09ChainIdentity)
 	if err != nil {
 		t.Fatalf("re-run migrate = %v", err)
 	}
@@ -237,7 +237,7 @@ func TestUsageV2DDLMatchesReferenceSchemaByteForByte(t *testing.T) {
 	db := b09Spine(t)
 	seedUsageSlot(t, db, "id-a", "local-a", "model-a", "openai-chat", 1, []string{"1"})
 	registry := ProductionMigrationRegistry()
-	if _, err := Migrate(db, registry, CurrentSchemaID); err != nil {
+	if _, err := Migrate(db, registry, b09ChainIdentity); err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
 	readObjects := func(d *sql.DB) []string {
