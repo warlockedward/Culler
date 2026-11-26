@@ -173,6 +173,7 @@ func IdentitySessionRevoke(db *sql.DB, id *RunIdentity, a IdentitySessionRevokeR
 	}
 	guard := identity.NewGuard()
 	revoked := 0
+	derivedRevoked := 0
 	if err := inTx(db, func(ctx context.Context, q Q) error {
 		actor, err := sessionActor(ctx, q, a.Token)
 		if err != nil {
@@ -196,6 +197,19 @@ func IdentitySessionRevoke(db *sql.DB, id *RunIdentity, a IdentitySessionRevokeR
 		case "user":
 			res, err = q.ExecContext(ctx, `UPDATE user_sessions SET state = 'revoked', revoked_by = ?
 				WHERE user_id = ? AND state = 'active'`, actor, actor)
+			// A granter whose every active session is gone is invalid; the
+			// grants they issued die in this same transaction, not at their
+			// original TTL (IG §6 derived-grant ruling).
+			if err == nil {
+				var casc sql.Result
+				casc, err = q.ExecContext(ctx, `UPDATE grants SET revoked_at = datetime('now')
+					WHERE granted_by_user_id = ? AND revoked_at IS NULL`, actor)
+				if err == nil {
+					if n, derr := casc.RowsAffected(); derr == nil {
+						derivedRevoked = int(n)
+					}
+				}
+			}
 		default:
 			return Usagef("The revocation scope is invalid.")
 		}
@@ -205,11 +219,15 @@ func IdentitySessionRevoke(db *sql.DB, id *RunIdentity, a IdentitySessionRevokeR
 		if n, err := res.RowsAffected(); err == nil {
 			revoked = int(n)
 		}
-		return recordActivity(ctx, q, actor, "session.revoked", a.SessionID, fmt.Sprintf("Revoked %d session(s) by scope %s.", revoked, a.Scope))
+		detail := fmt.Sprintf("Revoked %d session(s) by scope %s.", revoked, a.Scope)
+		if derivedRevoked > 0 {
+			detail += fmt.Sprintf(" %d derived grant(s) invalidated with the granter.", derivedRevoked)
+		}
+		return recordActivity(ctx, q, actor, "session.revoked", a.SessionID, detail)
 	}); err != nil {
 		return nil, classify(err)
 	}
-	return map[string]any{"revoked": revoked}, nil
+	return map[string]any{"revoked": revoked, "grants_revoked": derivedRevoked}, nil
 }
 
 // IdentityGrantIssueRequest issues a capability grant under the guard ruling.

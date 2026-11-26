@@ -61,3 +61,9 @@
 ## 7. 登记与收尾
 
 实施＝少提交于 shz/TD02；全道绿后 ff dev；登记轮＝AM v0.2.20＋status.json D02=EVIDENCED＋blcheck；诚实边界入册（矩阵第 3/5 行与在飞长任务签名/交付检查点＝具名候票面；epoch fence＝契约登记零代码）。
+
+## 8. 实施补记（先列后改的追加登记）
+
+- **测试 fixture 形态裁定**：T2/T8 族不走密码认证（该面 D01 族已实证）；会话 fixture 改经 guard 绑定路径直接播种（NewSessionToken＋inTx BindTrustedContext＋user_sessions guarded INSERT）——候选代码零凭据形值，且播种本身顺带实证对象范围 insert trigger 放行面。
+- **GrantAllows 决策形态**：包级无状态函数（不进 Guard 实例——判定输入为纯实时 spine 读，判定内无时钟依赖；now 由调用方注入并渲染为 SpineTime 定长形与存储值同格式字典序比较）。verbs 侧级联用事务内 datetime('now')＝SpineTime 纪律不变。
+- **级联 UPDATE 无 trigger 争用**：grants_guarded_insert 是 INSERT trigger；级联是 UPDATE grants（归属列不参与 UPDATE 约束），且与撤销同 inTx 同提交——DC §3.2 同事务原子性由 inTx 单一提交点承载，无需第二机制。

@@ -200,3 +200,31 @@ func (g *Guard) DecideSessionLifecycle(actor, scope string) Decision {
 		return Decision{Reason: "the revocation scope is unrecognized"}
 	}
 }
+
+// GrantAllows is the consumption-side ruling on a capability grant: it
+// answers, at the moment of the authorization decision, whether the actor
+// currently holds a grant covering the scope and resource. The input is a
+// live read of the spine only — no cached or derived state may enter the
+// decision (IG §6 zero-cache ruling), so a revoked or expired grant is
+// refused at the very next decision. The time bound is evaluated at `now`,
+// rendered in the spine's own time form so the comparison matches the
+// stored values.
+func GrantAllows(ctx context.Context, q interface {
+	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+}, actorID, scope, resource string, now time.Time) (Decision, error) {
+	nowStr := now.UTC().Format("2006-01-02 15:04:05")
+	var n int
+	err := q.QueryRowContext(ctx, `SELECT COUNT(*) FROM grants
+		WHERE grantee_user_id = ? AND scope = ?
+		  AND (resource IS NULL OR resource = ?)
+		  AND revoked_at IS NULL
+		  AND effective_at <= ? AND expires_at >= ?`,
+		actorID, scope, resource, nowStr, nowStr).Scan(&n)
+	if err != nil {
+		return Decision{}, fmt.Errorf("query grant validity: %w", err)
+	}
+	if n > 0 {
+		return Decision{Allow: true, Reason: "a valid grant covers the request"}, nil
+	}
+	return Decision{Reason: "no valid grant covers the request"}, nil
+}
