@@ -1,0 +1,10 @@
+AM v0.2.21 双面哈希登记（轮四十七收口窗：D03 legacy:operator 迁移＋映射表＋封存落地⇒EVIDENCED＝D-track 第三票；首个触 schema 的 D 票[S8⇒新基线 identity]；IG-T5 零改写＋封存拒写＋证据字段核验全绿）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 78a72edc6f21accedcb6c58d47376a1a045ef136f9da524d98d13b7b9c8e70b3
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 257bec3da6fd49277fd6fe714a3841bdcefb327c225ac2b8e35ab3cb0b30f72f，与 am-v0.2.20-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.20 = 257bec3da6fd49277fd6fe714a3841bdcefb327c225ac2b8e35ab3cb0b30f72f（evidence/A32/am-v0.2.20-hash.txt 实读）；再前 v0.2.19 = 45873255b57b60349dccd2dc3e8e233b95a67b41b1e58b3db5a08ef0b1719fd3（同件记载）
+- 同轮并入 dev 的提交: 9d97239（D03 设计面＋范围裁定 D0-D5：D1 值面裁定 live actor 'owner' 占位[后继 user ID 直上因当前面无登记路径否决，锁死风险违反 IG §8]＋D2 无条件表级封存＋D3 Class A 映射登记表＋D4 guard 双点＋D5 零改写）＋cb3fd78（D03：schema.sql S8 块[legacy_actor_mapping＋2 Class-A trigger＋索引＋activity_legacy_actor_sealed]；migrate.go X 钉定＋S7.to 钉 X＋S8；live 面 24 点 'operator'⇒'owner'＋谓词同步×2；IdentityLegacyMap verb＋recordActivity guard 点＋legacy-map 路由；L1/L2/L3＋T5-2..T5-5 测试族；registry 8 步全族更新；lane 首跑红点×9 修复[diagnostics source 误迁回退＋domain 直调实参 11 点＋第三处全链断言]）；status.json D03=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（27 包 ok，verbs 565.503s 非缓存实跑，零 FAIL 零 UNVERIFIED；首跑红点×9 全定位修复后二跑绿）；新基线 identity＝bd9ebc9c6a112e38410185ee1693b9966a3f48df9a58f24518cb77d366b049a8（shell 三文件拼接哈希＝Go CurrentSchemaID 探针 go run 逐字节相等）
+- 诚实边界: 'owner' 占位后继接线＝具名稳态后续票（映射表届时从登记性变承载性）；Diagnostic.Source/evalcase.Reviewer 'operator' 标签候票（非 activity 面）；block kind/returned_kind 'operator' 分类学值保留（异维度）；'collie:<runID>' 复合 actor 保留；映射 evidence 登记后追加候票（Class A 不可变张力）；封存例外 grant 机制未建（当前面无人需要）
+- 账: dev tip＝cb3fd78（本登记轮提交随后）/ worktrees＝main+dev+d03（d03 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明；完整审计重跑已候令）/ **D-chain 状态：D01＝D02＝D03＝EVIDENCED⇒D04/D05/D09 就绪；D06 候 O11 裁决（deps 已齐）；D07/D08 需 D06；B-chain 余 B06（门 O3 硬件候所有者触发）＋B08 稳态后续票面候裁定**
