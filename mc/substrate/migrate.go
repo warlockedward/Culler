@@ -116,6 +116,11 @@ const d03SealIdentity = "bd9ebc9c6a112e38410185ee1693b9966a3f48df9a58f24518cb77d
 // existed. Pinned as a historical fact like d03SealIdentity.
 const d05RegistryIdentity = "f9d1090e71e57130bcb7821a25a7959177098bd435c9756fcef8a13c0681e615"
 
+// d06SigningIdentity is the schema identity the tenth step produced: the
+// signing request state machine, before the anchoring registry existed.
+// Pinned as a historical fact like d05RegistryIdentity.
+const d06SigningIdentity = "9e322e35834ccffe95c6205252af12552b414596e7194c3a507d48456f9001a0"
+
 // ProductionMigrationRegistry returns the ordered step registry this release
 // carries. The registry always terminates at CurrentSchemaID: a release that
 // changes the schema text must register the step that crosses that boundary,
@@ -140,8 +145,10 @@ func ProductionMigrationRegistry() []MigrationStep {
 	registry = append(registry, eighth)
 	ninth := newMigrationStep(9, "add-degraded-grants", d03SealIdentity, d05RegistryIdentity, degradedGrantsDDL)
 	registry = append(registry, ninth)
-	tenth := newMigrationStep(10, "add-sign-requests", d05RegistryIdentity, CurrentSchemaID, signRequestsDDL)
-	return append(registry, tenth)
+	tenth := newMigrationStep(10, "add-sign-requests", d05RegistryIdentity, d06SigningIdentity, signRequestsDDL)
+	registry = append(registry, tenth)
+	eleventh := newMigrationStep(11, "add-anchor-checkpoints", d06SigningIdentity, CurrentSchemaID, anchorCheckpointsDDL)
+	return append(registry, eleventh)
 }
 
 // MigrationReport describes one runner pass over a spine.

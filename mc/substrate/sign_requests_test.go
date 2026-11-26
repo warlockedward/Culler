@@ -37,6 +37,7 @@ func d05Spine(t *testing.T) *sql.DB {
 	db := provisionProductionSpine(t, filepath.Join(t.TempDir(), "spine.db"), testUUID, d05RegistryIdentity)
 	t.Cleanup(func() { db.Close() })
 	stripSignRequests(t, db)
+	stripAnchorCheckpoints(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:9] {
 		recordStep(t, db, step)
@@ -55,8 +56,8 @@ func TestSignRequestsStepFromD05Baseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 1 || report.Applied[0] != "add-sign-requests" {
-		t.Fatalf("report = %+v; want only the tenth step applied", report)
+	if !report.Migrated || len(report.Applied) != 2 || report.Applied[0] != "add-sign-requests" || report.Applied[1] != "add-anchor-checkpoints" {
+		t.Fatalf("report = %+v; want the tenth and eleventh steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'sign_requests'`); n != 1 {
 		t.Fatalf("sign_requests table = %d; want 1", n)
@@ -64,8 +65,8 @@ func TestSignRequestsStepFromD05Baseline(t *testing.T) {
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'trigger' AND name IN ('sign_requests_guarded_insert','sign_requests_state_machine')`); n != 2 {
 		t.Fatalf("sign request triggers = %d; want 2", n)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 10 {
-		t.Fatalf("ledger rows = %d; want 10", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 11 {
+		t.Fatalf("ledger rows = %d; want 11", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {

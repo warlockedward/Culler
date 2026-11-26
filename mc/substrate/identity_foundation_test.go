@@ -65,6 +65,7 @@ func b08IdentitySpine(t *testing.T) *sql.DB {
 	stripLegacyActorSealing(t, db)
 	stripDegradedGrants(t, db)
 	stripSignRequests(t, db)
+	stripAnchorCheckpoints(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:6] {
 		recordStep(t, db, step)
@@ -83,8 +84,8 @@ func TestIdentityFoundationStepFromB08Baseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 4 || report.Applied[0] != "add-identity-foundation" || report.Applied[1] != "add-legacy-actor-sealing" || report.Applied[2] != "add-degraded-grants" || report.Applied[3] != "add-sign-requests" {
-		t.Fatalf("report = %+v; want the seventh through tenth steps applied", report)
+	if !report.Migrated || len(report.Applied) != 5 || report.Applied[0] != "add-identity-foundation" || report.Applied[1] != "add-legacy-actor-sealing" || report.Applied[2] != "add-degraded-grants" || report.Applied[3] != "add-sign-requests" || report.Applied[4] != "add-anchor-checkpoints" {
+		t.Fatalf("report = %+v; want the seventh through eleventh steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('users','user_sessions','teams','team_members','grants','trusted_ctx')`); n != 6 {
 		t.Fatalf("identity tables present = %d; want 6", n)
@@ -98,8 +99,8 @@ func TestIdentityFoundationStepFromB08Baseline(t *testing.T) {
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'degraded_grants'`); n != 1 {
 		t.Fatalf("degraded grants table present = %d; want 1", n)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 10 {
-		t.Fatalf("ledger rows = %d; want 10", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 11 {
+		t.Fatalf("ledger rows = %d; want 11", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {

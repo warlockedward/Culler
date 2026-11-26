@@ -488,3 +488,54 @@ WHEN NOT ((OLD.state = 'requested' AND NEW.state IN ('signed','closed'))
 BEGIN
     SELECT RAISE(ABORT, 'sign request state may only move requested->signed->recorded or requested->closed');
 END;`
+
+// anchorCheckpointsDDL is the eleventh step's object definitions: the
+// anchoring registry (D22) with its append-only lattice and the guarded
+// birth of checkpoint rows. Every statement's text must stay byte-identical
+// to the anchor checkpoints block in schema.sql, so the sqlite_schema rows
+// of a migrated spine hash like the reference spine built from the
+// baseline.
+const anchorCheckpointsDDL = `CREATE TABLE anchor_checkpoints (
+    checkpoint_seq   INTEGER NOT NULL UNIQUE
+                CHECK (checkpoint_seq >= 1),
+    prev_digest      TEXT NOT NULL
+                CHECK (length(prev_digest) = 64 AND
+                       length(CAST(prev_digest AS BLOB)) = 64 AND
+                       prev_digest NOT GLOB '*[^0-9a-f]*'),
+    root_digest      TEXT NOT NULL
+                CHECK (length(root_digest) = 64 AND
+                       length(CAST(root_digest AS BLOB)) = 64 AND
+                       root_digest NOT GLOB '*[^0-9a-f]*'),
+    algorithm_id     TEXT NOT NULL
+                CHECK (length(algorithm_id) BETWEEN 1 AND 128),
+    heads_digest     TEXT NOT NULL
+                CHECK (length(heads_digest) = 64 AND
+                       length(CAST(heads_digest AS BLOB)) = 64 AND
+                       heads_digest NOT GLOB '*[^0-9a-f]*'),
+    leaf_count       INTEGER NOT NULL
+                CHECK (leaf_count >= 0),
+    heads_json       TEXT NOT NULL
+                CHECK (length(heads_json) BETWEEN 2 AND 65536),
+    published_by     TEXT NOT NULL REFERENCES users (id),
+    sign_request_id  TEXT NOT NULL REFERENCES sign_requests (request_id),
+    artifact_digest  TEXT NOT NULL
+                CHECK (length(artifact_digest) = 64 AND
+                       length(CAST(artifact_digest AS BLOB)) = 64 AND
+                       artifact_digest NOT GLOB '*[^0-9a-f]*'),
+    created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (checkpoint_seq)
+);
+
+CREATE TRIGGER anchor_checkpoints_guarded_insert BEFORE INSERT ON anchor_checkpoints
+BEGIN
+    SELECT RAISE(ABORT, 'anchor checkpoint insert requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'anchor checkpoint attribution disagrees with the trusted context')
+    WHERE NEW.published_by NOT IN (SELECT actor FROM trusted_ctx);
+END;
+
+CREATE TRIGGER anchor_checkpoints_no_update BEFORE UPDATE ON anchor_checkpoints
+BEGIN SELECT RAISE(ABORT, 'anchor checkpoints are append only'); END;
+
+CREATE TRIGGER anchor_checkpoints_no_delete BEFORE DELETE ON anchor_checkpoints
+BEGIN SELECT RAISE(ABORT, 'anchor checkpoints are append only'); END;`

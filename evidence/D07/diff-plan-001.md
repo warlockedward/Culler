@@ -60,3 +60,12 @@
 ## 7. 登记与收尾
 
 实施＝少提交于 shz/TD07；全道绿后 ff dev；登记轮＝AM v0.2.26＋status.json D07=EVIDENCED＋blcheck；新基线 identity 入册；诚实边界（D5 五项）入登记。
+
+## 8. 实施补记（先列后改的追加登记）
+
+- **新基线 identity（S11 后）**＝`f8620d7ebb34c4fc092ae69cac5412529cf1bd3d65039754ee5becac48af87c3`（shell 三文件拼接哈希＝Go CurrentSchemaID 探针 go run 逐字节相等；S11.to 用 CurrentSchemaID 符号，S10.to 钉 d06SigningIdentity＝9e322e35…01a0）。
+- **heads_json 存储形态**：checkpoint 行存链头集的 **JSON 数组形态**（json.Marshal；空集＝"[]" 满足 length≥2 CHECK），与 heads_digest 的**规范渲染形态**（聚合 id 升序 `id|seq_max|chain_digest` 换行拼接，供 sha256）分离——前者为重建载体、后者为摘要输入，artifact 携带 JSON 数组、离线验证器按同序重渲染重算 digest，双形态一致性由同函数对承载。
+- **root 不移动＝静态链的合法态（测试语义登记）**：两次 publish 间无新审计事件⇒链头集不变⇒root 相同——D22 不要求 root 逐 checkpoint 移动，要求的是 checkpoint **链**（prev 绑定）与单调 seq；root 移动性由"新事件后重锚"场景隐式承载（链头集随链移动是 ComputeRoot 的纯函数属性，anchor 包向量已覆盖 head set→root 重算一致性）。
+- **恢复路径的 request_digest 重算**：sign_requests 不持久化 request_digest（它由 shz-sign-v1 规范形确定性派生），恢复路径从行内字段（root_digest/algorithm_id/serializer_id/scope/source_actor）经同一函数重算——单一权威，不可漂移。
+- **artifact 公钥内嵌**：每个 artifact 携带签名时 ring 公钥（public_key_hex），离线验证零部署态依赖（公钥可公开＝D22 sigstore 纪律允许验证元数据）；ring 保留历史键（旧 artifact 按其记录的键永可验，§5.1 锚定私钥行"历史 root 永可验"语义一致）。
+- **零行 UPDATE 不触发行级 trigger（测试教训）**：append-only lattice 断言必须对着**真实行**（种子后 UPDATE/DELETE 必红）；空表 UPDATE 静默成功＝0 行匹配。
