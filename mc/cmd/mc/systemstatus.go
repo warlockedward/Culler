@@ -467,6 +467,36 @@ func commandSystemSpine(action string, stdin io.Reader) (any, error) {
 			return nil, err
 		}
 		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityLegacyMap(db, id, a) })
+	case "sign-create":
+		var a verbs.SignRequestCreateRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.SignRequestCreate(db, id, a) })
+	case "sign-execute":
+		var a verbs.SignRequestExecuteRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.SignRequestExecute(db, id, a) })
+	case "sign-reconcile":
+		var a verbs.SignRequestReconcileRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.SignRequestReconcile(db, id, a) })
+	case "sign-cancel":
+		var a verbs.SignRequestCancelRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.SignRequestCancel(db, id, a) })
+	case "sign-supersede":
+		var a verbs.SignRequestSupersedeRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.SignRequestSupersede(db, id, a) })
 	case "identity-degraded-grant-issue":
 		var a verbs.IdentityDegradedGrantIssueRequest
 		if err := decodeDiagnosticRequest(stdin, &a); err != nil {

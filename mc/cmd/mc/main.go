@@ -159,6 +159,9 @@ func dispatchArgs(args []string, stdin io.Reader, stdout, stderr io.Writer) int 
 	if args[0] == "__onboard-spine" {
 		return runPrivateOnboardSpine(args, stdin, stdout, stderr)
 	}
+	if args[0] == "__sign-node" {
+		return runPrivateSignNode(args, stdin, stdout, stderr)
+	}
 	if args[0] == "__doctor-runtime" {
 		return runPrivateDoctorRuntime(args, stdin, stdout, stderr)
 	}
@@ -318,7 +321,7 @@ func dispatchArgs(args []string, stdin io.Reader, stdout, stderr io.Writer) int 
 	if len(args) > 1 && ((args[0] == "run" || args[0] == "collie") && args[1] == "launch-check") {
 		return runLocal(args, stdin, stdout, stderr)
 	}
-	if args[0] == "discord" || args[0] == "__discord-config" || args[0] == "evaluation" || args[0] == "system" || args[0] == "connection" || args[0] == "agent-profile" || args[0] == "config" || args[0] == "routing" || args[0] == "logs" || args[0] == "health" || args[0] == "usage" || args[0] == "identity" {
+	if args[0] == "discord" || args[0] == "__discord-config" || args[0] == "evaluation" || args[0] == "system" || args[0] == "connection" || args[0] == "agent-profile" || args[0] == "config" || args[0] == "routing" || args[0] == "logs" || args[0] == "health" || args[0] == "usage" || args[0] == "identity" || args[0] == "sign" {
 		return runLocal(args, stdin, stdout, stderr)
 	}
 
@@ -955,6 +958,8 @@ func dispatchVerb(args []string, stdin io.Reader) (any, error) {
 		return commandUsage(rest, stdin)
 	case "identity":
 		return commandIdentity(rest, stdin)
+	case "sign":
+		return commandSign(rest, stdin)
 	case "__system-state":
 		if len(rest) != 1 {
 			return nil, verbs.Usagef("The system state action is required.")

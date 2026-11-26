@@ -193,6 +193,26 @@ func buildPreLedgerSpineFile(t *testing.T, path, uuid string) {
 		db.Close()
 		t.Fatalf("strip degraded grants table: %v", err)
 	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS sign_requests_guarded_insert`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests guard trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS sign_requests_state_machine`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests state machine trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS sign_requests_state`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests state index: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS sign_requests_supersedes`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests supersedes index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS sign_requests`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests table: %v", err)
+	}
 	preID := substrate.ProductionMigrationRegistry()[0].FromSchemaID
 	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, preID); err != nil {
 		db.Close()
@@ -227,8 +247,8 @@ func TestOnboardSpineMigratesPreLedgerSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 9 {
-		t.Fatalf("ledger rows = %d (%v); want 9", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 10 {
+		t.Fatalf("ledger rows = %d (%v); want 10", ledgerRows, err)
 	}
 	db.Close()
 
@@ -613,6 +633,26 @@ func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
 		db.Close()
 		t.Fatalf("strip degraded grants table: %v", err)
 	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS sign_requests_guarded_insert`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests guard trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS sign_requests_state_machine`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests state machine trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS sign_requests_state`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests state index: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS sign_requests_supersedes`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests supersedes index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS sign_requests`); err != nil {
+		db.Close()
+		t.Fatalf("strip sign requests table: %v", err)
+	}
 	step1 := substrate.ProductionMigrationRegistry()[0]
 	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, step1.ToSchemaID); err != nil {
 		db.Close()
@@ -626,7 +666,7 @@ func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
 }
 
 // U4: OnboardSpine crosses a spine left at the first step's target identity:
-// the recorded first step is skipped, the second through ninth steps
+// the recorded first step is skipped, the second through tenth steps
 // land, the deployment UUID is preserved, and the schema check passes on
 // the result.
 func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
@@ -649,8 +689,8 @@ func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 9 {
-		t.Fatalf("ledger rows = %d (%v); want 9", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 10 {
+		t.Fatalf("ledger rows = %d (%v); want 10", ledgerRows, err)
 	}
 	db.Close()
 }

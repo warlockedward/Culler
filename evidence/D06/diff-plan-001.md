@@ -52,3 +52,11 @@
 ## 6. 登记与收尾
 
 设计面（本件）⇒O11 裁决（所有者一言）⇒进码⇒全道⇒登记轮 AM v0.2.25（或随 O11 裁决轮）＋status.json D06=EVIDENCED＋blcheck；新基线 identity 入册；诚实边界（参考节点 transitional 标记／生产锚定门在 D07 消费侧）入登记。
+
+## 8. 实施补记（先列后改的追加登记）
+
+- **P1 规范形落地形态修正**：P1 原写"request_digest 复用 shz-canon-v1"。实施发现 `EncodeCanonicalEvent` 强制 14 字段信封＋已注册 payload 家族，是为**链事件**设计的；签名请求元组（request_id/root_digest/algorithm/serializer/scope/source_actor）不是链事件，硬塞会伪造信封字段。故落地为 signnode 包内两个**版本化冻结规范形**单一权威函数：`RequestDigest`（shz-sign-request-v1，六元组换行拼接 sha256）与 `AttestationCanonical`（shz-sign-attestation-v1，四元组）。节点与 spine **同调同一函数**，两侧不可能漂移；不新建链序列化权威（shz-canon-v1 原样保留给 audit_events 链）。语义与 P1 一致（版本化＋冻结字段序＋单一权威），仅载体从"链事件编码器"改为"专用规范形"。
+- **P5 进程形态落地修正**：P5 原写"节点＝按次调用子进程，mc verb spawn"。实施落地为**双形态同一 serve**：`signnode.Serve(home, in, out)` 是唯一操作实现；独立子进程形态保留为 `__sign-node` 私有命令（操作者/自动化面，含 `--request <file>` 文件交接）；verb 面默认经 `signNodeServe` 缝**进程内**调同一 serve（盘上 ledger＋flock 语义不变，进程无内存态⇒F2 重启语义＝新 serve 实例，五证不受影响）。测试经该缝注入隔离 home/故障。此修正不削弱 P2/P5 的任何语义（状态仍在盘上账本、flock 仍串行化跨进程/跨调用、重启仍只读盘）；生产载体 B（KMS/HSM）落地时该缝换为远端调用，协议形态 P1-P3 不变。
+- **P3 密钥存储经 A02 host secret 缝**：节点签名 seed 经 `signnode.HostSecretStore`（生产＝deployment.WriteHostSecret/ReadHostSecret，即 A02 hostSecretStore）；公钥环（ring.json）留 MC_HOME 供 spine 验证。测试注入文件隔离 store，绝不触真实 keychain。
+- **Supersede 单后继守卫**：`SignRequestSupersede` 增"已存在后继⇒拒"检查（supersedes 链不分支，DC §3.3 链语义）。原计划未显式列，实施补上以防链分叉。
+- **能力门（IG §5.1）**：`SignRequestCreate` 要求 actor 持有效 `anchor.sign.request` grant（经 D02 `identity.GrantAllows` 实时判定）——"使用主体＝仅 anchor.sign.request"落地。无 grant⇒请求不生。

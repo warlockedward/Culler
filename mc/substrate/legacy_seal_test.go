@@ -36,6 +36,7 @@ func d01IdentitySpine(t *testing.T) *sql.DB {
 	t.Cleanup(func() { db.Close() })
 	stripLegacyActorSealing(t, db)
 	stripDegradedGrants(t, db)
+	stripSignRequests(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:7] {
 		recordStep(t, db, step)
@@ -43,11 +44,12 @@ func d01IdentitySpine(t *testing.T) *sql.DB {
 	return db
 }
 
-// L1: crossing from the d01 baseline lands the legacy actor sealing and the
-// degraded grants registry: both steps apply, the objects are present, the
-// ledger and the stamp follow, the spine passes the schema check, and the
-// seal is live at once: the legacy actor is refused at the execution point
-// while the current owner actor writes through.
+// L1: crossing from the d01 baseline lands the legacy actor sealing, the
+// degraded grants registry, and the signing request state machine: all three
+// steps apply, the objects are present, the ledger and the stamp follow, the
+// spine passes the schema check, and the seal is live at once: the legacy
+// actor is refused at the execution point while the current owner actor
+// writes through.
 func TestLegacyActorSealStepFromD01Baseline(t *testing.T) {
 	db := d01IdentitySpine(t)
 	registry := ProductionMigrationRegistry()
@@ -55,8 +57,8 @@ func TestLegacyActorSealStepFromD01Baseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 2 || report.Applied[0] != "add-legacy-actor-sealing" || report.Applied[1] != "add-degraded-grants" {
-		t.Fatalf("report = %+v; want the eighth and ninth steps applied", report)
+	if !report.Migrated || len(report.Applied) != 3 || report.Applied[0] != "add-legacy-actor-sealing" || report.Applied[1] != "add-degraded-grants" || report.Applied[2] != "add-sign-requests" {
+		t.Fatalf("report = %+v; want the eighth through tenth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'legacy_actor_mapping'`); n != 1 {
 		t.Fatalf("legacy actor mapping table = %d; want 1", n)
@@ -64,8 +66,8 @@ func TestLegacyActorSealStepFromD01Baseline(t *testing.T) {
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'trigger' AND name IN ('legacy_actor_mapping_no_update','legacy_actor_mapping_no_delete','activity_legacy_actor_sealed')`); n != 3 {
 		t.Fatalf("sealing triggers = %d; want 3", n)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 9 {
-		t.Fatalf("ledger rows = %d; want 9", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 10 {
+		t.Fatalf("ledger rows = %d; want 10", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {

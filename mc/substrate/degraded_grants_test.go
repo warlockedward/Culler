@@ -29,6 +29,7 @@ func d03Spine(t *testing.T) *sql.DB {
 	db := provisionProductionSpine(t, filepath.Join(t.TempDir(), "spine.db"), testUUID, d03SealIdentity)
 	t.Cleanup(func() { db.Close() })
 	stripDegradedGrants(t, db)
+	stripSignRequests(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:8] {
 		recordStep(t, db, step)
@@ -36,11 +37,11 @@ func d03Spine(t *testing.T) *sql.DB {
 	return db
 }
 
-// M1: the ninth step lands the degraded grants registry on a d03-baseline
-// spine: only the new step applies, the objects are present, the ledger and
-// the stamp follow, the spine passes the schema check, and the guard trigger
-// is live at once — an unguarded insert is refused and a mismatched
-// attribution is refused.
+// M1: crossing from the d03 baseline lands the degraded grants registry and
+// the signing request state machine: both steps apply, the objects are
+// present, the ledger and the stamp follow, the spine passes the schema
+// check, and the guard trigger is live at once — an unguarded insert is
+// refused and a mismatched attribution is refused.
 func TestDegradedGrantsStepFromD03Baseline(t *testing.T) {
 	db := d03Spine(t)
 	registry := ProductionMigrationRegistry()
@@ -48,8 +49,8 @@ func TestDegradedGrantsStepFromD03Baseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 1 || report.Applied[0] != "add-degraded-grants" {
-		t.Fatalf("report = %+v; want only the ninth step applied", report)
+	if !report.Migrated || len(report.Applied) != 2 || report.Applied[0] != "add-degraded-grants" || report.Applied[1] != "add-sign-requests" {
+		t.Fatalf("report = %+v; want the ninth and tenth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'degraded_grants'`); n != 1 {
 		t.Fatalf("degraded_grants table = %d; want 1", n)
@@ -57,8 +58,8 @@ func TestDegradedGrantsStepFromD03Baseline(t *testing.T) {
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'trigger' AND name = 'degraded_grants_guarded_insert'`); n != 1 {
 		t.Fatalf("guard trigger = %d; want 1", n)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 9 {
-		t.Fatalf("ledger rows = %d; want 9", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 10 {
+		t.Fatalf("ledger rows = %d; want 10", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {

@@ -152,8 +152,8 @@ func TestOnboardCarriesLegacyRowsThroughTheSeal(t *testing.T) {
 		t.Fatalf("legacy row = (%s, %s); want it verbatim (zero rewrite)", actor, detail)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 9 {
-		t.Fatalf("ledger rows = %d (%v); want 9", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 10 {
+		t.Fatalf("ledger rows = %d (%v); want 10", ledgerRows, err)
 	}
 	// The seal is live on the onboarded spine: a new legacy write is refused.
 	dbRw, err := substrate.Open(spine)

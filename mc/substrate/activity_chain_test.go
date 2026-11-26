@@ -29,6 +29,7 @@ func b08Spine(t *testing.T) *sql.DB {
 	stripIdentityFoundation(t, db)
 	stripLegacyActorSealing(t, db)
 	stripDegradedGrants(t, db)
+	stripSignRequests(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:5] {
 		recordStep(t, db, step)
@@ -142,8 +143,8 @@ func TestActivityBackfillProjectsStockRowsInOrder(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 4 || report.Applied[0] != "migrate-activity-to-chain" || report.Applied[1] != "add-identity-foundation" || report.Applied[2] != "add-legacy-actor-sealing" || report.Applied[3] != "add-degraded-grants" {
-		t.Fatalf("report = %+v; want the sixth through ninth steps applied", report)
+	if !report.Migrated || len(report.Applied) != 5 || report.Applied[0] != "migrate-activity-to-chain" || report.Applied[1] != "add-identity-foundation" || report.Applied[2] != "add-legacy-actor-sealing" || report.Applied[3] != "add-degraded-grants" || report.Applied[4] != "add-sign-requests" {
+		t.Fatalf("report = %+v; want the sixth through tenth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'activity'`); n != 2 {
 		t.Fatalf("activity chain rows = %d; want 2 (one per stock row)", n)

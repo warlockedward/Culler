@@ -427,3 +427,64 @@ BEGIN
     SELECT RAISE(ABORT, 'degraded grant attribution disagrees with the trusted context')
     WHERE NEW.issued_by_user_id NOT IN (SELECT actor FROM trusted_ctx);
 END;`
+
+// signRequestsDDL is the tenth step's object definitions: the signing
+// request state machine (IG §5.3) with its one-way states and the
+// object-scope guard on request birth. Every statement's text must stay
+// byte-identical to the sign requests block in schema.sql, so the
+// sqlite_schema rows of a migrated spine hash like the reference spine
+// built from the baseline.
+const signRequestsDDL = `CREATE TABLE sign_requests (
+    request_id        TEXT NOT NULL UNIQUE
+                CHECK (length(request_id) = 32 AND
+                       length(CAST(request_id AS BLOB)) = 32 AND
+                       request_id NOT GLOB '*[^0-9a-f]*'),
+    root_digest       TEXT NOT NULL
+                CHECK (length(root_digest) = 64 AND
+                       length(CAST(root_digest AS BLOB)) = 64 AND
+                       root_digest NOT GLOB '*[^0-9a-f]*'),
+    algorithm_id      TEXT NOT NULL
+                CHECK (length(algorithm_id) BETWEEN 1 AND 128),
+    serializer_id     TEXT NOT NULL
+                CHECK (length(serializer_id) BETWEEN 1 AND 128),
+    source_actor      TEXT NOT NULL REFERENCES users (id),
+    scope             TEXT NOT NULL
+                CHECK (length(scope) BETWEEN 1 AND 128),
+    created_at        TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at        TEXT NOT NULL,
+    state             TEXT NOT NULL DEFAULT 'requested'
+                CHECK (state IN ('requested','signed','recorded','closed')),
+    result_digest     TEXT
+                CHECK (result_digest IS NULL OR (length(result_digest) = 64 AND
+                       length(CAST(result_digest AS BLOB)) = 64 AND
+                       result_digest NOT GLOB '*[^0-9a-f]*')),
+    signature_hex     TEXT,
+    receipt_attestation TEXT,
+    key_id            TEXT,
+    close_reason      TEXT
+                CHECK (close_reason IS NULL OR close_reason IN ('not_accepted','fenced')),
+    supersedes_request_id TEXT
+                CHECK (supersedes_request_id IS NULL OR
+                       (length(supersedes_request_id) = 32 AND
+                        length(CAST(supersedes_request_id AS BLOB)) = 32 AND
+                        supersedes_request_id NOT GLOB '*[^0-9a-f]*')),
+    PRIMARY KEY (request_id)
+);
+
+CREATE INDEX sign_requests_state ON sign_requests (state);
+CREATE INDEX sign_requests_supersedes ON sign_requests (supersedes_request_id);
+
+CREATE TRIGGER sign_requests_guarded_insert BEFORE INSERT ON sign_requests
+BEGIN
+    SELECT RAISE(ABORT, 'sign request insert requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'sign request attribution disagrees with the trusted context')
+    WHERE NEW.source_actor NOT IN (SELECT actor FROM trusted_ctx);
+END;
+
+CREATE TRIGGER sign_requests_state_machine BEFORE UPDATE OF state ON sign_requests
+WHEN NOT ((OLD.state = 'requested' AND NEW.state IN ('signed','closed'))
+       OR (OLD.state = 'signed' AND NEW.state = 'recorded'))
+BEGIN
+    SELECT RAISE(ABORT, 'sign request state may only move requested->signed->recorded or requested->closed');
+END;`
