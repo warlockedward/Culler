@@ -123,6 +123,9 @@ func applyMigrationStep(db *sql.DB, step MigrationStep) (bool, error) {
 	if _, err := tx.Exec(step.Statement); err != nil {
 		return false, fmt.Errorf("execute migration step %s: %w", step.Name, err)
 	}
+	if err := verifyStep(tx, step); err != nil {
+		return false, fmt.Errorf("verify migration step %s: %w", step.Name, err)
+	}
 	appliedAt := time.Now().UTC().Format(time.RFC3339)
 	if _, err := tx.Exec(
 		`INSERT INTO schema_history (version, step_name, step_checksum, from_schema_id, to_schema_id, applied_at) VALUES (?, ?, ?, ?, ?, ?)`,

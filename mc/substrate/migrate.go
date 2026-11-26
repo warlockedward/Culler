@@ -2,6 +2,7 @@ package substrate
 
 import (
 	"crypto/sha256"
+	"database/sql"
 	"fmt"
 	"sort"
 )
@@ -18,6 +19,23 @@ type MigrationStep struct {
 	ToSchemaID   string
 	Checksum     string
 	Statement    string
+	// Verify, when set, must pass inside the step's transaction after the
+	// statement ran and before the ledger row, the chain event, and the
+	// stamp commit. A failure rolls the whole step back, so a spine never
+	// carries state its step cannot prove. The checksum deliberately does
+	// not cover it: the ledger records what was applied, not how it was
+	// proven.
+	Verify func(tx *sql.Tx) error
+}
+
+// verifyStep runs the step's optional same-transaction proof: it must pass
+// after the statement and before the ledger row, the chain event, and the
+// stamp commit; a failure rolls the whole step back.
+func verifyStep(tx *sql.Tx, step MigrationStep) error {
+	if step.Verify == nil {
+		return nil
+	}
+	return step.Verify(tx)
 }
 
 func newMigrationStep(version int, name, fromSchemaID, toSchemaID, statement string) MigrationStep {
@@ -53,17 +71,25 @@ const b02BaselineIdentity = "eb7ebcf932c3f52895412c9aef0b3c5f38e43c06d8ef64a6e0e
 // b02BaselineIdentity.
 const b07BaselineIdentity = "4a3159e3cef11986fd68eac67c0d53f7cadc6a992664b9f61b7c5a266150bf9a"
 
+// c03UsageIdentity is the schema identity the fourth step produced: the
+// usage accumulation tables, before the v2 consumption projection existed.
+// Pinned as a historical fact like b07BaselineIdentity.
+const c03UsageIdentity = "6ce879af3bbea92540934d467976d8a0356b5285919193dde4eff15513d3d085"
+
 // ProductionMigrationRegistry returns the ordered step registry this release
 // carries. The registry always terminates at CurrentSchemaID: a release that
 // changes the schema text must register the step that crosses that boundary,
 // so a spine at any previously published identity can reach this release.
 func ProductionMigrationRegistry() []MigrationStep {
-	return []MigrationStep{
+	registry := []MigrationStep{
 		newMigrationStep(1, "add-schema-history-ledger", preLedgerBaselineIdentity, b01BaselineIdentity, schemaHistoryDDL),
 		newMigrationStep(2, "rename-health-alert-body", b01BaselineIdentity, b02BaselineIdentity, renameHealthAlertBodySQL),
 		newMigrationStep(3, "add-audit-events-chain", b02BaselineIdentity, b07BaselineIdentity, auditEventsDDL),
-		newMigrationStep(4, "add-usage-observations", b07BaselineIdentity, CurrentSchemaID, usageObservationsDDL),
+		newMigrationStep(4, "add-usage-observations", b07BaselineIdentity, c03UsageIdentity, usageObservationsDDL),
 	}
+	last := newMigrationStep(5, "migrate-usage-to-v2", c03UsageIdentity, CurrentSchemaID, usageV2DDL)
+	last.Verify = VerifyUsageBackfill
+	return append(registry, last)
 }
 
 // MigrationReport describes one runner pass over a spine.

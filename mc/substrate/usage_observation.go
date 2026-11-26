@@ -284,6 +284,11 @@ func RecordUsageObservation(ctx context.Context, q usageWriter, in UsageObservat
 	if err != nil {
 		return UsageObservationResult{}, fmt.Errorf("persist usage observation: %w", err)
 	}
+	// The v2 current-row projection commits with the v1 evidence: the slot's
+	// previous current row is replaced by this one, all or nothing.
+	if err := UpsertUsageCurrent(ctx, q, identity, in, observationID, state, digest); err != nil {
+		return UsageObservationResult{}, err
+	}
 	if err := appendUsageChainEvent(ctx, q, identity, in, payload); err != nil {
 		return UsageObservationResult{}, err
 	}

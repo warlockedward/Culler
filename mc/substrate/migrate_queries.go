@@ -172,3 +172,61 @@ CREATE TRIGGER usage_observations_no_update BEFORE UPDATE ON usage_observations
 BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;
 CREATE TRIGGER usage_observations_no_delete BEFORE DELETE ON usage_observations
 BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;`
+
+// usageV2DDL is the fifth step's statements: the v2 settlement-consumption
+// table (its object definitions byte-identical to the usage block in
+// schema.sql) and the blob backfill that promotes each slot's current
+// observation. The backfill INSERT is migration-only: a fresh spine has
+// nothing to promote, and the step's same-transaction proof (count,
+// multiset digest, both anti-join directions) must pass before the step
+// commits. The v1 tables are never dropped: the originals survive the
+// migration by construction.
+const usageV2DDL = `CREATE TABLE usage (
+    source_report_id      TEXT NOT NULL UNIQUE
+                         CHECK (length(source_report_id) = 64 AND
+                                length(CAST(source_report_id AS BLOB)) = 64 AND
+                                source_report_id NOT GLOB '*[^0-9a-f]*'),
+    request_identity      TEXT NOT NULL,
+    local_request_id      TEXT NOT NULL,
+    provider_request_id   TEXT,
+    event_seq             INTEGER NOT NULL CHECK (event_seq >= 1),
+    source_version        INTEGER NOT NULL CHECK (source_version >= 1),
+    origin                TEXT NOT NULL CHECK (origin IN ('provider','local')),
+    usage_family          TEXT NOT NULL,
+    model_id              TEXT NOT NULL,
+    output_tokens         TEXT NOT NULL,
+    input_tokens          TEXT NOT NULL,
+    report_kind           TEXT NOT NULL CHECK (report_kind IN ('cumulative','incremental')),
+    finality              TEXT NOT NULL CHECK (finality IN ('interim','final')),
+    identity_provability  TEXT NOT NULL CHECK (identity_provability IN ('native','cursor','none')),
+    state                 TEXT NOT NULL CHECK (state IN ('reported','unknown','reconciliation')),
+    payload_digest        TEXT NOT NULL
+                         CHECK (length(payload_digest) = 64 AND
+                                length(CAST(payload_digest AS BLOB)) = 64 AND
+                                payload_digest NOT GLOB '*[^0-9a-f]*'),
+    supersedes_report_id  TEXT
+                         CHECK (supersedes_report_id IS NULL OR
+                                (length(supersedes_report_id) = 64 AND
+                                 length(CAST(supersedes_report_id AS BLOB)) = 64 AND
+                                 supersedes_report_id NOT GLOB '*[^0-9a-f]*')),
+    occurred_at           TEXT NOT NULL
+                         CHECK (length(occurred_at) = 27 AND
+                                occurred_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    PRIMARY KEY (source_report_id)
+);
+CREATE INDEX usage_request ON usage (request_identity, event_seq);
+CREATE INDEX usage_local ON usage (local_request_id);
+INSERT INTO usage (
+    source_report_id, request_identity, local_request_id, provider_request_id,
+    event_seq, source_version, origin, usage_family, model_id,
+    output_tokens, input_tokens, report_kind, finality, identity_provability,
+    state, payload_digest, supersedes_report_id, occurred_at
+)
+SELECT o.observation_id, o.request_identity, o.local_request_id, o.provider_request_id,
+    o.event_seq, o.source_version, o.origin, o.usage_family, o.model_id,
+    o.output_tokens, o.input_tokens, o.report_kind, o.finality, o.identity_provability,
+    o.state, o.payload_digest, o.supersedes_observation_id, o.occurred_at
+FROM usage_observations o
+WHERE o.source_version = (
+    SELECT MAX(o2.source_version) FROM usage_observations o2
+    WHERE o2.request_identity = o.request_identity AND o2.event_seq = o.event_seq);`

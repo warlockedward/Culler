@@ -206,6 +206,52 @@ BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;
 CREATE TRIGGER usage_observations_no_delete BEFORE DELETE ON usage_observations
 BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;
 
+-- usage — the v2 settlement-consumption projection of the usage
+-- observations (B09 first migration). One row per (request_identity,
+-- event_seq) slot at its current (max) source_version. Class B: mutable by
+-- design — the append-only history and its chain evidence stay in
+-- usage_observations (v1); this table is the readable current fact for
+-- settlement. The backfill that populates it runs inside the migration
+-- step's single transaction and is proven by count, multiset digest, and
+-- both anti-join directions before the step may commit.
+CREATE TABLE usage (
+    source_report_id      TEXT NOT NULL UNIQUE
+                         CHECK (length(source_report_id) = 64 AND
+                                length(CAST(source_report_id AS BLOB)) = 64 AND
+                                source_report_id NOT GLOB '*[^0-9a-f]*'),
+    request_identity      TEXT NOT NULL,
+    local_request_id      TEXT NOT NULL,
+    provider_request_id   TEXT,
+    event_seq             INTEGER NOT NULL CHECK (event_seq >= 1),
+    source_version        INTEGER NOT NULL CHECK (source_version >= 1),
+    origin                TEXT NOT NULL CHECK (origin IN ('provider','local')),
+    usage_family          TEXT NOT NULL,
+    model_id              TEXT NOT NULL,
+    output_tokens         TEXT NOT NULL,
+    input_tokens          TEXT NOT NULL,
+    report_kind           TEXT NOT NULL CHECK (report_kind IN ('cumulative','incremental')),
+    finality              TEXT NOT NULL CHECK (finality IN ('interim','final')),
+    identity_provability  TEXT NOT NULL CHECK (identity_provability IN ('native','cursor','none')),
+    state                 TEXT NOT NULL CHECK (state IN ('reported','unknown','reconciliation')),
+    payload_digest        TEXT NOT NULL
+                         CHECK (length(payload_digest) = 64 AND
+                                length(CAST(payload_digest AS BLOB)) = 64 AND
+                                payload_digest NOT GLOB '*[^0-9a-f]*'),
+    supersedes_report_id  TEXT
+                         CHECK (supersedes_report_id IS NULL OR
+                                (length(supersedes_report_id) = 64 AND
+                                 length(CAST(supersedes_report_id AS BLOB)) = 64 AND
+                                 supersedes_report_id NOT GLOB '*[^0-9a-f]*')),
+    occurred_at           TEXT NOT NULL
+                         CHECK (length(occurred_at) = 27 AND
+                                occurred_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    PRIMARY KEY (source_report_id)
+);
+
+CREATE INDEX usage_request ON usage (request_identity, event_seq);
+
+CREATE INDEX usage_local ON usage (local_request_id);
+
 ------------------------------------------------------------------------------
 -- projects / sandbox_profiles — infrastructure records.
 ------------------------------------------------------------------------------

@@ -425,8 +425,8 @@ func TestMigrateAppliesAuditChainStepFromSecondStepBaseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 2 || report.Applied[0] != "add-audit-events-chain" || report.Applied[1] != "add-usage-observations" {
-		t.Fatalf("report = %+v; want the third and fourth steps applied", report)
+	if !report.Migrated || len(report.Applied) != 3 || report.Applied[0] != "add-audit-events-chain" || report.Applied[1] != "add-usage-observations" || report.Applied[2] != "migrate-usage-to-v2" {
+		t.Fatalf("report = %+v; want the third through fifth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'audit_events'`); n != 1 {
 		t.Fatalf("audit_events present = %d; want 1", n)
@@ -438,8 +438,8 @@ func TestMigrateAppliesAuditChainStepFromSecondStepBaseline(t *testing.T) {
 	if stamped != CurrentSchemaID {
 		t.Fatalf("meta.schema_id = %s; want %s", stamped, CurrentSchemaID)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'schema'`); n != 2 {
-		t.Fatalf("schema aggregate chain rows = %d; want 2 (S3 starts the chain, S4 extends it)", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'schema'`); n != 3 {
+		t.Fatalf("schema aggregate chain rows = %d; want 3 (S3 starts the chain, S4 and S5 extend it)", n)
 	}
 	if err := CheckSchema(db); err != nil {
 		t.Fatalf("post-migration schema check: %v", err)
@@ -463,7 +463,7 @@ func TestMigrationStepRecordsClosedChainRow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if len(report.Applied) != 4 {
+	if len(report.Applied) != 5 {
 		t.Fatalf("report = %+v; want the full chain applied", report)
 	}
 
@@ -500,15 +500,32 @@ func TestMigrationStepRecordsClosedChainRow(t *testing.T) {
 	for _, want := range []string{
 		`"step_name":"add-usage-observations"`,
 		`"from_schema_id":"` + b07BaselineIdentity + `"`,
-		`"to_schema_id":"` + CurrentSchemaID + `"`,
+		`"to_schema_id":"` + c03UsageIdentity + `"`,
 		`"version":"4"`,
 	} {
 		if !strings.Contains(payloadJSON, want) {
 			t.Fatalf("S4 payload %s lacks %s", payloadJSON, want)
 		}
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events`); n != 2 {
-		t.Fatalf("chain rows = %d; want the S3 and S4 mapping rows (S1 and S2 ran before the table existed)", n)
+	if err := db.QueryRow(`SELECT aggregate_id, seq, payload_json FROM audit_events WHERE seq = 3`).
+		Scan(&aggregateID, &seq, &payloadJSON); err != nil {
+		t.Fatalf("read the S5 migration chain row: %v", err)
+	}
+	if aggregateID != "schema" || seq != 3 {
+		t.Fatalf("S5 migration row = (%s, %d); want (schema, 3)", aggregateID, seq)
+	}
+	for _, want := range []string{
+		`"step_name":"migrate-usage-to-v2"`,
+		`"from_schema_id":"` + c03UsageIdentity + `"`,
+		`"to_schema_id":"` + CurrentSchemaID + `"`,
+		`"version":"5"`,
+	} {
+		if !strings.Contains(payloadJSON, want) {
+			t.Fatalf("S5 payload %s lacks %s", payloadJSON, want)
+		}
+	}
+	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events`); n != 3 {
+		t.Fatalf("chain rows = %d; want the S3, S4 and S5 mapping rows (S1 and S2 ran before the table existed)", n)
 	}
 
 	verifierReport, err := VerifyAuditChain(db, "")
