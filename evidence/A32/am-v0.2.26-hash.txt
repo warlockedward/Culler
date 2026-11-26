@@ -1,0 +1,10 @@
+AM v0.2.26 双面哈希登记（轮五十一收口窗：D07 锚定发布落地⇒EVIDENCED＝D-track 第七票；锚定四要求离线验证全绿[复制目录孤立验证/seq 单调/防回滚链/密钥域分离]；层二消失检测的预期依据（已锚定链头集）就此在位）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 5a8535ce3a7353dc9aa487df3ba4798e0945c4f9ecfb2b753a86d189a9d8db6d
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 6729276b27c1738b9384f4caf587297d40e40d597023f8ff341540a06be7ac13，与 am-v0.2.25-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.25 = 6729276b27c1738b9384f4caf587297d40e40d597023f8ff341540a06be7ac13（evidence/A32/am-v0.2.25-hash.txt 实读）；再前 v0.2.24 = a987bbb398f122fe4978d302daeadc1ef4eff0b03ff7be2011b56851a85514fa（同件记载）
+- 同轮并入 dev 的提交: 046004b（D07 设计面）＋1d138bc（D07 实施：schema.sql S11 anchor_checkpoints[append-only lattice＝D22③ 防回滚结构承载]；migrate.go d06SigningIdentity 钉定+S10.to 钉+S11；mc/anchor 包[shz-anchor-checkpoint-v1 规范形+genesis 域分离+VerifyDir 离线验证器：零 spine 零 MC_HOME，attestation 复用 signnode 单一权威，root 注入 ComputeRoot 重算]；verbs AnchorPublish[层一预检拒锚+恢复分支幂等复制+D06 路径签核+artifact 落盘]；mc anchor 命令[publish/verify <dir>]；R 族四要求离线验证+行为面+S11 步骤族；registry 11 步全族更新）；status.json D07=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（29 包 ok[新 anchor 包入套]，mc/anchor 0.038s，verbs 491.662s 非缓存实跑，零 FAIL 零 UNVERIFIED，首跑无红点）；新基线 identity＝f8620d7ebb34c4fc092ae69cac5412529cf1bd3d65039754ee5becac48af87c3（shell 三文件拼接＝Go 探针逐字节相等）
+- 诚实边界: 异地传输＝A06 运维域（本票产复制单元）；sigstore/外部 log＝可选路径未建（artifact 形态已守纪律）；层二消失检测器不在票面（本票交付其预期依据）；生产锚定接受＝§5.4 载体 B 所有者决策（key_id/carrier 字段使门可审计）；锚定锚完整性不锚内容可信
+- 账: dev tip＝1d138bc（本登记轮提交随后）/ worktrees＝main+dev+d07（d07 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa 完整审计重跑候 push 门（Q7 裁定）/ **D-chain 状态：D01＝D02＝D03＝D04＝D05＝D06＝D07＝EVIDENCED⇒D08（signoffs+SoD，deps D06✓+B02✓）＝D-track 最后一张非门票；D09 缓行（Q2）；B-chain：B10 入图可立，余 B06（门 O3 硬件候 218）**
