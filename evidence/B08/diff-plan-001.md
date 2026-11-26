@@ -16,15 +16,17 @@
 
 ## 1. 设计裁定（本票决策面）
 
+- **D0 范围裁定（先于一切）**：本票＝**存量域入链迁移**（票面 F1「第二迁移实战＋零改写比对」的字面交付）。稳态接线（未来 activity 行自动入链，需改 35 处调用点含 dispatchseam 设计决策面）**登记为具名后续票**，不在本票——理由：票面 F1 只验收迁移与零改写；35 点改接的风险面（dispatchseam 冻结 JSON、逐点 NULL/空串语义）超出本票的最小安全变更面。边界诚实登记＝迁移后 'activity' 聚合为迁移时点快照，后续行候稳态票入链（DC §3.2 activity 入链义务的稳态半＝具名残余，不冒充已闭）。
 - **D1 入链语义**：activity 每行⇒`activity` 聚合一条链行（Class A 证据入链，DC §3.2 明文）；链行 payload=activity 行的规范投影（原值照录，含 legacy actor——零改写＝不改写＋不改值）。
+- **D1b 无独立 aggregate_open**：'activity' 聚合首行即 genesis（DC §3.4「首事件即存在证明」，同 'schema' 聚合先例——B07 S3 首迁移行 prev=genesis，无 open 事件）⇒链行与 activity 行一一对应，覆盖证明更简。
 - **D2 payload 家族 `activity`（declared-pending-vectors，B07 先例）**：字段表（声明序）＝`id(dec_int,req)／actor(str,req)／kind(str,req)／created_at(time,req，SpineTime⇒规范 RFC3339Z 微秒形确定性转换)／subject(str,opt)／detail(str,opt)／dispatch_key(str,opt)／dispatch_request_id(str,opt)／dispatch_result(str,opt)／project(str,opt)`；无向量（NOT verified 登记）；event_type=activity.kind（既有点分 slug，event_type 索引可按 kind 查）。
 - **D3 event_id 确定性**：sha256("shz-activity-chain-v1|<activity_id>")——回填与稳态同一式，重放身份稳定（C03 open 事件 ID 先例）。
-- **D4 稳态接线＝集中 `AppendActivity`**（substrate 新文件）：activity 行＋链行同事务（R-03；先插 activity 取 rowid，再 AppendAuditEvent）；35 处调用点机械改接（SQL 效果同＋链行新增；dispatchseam 冻结 JSON 面零触碰——只换其 activity 记录行）。
-- **D5 覆盖闸（B05 两阶段先例）**：源级测试枚举全仓（非测试）`INSERT INTO activity`，断言仅 substrate/activity_chain.go 含之——未来旁路必红（fail-closed）。
-- **D6 S6 步骤形态**：Statement＝`activity_chain_map` DDL（activity_id INTEGER PRIMARY KEY REFERENCES activity(id)＋event_id hex64 围栏 UNIQUE）——合法 schema delta⇒identity 跨 W⇒V；**Migrate 钩子**（新可选字段，B09 Verify 同族，checksum 不含）＝Go 回填：aggregate_open（确定性 open ID）＋按 id 升序逐行 AppendAuditEvent＋map 行（本地 prev 递推＝EventDigest/ChainDigest 预计算，免逐行回查）；**Verify 钩子**＝覆盖三验（map 行数==activity 行数；map.event_id anti-join audit_events=0；'activity' 聚合链行数==activity 行数+1[open]）。
+- **D4 稳态接线＝具名后续票（D0）**：本票不建 `AppendActivity`、不改 35 处调用点；后续票面＝集中 `AppendActivity`（activity 行＋链行同事务）＋35 点机械改接＋源级覆盖闸（B05 两阶段先例）。本票只交付存量迁移＋证明。
+- **D5 覆盖闸（随 D4 后续票）**：源级测试枚举全仓（非测试）`INSERT INTO activity`，断言仅 `AppendActivity` 含之——未来旁路必红（fail-closed）。本票不建（无稳态写入面可闸）。
+- **D6 S6 步骤形态**：Statement＝`activity_chain_map` DDL（activity_id INTEGER PRIMARY KEY REFERENCES activity(id)＋event_id hex64 围栏 UNIQUE）——合法 schema delta⇒identity 跨 W⇒V；**Migrate 钩子**（新可选字段，B09 Verify 同族，checksum 不含）＝Go 回填：按 id 升序逐行 AppendAuditEvent（D1b：无 open 事件，首行 prev=genesis）＋map 行（本地 prev 递推＝EventDigest/ChainDigest 预计算，免逐行回查）；**Verify 钩子**＝覆盖三验（map 行数==activity 行数；map.event_id anti-join audit_events=0；'activity' 聚合链行数==activity 行数）。
 - **D7 零改写证明（双层面）**：步骤内＝S6 不写 activity（结构性，Verify 不依赖它）；测试面＝Migrate 前后 activity 全列 digest 相等＋payload 中 actor 原值（含 'operator'）逐字断言（IG §7 票面互验）。
 - **D8 顺序即 rowid 序**：回填按 activity.id 升序⇒链 seq 与行序一致（单写者＋seq 分配 max+1 天然吻合；seq_prefix 触发器兜底）。
-- **D9 诚实边界**：declared-pending 家族无向量（NOT verified 登记，同 B07 migration/aggregate_open 族）；activity 链行不承载"历史归因"（IG §7 更强归因仅经映射行证据追加，本票不建该表）；35 处改接的等价性由全道＋覆盖闸承载，不逐点宣称行为零变更证明（链行是新增面）。
+- **D9 诚实边界**：declared-pending 家族无向量（NOT verified 登记，同 B07 migration/aggregate_open 族）；activity 链行不承载"历史归因"（IG §7 更强归因仅经映射行证据追加，本票不建该表）；**稳态入链＝具名后续票（D0/D4）——迁移后 'activity' 聚合为迁移时点快照，DC §3.2 稳态半候后续票，不冒充已闭**。
 
 ## 2. 正清单（只触这些文件）
 
@@ -34,10 +36,10 @@ Go（mc/）：
 3. `mc/substrate/migrate.go` — `b09ChainIdentity` 常量（W 字面量，独立复算钉定）＋S5.to 钉 W＋S6 `migrate-activity-to-chain`（W⇒CurrentSchemaID 符号，Statement=activityChainMapDDL，Migrate=回填钩子，Verify=覆盖三验）＋`MigrationStep.Migrate func(tx *sql.Tx) error` 字段（additive）。
 4. `mc/substrate/migrate_apply.go` — applyMigrationStep 步骤 SQL 后调 Migrate 钩子、Verify 前（既有 verifyStep 位不动）。
 5. `mc/substrate/auchain.go` — payloadSchemas 增 `activity` 家族字段表（addition-only 附录，注释同先例）。
-6. `mc/substrate/activity_chain.go`（新）— `ActivityEntry` 结构＋`AppendActivity`（稳态：activity 行＋链行同事务，created_at 经 tx 内 clock 读）＋`migrateActivityToChain`（S6 Migrate 钩子）＋`VerifyActivityBackfill`（S6 Verify 三验）＋SpineTime⇒canonical 转换＋确定性 event/open ID。
-7. 35 处调用点（verbs/ 各文件＋substrate/migrate_apply.go 的迁移 activity 行）— 改接 AppendActivity（机械，语义同）。
-8. `mc/substrate/activity_chain_test.go`（新）— N1-N6 测试族（§5）。
-9. `mc/substrate/coverage_gate_test.go`（新，或并入 activity_chain_test.go）— D5 源级覆盖闸。
+6. `mc/substrate/activity_chain.go`（新）— `migrateActivityToChain`（S6 Migrate 钩子：按 id 升序逐行 AppendAuditEvent＋map 行，本地 prev 递推免回查）＋`VerifyActivityBackfill`（S6 Verify 三验）＋SpineTime⇒canonical 转换＋确定性 event ID。
+7. ~~35 处调用点改接 AppendActivity~~（**移出本票＝D4/D0 具名后续**）。
+8. `mc/substrate/activity_chain_test.go`（新）— N1-N5 测试族（§5）。
+9. ~~覆盖闸测试~~（**随 D4 后续票＝D5**）。
 10. `mc/substrate/migrate_test.go` — 随 6 步 registry 更新（preLedger 6/b01 5/no-op 6 行）＋strip 助手补 activity_chain_map。
 11. `mc/substrate/usage_observation_test.go` — U13（b07 基线⇒S4+S5+S6 三步）＋U14（strip 面）更新。
 12. `mc/substrate/auchain_test.go` — W11（b02 基线⇒S3-S6 四步，schema 聚合链行 4）＋W12（preLedger⇒5 applied… 更正：S1-S6 全链⇒audit 链行 4[S3,S4,S5,S6]，S6 载荷断言）更新。
@@ -70,12 +72,11 @@ CREATE TABLE activity_chain_map (
 
 ## 5. 测试族（activity_chain_test.go）
 
-- **N1 回填正确性**：种子 activity 行（含可选列变体×3＋legacy actor 'operator'）⇒S6 应用⇒'activity' 聚合链行=种子数+1(open)；seq 按 id 升序；payload 字段逐值（含 actor 原值）；map 行齐。
+- **N1 回填正确性**：种子 activity 行（含可选列变体×3＋legacy actor 'operator'）⇒S6 应用⇒'activity' 聚合链行=种子数（一一对应，D1b 无 open 事件）；seq 按 id 升序（首行 prev=GenesisHash("activity")）；payload 字段逐值（含 actor 原值、created_at 规范形转换）；map 行齐（activity_id↔event_id 确定性）。
 - **N2 零改写互验（IG §7 票面）**：Migrate 前后 activity 全列多重集 digest 相等＋payload_json 中 actor 与活动行原值逐字相等（含 'operator'）。
-- **N3 证明失败⇒整步回滚**：篡改 registry（Migrate 钩子只回填一半，用计数截断）⇒ErrBackfillProof 族⇒map/链行/DDL 全回滚＋ledger 无第六行＋meta 钉 W 不动＋activity 零触。
-- **N4 稳态同事务**：AppendActivity⇒activity 行＋链行同 tx（回滚则俱无）；event_id 确定性（同 rowid 同 ID）。
-- **N5 覆盖闸**：源级枚举 `INSERT INTO activity`（非测试 .go 文件）⇒仅 activity_chain.go 命中（fail-closed 锚点：AppendActivity 本体）。
-- **N6 既有 registry 测试随 6 步全绿**（migrate/usage/auchain/onboard 族更新）。
+- **N3 证明失败⇒整步回滚**：篡改 registry（Migrate 钩子只回填一半）⇒ErrBackfillProof 族⇒map/链行/DDL 全回滚＋ledger 无第六行＋meta 钉 W 不动＋activity 零触。
+- **N4 幂等**：已全映射的脊重跑 S6 语义＝无新行（map 主键挡重放；四态 runner 层面=已记录⇒跳过）。
+- **N5 既有 registry 测试随 6 步全绿**（migrate/usage/auchain/onboard 族更新）。
 
 ## 6. 验证 lane
 
