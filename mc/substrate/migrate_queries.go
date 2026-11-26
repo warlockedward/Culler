@@ -232,12 +232,11 @@ WHERE o.source_version = (
     WHERE o2.request_identity = o.request_identity AND o2.event_seq = o.event_seq);`
 
 // identityFoundationDDL is the seventh step's object definitions: the P4
-// identity plane (users, sessions, teams, membership, grants) and its
-// object-scope guards. Every statement's text must stay byte-identical to
-// the identity block in schema.sql, so the sqlite_schema rows of a migrated
-// spine hash like the reference spine built from the baseline. The
-// trusted_ctx temp table is deliberately absent: it is per-connection and is
-// bound by the guard inside the write transaction, never by the schema.
+// identity plane (users, sessions, teams, membership, grants), the
+// trusted_ctx lifecycle table, and the object-scope guards. Every
+// statement's text must stay byte-identical to the identity block in
+// schema.sql, so the sqlite_schema rows of a migrated spine hash like the
+// reference spine built from the baseline.
 const identityFoundationDDL = `CREATE TABLE users (
     id            TEXT NOT NULL UNIQUE
                CHECK (length(id) = 32 AND
@@ -359,3 +358,35 @@ const activityChainMapDDL = `CREATE TABLE activity_chain_map (
                       length(CAST(event_id AS BLOB)) = 64 AND
                       event_id NOT GLOB '*[^0-9a-f]*')
 );`
+
+// legacySealDDL is the eighth step's object definitions: the legacy actor
+// attribution registry (Class A) and the execution-point seal of the legacy
+// 'operator' actor. Every statement's text must stay byte-identical to the
+// sealing block in schema.sql, so the sqlite_schema rows of a migrated spine
+// hash like the reference spine built from the baseline.
+const legacySealDDL = `CREATE TABLE legacy_actor_mapping (
+    legacy_actor    TEXT PRIMARY KEY
+                CHECK (length(legacy_actor) BETWEEN 1 AND 128),
+    mapped_user_id  TEXT NOT NULL REFERENCES users (id),
+    basis           TEXT NOT NULL
+                CHECK (length(basis) BETWEEN 1 AND 256),
+    nature          TEXT NOT NULL
+                CHECK (length(nature) BETWEEN 1 AND 256),
+    strength        TEXT NOT NULL
+                CHECK (length(strength) BETWEEN 1 AND 256),
+    evidence        TEXT
+                CHECK (evidence IS NULL OR length(evidence) <= 4096),
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX legacy_actor_mapping_user ON legacy_actor_mapping (mapped_user_id);
+
+CREATE TRIGGER legacy_actor_mapping_no_update BEFORE UPDATE ON legacy_actor_mapping
+BEGIN SELECT RAISE(ABORT, 'legacy actor mappings are append only'); END;
+
+CREATE TRIGGER legacy_actor_mapping_no_delete BEFORE DELETE ON legacy_actor_mapping
+BEGIN SELECT RAISE(ABORT, 'legacy actor mappings are append only'); END;
+
+CREATE TRIGGER activity_legacy_actor_sealed BEFORE INSERT ON activity
+WHEN NEW.actor = 'operator'
+BEGIN SELECT RAISE(ABORT, 'the legacy operator actor is sealed after the identity migration'); END;`

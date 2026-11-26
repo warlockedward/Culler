@@ -461,6 +461,12 @@ func commandSystemSpine(action string, stdin io.Reader) (any, error) {
 			return nil, err
 		}
 		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityGrantRevoke(db, id, a) })
+	case "identity-legacy-map":
+		var a verbs.IdentityLegacyMapRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityLegacyMap(db, id, a) })
 	case "launch-check":
 		var a struct {
 			Run          string                    `json:"run"`

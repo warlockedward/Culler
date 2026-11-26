@@ -62,3 +62,14 @@
 ## 7. 登记与收尾
 
 实施＝少提交于 shz/TD03；全道绿后 ff dev；登记轮＝AM v0.2.21＋status.json D03=EVIDENCED＋blcheck；新基线 identity 入册；诚实边界（'owner' 占位后继接线候票／Diagnostic·evalcase 词汇候票／映射证据追加候票／封存例外 grant 机制未建）入登记。
+
+## 8. 实施补记（先列后改的追加登记）
+
+- **live 面精确计数＝24 点**（§0 初估 21，实施中枚举收敛）：collie.go×9（含 :1961 actor 变量＋:2007 谓词 `actor == "owner" || actor == "collie"`——collie 复合类别保留）＋task.go×5＋board.go×1＋packet.go×1＋customization.go×2＋environment.go×1＋systemstatus.go×1＋allowances.go×2＋**collietitle.go×1（§0 普查漏点，实施中枚举补获——同型 host/agent 双分支 actor）**＋identity.go×1（bootstrap 改**自归属**：user.created 事件 actor＝所创建用户 ID，非 'owner'——账号记录自身出生，比组件归属更诚实）。谓词同步＝domain/task.go:210 Cancel 一处（'owner'∨'collie:' 前缀）。
+- **I1 语义随 S8 调整**：b08 基线⇒当前发行＝S7+S8 两步交叉（applied=2，ledger 8，CheckSchema 于 Current）；S7 单独步证据面移至 S8 侧（L1 于 d01 基线单步应用 S8）。
+- **W12 S7 payload to 端点随钉定改 d01FoundationIdentity**（D01 时代 S7 为末步＝Current 符号；S8 加入后 S7.to 是历史端点字面量——B02 先例：历史步骤端点钉字面量）。
+- **D01 旧注释修正**：migrate_queries.go identityFoundationDDL 注释残留 D3′ 转向前"trusted_ctx temp table 故意缺席"文句（与常量实际含 main 库 trusted_ctx 矛盾）⇒按 AGENTS.md"删除变更使之变假的陈述"更正。
+- **spine_transfer_test 哨兵行随迁**：'restore sentinel' 种子在当前 schema 脊上⇒'owner'（incidental fixture，非 legacy 模拟）。
+- **自纠×1**：onboard ledger 断言只改了消息行未改条件行（`!= 7` 残留⇒"want 8"红点）⇒两行块整体替换（D01 先例形态）。
+- **新基线 identity 双方法验证**：shell 三文件拼接哈希＝Go CurrentSchemaID（探针 go run）逐字节相等＝bd9ebc9c…049a8。
+- **lane 首跑红点×9（全部定位修复⇒二跑候绿）**：①**systemstatus.go:544 误迁回退**——`ResetProjectInfrastructure` 第二参是 diagnostics **source** 词汇（CHECK `source IN ('resident','runner','agent','operator','mc')`，'operator' 仍合法），非 activity actor；§0 普查按"actor"误归类（参数名 source 未逐点核落表）⇒回退 'operator'，教训登记：actor 字面量迁移必须逐点核**落表**而非逐点核参数位置；②auchain TestMigrationStepRecordsClosedChainRow 全链 7⇒8（W11/W12 之外的第三处链断言）；③connectionwait/deliverystart/brief_history/queue×2/task×2/execution×2/packet/requirements_packet/reads×5＝**测试直调 domain 函数以 "operator" 为 actor 实参**（§0 测试面普查只覆盖了字面 SQL 种子与断言，漏了 domain 直调实参面）⇒随迁 'owner'；④TestProjectInfrastructureResume＝①的咬点。生产面 24 点迁移本身无红（谓词同步单点命中）。

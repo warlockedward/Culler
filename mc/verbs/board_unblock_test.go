@@ -51,7 +51,7 @@ func TestBoardApprovedUpdateResume(t *testing.T) {
 				if string(a) != string(b) || dfInt(t, f.db, `SELECT count(*) FROM board_operations WHERE task_id=?`, task) != 1 {
 					t.Fatalf("the repeated recovery changed its receipt: %s / %s", a, b)
 				}
-				if dfStr(t, f.db, `SELECT actor||':'||reason FROM board_operations WHERE task_id=?`, task) != "operator:"+reason {
+				if dfStr(t, f.db, `SELECT actor||':'||reason FROM board_operations WHERE task_id=?`, task) != "owner:"+reason {
 					t.Fatal("the recovery lost its actor or reason")
 				}
 				request.OperationID = "stale-recovery"
@@ -69,7 +69,7 @@ func TestBoardApprovedUpdateResume(t *testing.T) {
 			if dfInt(t, f.db, `SELECT dispatch_retries FROM tasks WHERE id=?`, task) != domain.InfraBudget {
 				t.Fatal("the recovery did not restore the infrastructure allowance")
 			}
-			if dfInt(t, f.db, `SELECT count(*) FROM activity WHERE kind='task.resumed' AND subject=? AND actor='operator' AND detail=?`, task, reason) != 1 {
+			if dfInt(t, f.db, `SELECT count(*) FROM activity WHERE kind='task.resumed' AND subject=? AND actor='owner' AND detail=?`, task, reason) != 1 {
 				t.Fatal("the recovery reason must appear once")
 			}
 			records, err := loadVisionRecords(context.Background(), f.db, "ws-test")

@@ -50,7 +50,7 @@ func CollieTitle(db *sql.DB, id *RunIdentity, session, title string) (any, error
 		if _, err := q.ExecContext(ctx, `UPDATE collie_sessions SET title=? WHERE id=?`, title, session); err != nil {
 			return err
 		}
-		actor := "operator"
+		actor := "owner"
 		if id != nil {
 			actor = "collie"
 		}

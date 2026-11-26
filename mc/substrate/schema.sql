@@ -3357,3 +3357,39 @@ BEGIN SELECT RAISE(ABORT, 'a conflict requires the custom instructions of its ac
 CREATE TRIGGER customization_conflicts_wiki_update_cleared BEFORE INSERT ON customization_conflicts
 WHEN NEW.cleared_at IS NULL AND EXISTS (SELECT 1 FROM wiki_updates w WHERE w.run_id=NEW.run_id)
 BEGIN SELECT RAISE(ABORT, 'the conflict of a wiki update run sets no role block'); END;
+
+-- legacy_actor_mapping — the attribution registry of retired legacy actors
+-- (IG §7). A row records which named user succeeded a legacy actor, on what
+-- basis, and with what strength of attribution; the evidence column carries
+-- independent proof of stronger attribution when the owner has it. Rows are
+-- append only: the association is governance record, not mutable state.
+CREATE TABLE legacy_actor_mapping (
+    legacy_actor    TEXT PRIMARY KEY
+                CHECK (length(legacy_actor) BETWEEN 1 AND 128),
+    mapped_user_id  TEXT NOT NULL REFERENCES users (id),
+    basis           TEXT NOT NULL
+                CHECK (length(basis) BETWEEN 1 AND 256),
+    nature          TEXT NOT NULL
+                CHECK (length(nature) BETWEEN 1 AND 256),
+    strength        TEXT NOT NULL
+                CHECK (length(strength) BETWEEN 1 AND 256),
+    evidence        TEXT
+                CHECK (evidence IS NULL OR length(evidence) <= 4096),
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX legacy_actor_mapping_user ON legacy_actor_mapping (mapped_user_id);
+
+CREATE TRIGGER legacy_actor_mapping_no_update BEFORE UPDATE ON legacy_actor_mapping
+BEGIN SELECT RAISE(ABORT, 'legacy actor mappings are append only'); END;
+
+CREATE TRIGGER legacy_actor_mapping_no_delete BEFORE DELETE ON legacy_actor_mapping
+BEGIN SELECT RAISE(ABORT, 'legacy actor mappings are append only'); END;
+
+-- activity_legacy_actor_sealed — the legacy 'operator' actor is sealed at the
+-- execution point (IG §7 封存): no new event may be attributed to it, on any
+-- spine carrying this schema. History rows keep the value verbatim (zero
+-- rewrite); live control surfaces write the current 'owner' actor instead.
+CREATE TRIGGER activity_legacy_actor_sealed BEFORE INSERT ON activity
+WHEN NEW.actor = 'operator'
+BEGIN SELECT RAISE(ABORT, 'the legacy operator actor is sealed after the identity migration'); END;

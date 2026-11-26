@@ -639,7 +639,7 @@ func TestCancel(t *testing.T) {
 		id := mkTask(t, db, "task", "packaged")
 		mkPacket(t, db, id)
 		mustTx(t, db, func(ctx context.Context, q domain.Q) error {
-			return domain.Cancel(ctx, q, id, "direction changed", "operator")
+			return domain.Cancel(ctx, q, id, "direction changed", "owner")
 		})
 		if got := taskStr(t, db, id, "decision"); got != "cancelled" {
 			t.Fatalf("decision = %q", got)
@@ -659,7 +659,7 @@ func TestCancel(t *testing.T) {
 		db := openSpine(t)
 		id := mkTask(t, db, "task", "packaged")
 		wantCode(t, db, domain.CodeReasonRequired, func(ctx context.Context, q domain.Q) error {
-			return domain.Cancel(ctx, q, id, "", "operator")
+			return domain.Cancel(ctx, q, id, "", "owner")
 		})
 	})
 

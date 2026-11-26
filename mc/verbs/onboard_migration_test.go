@@ -161,6 +161,26 @@ func buildPreLedgerSpineFile(t *testing.T, path, uuid string) {
 		db.Close()
 		t.Fatalf("strip trusted context table: %v", err)
 	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS activity_legacy_actor_sealed`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor seal trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS legacy_actor_mapping_no_update`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor mapping no update: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS legacy_actor_mapping_no_delete`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor mapping no delete: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS legacy_actor_mapping_user`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor mapping index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS legacy_actor_mapping`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor mapping table: %v", err)
+	}
 	preID := substrate.ProductionMigrationRegistry()[0].FromSchemaID
 	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, preID); err != nil {
 		db.Close()
@@ -195,8 +215,8 @@ func TestOnboardSpineMigratesPreLedgerSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 7 {
-		t.Fatalf("ledger rows = %d (%v); want 7", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 8 {
+		t.Fatalf("ledger rows = %d (%v); want 8", ledgerRows, err)
 	}
 	db.Close()
 
@@ -549,6 +569,26 @@ func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
 		db.Close()
 		t.Fatalf("strip trusted context table: %v", err)
 	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS activity_legacy_actor_sealed`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor seal trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS legacy_actor_mapping_no_update`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor mapping no update: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS legacy_actor_mapping_no_delete`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor mapping no delete: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS legacy_actor_mapping_user`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor mapping index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS legacy_actor_mapping`); err != nil {
+		db.Close()
+		t.Fatalf("strip legacy actor mapping table: %v", err)
+	}
 	step1 := substrate.ProductionMigrationRegistry()[0]
 	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, step1.ToSchemaID); err != nil {
 		db.Close()
@@ -562,7 +602,7 @@ func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
 }
 
 // U4: OnboardSpine crosses a spine left at the first step's target identity:
-// the recorded first step is skipped, the second through seventh steps
+// the recorded first step is skipped, the second through eighth steps
 // land, the deployment UUID is preserved, and the schema check passes on
 // the result.
 func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
@@ -585,8 +625,8 @@ func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 7 {
-		t.Fatalf("ledger rows = %d (%v); want 7", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 8 {
+		t.Fatalf("ledger rows = %d (%v); want 8", ledgerRows, err)
 	}
 	db.Close()
 }

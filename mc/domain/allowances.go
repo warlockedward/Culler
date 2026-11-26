@@ -21,7 +21,7 @@ func RequestPacketRevision(ctx context.Context, q Q, task int64, reason string) 
 	if err := q.QueryRowContext(ctx, `SELECT record_version FROM tasks WHERE id=?`, task).Scan(&version); err != nil {
 		return err
 	}
-	_, err := RequestTaskRevision(ctx, q, task, version, fmt.Sprintf("packet-revision:%d:%d", task, version), nil, nil, reason, "operator")
+	_, err := RequestTaskRevision(ctx, q, task, version, fmt.Sprintf("packet-revision:%d:%d", task, version), nil, nil, reason, "owner")
 	return err
 }
 
@@ -66,7 +66,7 @@ func GrantCorrectionAllowance(ctx context.Context, q Q, task int64, reason strin
 	if _, err := q.ExecContext(ctx, `UPDATE tasks SET correction_count=0,verifier_correction_open=1,correction_operator_reason=? WHERE id=?`, reason, task); err != nil {
 		return err
 	}
-	if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('operator','task.correction_allowance',?,json_object('reason',?,'attempts',3))`, task, reason); err != nil {
+	if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('owner','task.correction_allowance',?,json_object('reason',?,'attempts',3))`, task, reason); err != nil {
 		return err
 	}
 	return returnToSeeded(ctx, q, task, "verifier", report)

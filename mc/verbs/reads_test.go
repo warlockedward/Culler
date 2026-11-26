@@ -328,9 +328,9 @@ func TestLeaseListIsOneRowPerProjectInIDOrder(t *testing.T) {
 
 func TestActivityProjectFilterPrecedesLimit(t *testing.T) {
 	db := rlSeed(t)
-	dvExec(t, db, `INSERT INTO activity(actor,kind,subject,detail) VALUES ('operator','task.test','11','selected')`)
+	dvExec(t, db, `INSERT INTO activity(actor,kind,subject,detail) VALUES ('owner','task.test','11','selected')`)
 	for range 12 {
-		dvExec(t, db, `INSERT INTO activity(actor,kind,subject,detail) VALUES ('operator','task.test','13','other')`)
+		dvExec(t, db, `INSERT INTO activity(actor,kind,subject,detail) VALUES ('owner','task.test','13','other')`)
 	}
 	result, err := ActivityList(db, "task.test", 1, "ws-test")
 	if err != nil {
@@ -349,16 +349,16 @@ func TestActivityProjectAssociation(t *testing.T) {
 		kind, subject, actor, result string
 		own                          bool
 	}{
-		{"task.test", "11", "operator", "", true},
-		{"task.test", "14", "operator", "", true},
+		{"task.test", "11", "owner", "", true},
+		{"task.test", "14", "owner", "", true},
 		{"project.self_archived", "ws-test", "system", "", true},
 		{"dispatch.result", "", "dispatch", `{"project":"ws-test"}`, true},
 		{"run.test", "run-source", "system", "", true},
 		{"run.test", "", "run-source", "", true},
-		{"collie.test", "11", "operator", "", false},
-		{"task.test", "11junk", "operator", "", false},
+		{"collie.test", "11", "owner", "", false},
+		{"task.test", "11junk", "owner", "", false},
 		{"dispatch.health", "", "dispatch", "", false},
-		{"task.test", "13", "operator", "", false},
+		{"task.test", "13", "owner", "", false},
 	} {
 		t.Run(row.kind+row.subject+row.actor, func(t *testing.T) {
 			res, err := db.Exec(`INSERT INTO activity(actor,kind,subject,dispatch_result,dispatch_request_id) VALUES (?,?,?,?,?)`, row.actor, row.kind, nullIfEmpty(row.subject), nullIfEmpty(row.result), func() any {

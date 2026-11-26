@@ -702,7 +702,7 @@ func TestDispatchSpawnBriefCarriesClaimedState(t *testing.T) {
 		dvExec(t, db, `UPDATE tasks SET description='criterion: exact output' WHERE id=1`)
 		insertHistoricalTask(t, db, 2, "ws-test", "cancelled", "2000-01-01 00:00:00")
 		insertHistoricalTask(t, db, 3, "ws-test", "rejected", "2000-01-01 00:00:00")
-		dvExec(t, db, `INSERT INTO activity(actor,kind,subject,detail) VALUES('operator','task.cancelled','2','Low value.')`)
+		dvExec(t, db, `INSERT INTO activity(actor,kind,subject,detail) VALUES('owner','task.cancelled','2','Low value.')`)
 		_, got := dvDispatch(t, db, dispatch.Records{Tasks: []dispatch.Task{task}}, dispatch.Lease{}, dvConfig())
 		brief := fmt.Sprint(got["brief"])
 		for _, want := range []string{"contrast this proposal", "criterion: exact output", "## " + partPool} {

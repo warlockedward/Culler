@@ -128,7 +128,7 @@ func TaskBlock(db *sql.DB, id *RunIdentity, task int64, reason string) (any, err
 				return endRun(ctx, q, id.RunID, "blocked")
 			}
 		}
-		actor, kind := "operator", domain.BlockOperator
+		actor, kind := "owner", domain.BlockOperator
 		if pipeline {
 			actor, kind = id.Role, domain.BlockReport
 		}
@@ -166,7 +166,7 @@ func TaskUnblock(db *sql.DB, id *RunIdentity, task int64, reasons ...string) (an
 			return err
 		}
 		var err error
-		revision, err = unblockTaskTx(ctx, q, task, reasons[0], "operator")
+		revision, err = unblockTaskTx(ctx, q, task, reasons[0], "owner")
 		return err
 	})
 	if err != nil {
@@ -188,7 +188,7 @@ func TaskResume(db *sql.DB, id *RunIdentity, task int64, reason string) (any, er
 		if err := requireOperatorVerbTx(ctx, q, id, "task.resume"); err != nil {
 			return err
 		}
-		return resumeTaskTx(ctx, q, task, reason, "operator")
+		return resumeTaskTx(ctx, q, task, reason, "owner")
 	})
 	return map[string]any{"task_id": task, "resumed": err == nil}, err
 }
@@ -231,7 +231,7 @@ func TaskInterrupt(db *sql.DB, id *RunIdentity, task int64) (any, error) {
 		if err != nil {
 			return err
 		}
-		return domain.Cancel(ctx, q, task, "operator_interrupt", "operator")
+		return domain.Cancel(ctx, q, task, "operator_interrupt", "owner")
 	})
 	if err != nil {
 		return nil, err
@@ -267,7 +267,7 @@ func TaskCancel(db *sql.DB, id *RunIdentity, task int64, reason string) (any, er
 		if lockRun.Valid {
 			runID = lockRun.String
 		}
-		return domain.Cancel(ctx, q, task, reason, "operator")
+		return domain.Cancel(ctx, q, task, reason, "owner")
 	})
 	if err != nil {
 		return nil, err

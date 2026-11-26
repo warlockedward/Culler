@@ -27,6 +27,7 @@ func b08Spine(t *testing.T) *sql.DB {
 	t.Cleanup(func() { db.Close() })
 	stripActivityChainMap(t, db)
 	stripIdentityFoundation(t, db)
+	stripLegacyActorSealing(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:5] {
 		recordStep(t, db, step)
@@ -140,8 +141,8 @@ func TestActivityBackfillProjectsStockRowsInOrder(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 2 || report.Applied[0] != "migrate-activity-to-chain" || report.Applied[1] != "add-identity-foundation" {
-		t.Fatalf("report = %+v; want the sixth and seventh steps applied", report)
+	if !report.Migrated || len(report.Applied) != 3 || report.Applied[0] != "migrate-activity-to-chain" || report.Applied[1] != "add-identity-foundation" || report.Applied[2] != "add-legacy-actor-sealing" {
+		t.Fatalf("report = %+v; want the sixth through eighth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'activity'`); n != 2 {
 		t.Fatalf("activity chain rows = %d; want 2 (one per stock row)", n)

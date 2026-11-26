@@ -362,7 +362,7 @@ func collieStartWithBinding(db *sql.DB, from SurfaceRef, allowJSON, rawFrom, bin
 			}
 			preserved = messages > 0
 			if !preserved {
-				if _, _, err := collieEndTx(ctx, q, "operator", previous, "The operator changed the model of an empty conversation."); err != nil {
+				if _, _, err := collieEndTx(ctx, q, "owner", previous, "The operator changed the model of an empty conversation."); err != nil {
 					return err
 				}
 				if _, err := q.ExecContext(ctx, `UPDATE collie_sessions SET deleted_at=datetime('now') WHERE id=?`, previous); err != nil {
@@ -396,7 +396,7 @@ func collieStartWithBinding(db *sql.DB, from SurfaceRef, allowJSON, rawFrom, bin
 			var foundID, foundPath, foundBinding, foundStatus string
 			err := q.QueryRowContext(ctx, `SELECT id,session_path,binding,status FROM collie_sessions WHERE vision_project_id=? ORDER BY rowid DESC LIMIT 1`, visionProject).Scan(&foundID, &foundPath, &foundBinding, &foundStatus)
 			if err == nil && clear {
-				if _, _, err := collieEndTx(ctx, q, "operator", foundID, "The operator cleared the Vision conversation."); err != nil {
+				if _, _, err := collieEndTx(ctx, q, "owner", foundID, "The operator cleared the Vision conversation."); err != nil {
 					return err
 				}
 			} else if err == nil {
@@ -531,7 +531,7 @@ func preparePacketConversation(ctx context.Context, q Q, packet, packetVersion i
 		return nil, err
 	}
 	if clear {
-		_, _, err := collieEndTx(ctx, q, "operator", found.id, "The operator started a new conversation for this packet.")
+		_, _, err := collieEndTx(ctx, q, "owner", found.id, "The operator started a new conversation for this packet.")
 		return nil, err
 	}
 	var place SurfaceRef
@@ -677,7 +677,7 @@ func CollieResume(db *sql.DB, id *RunIdentity, sessionID, rawFrom string) (any, 
 		}
 		if _, err := q.ExecContext(ctx, `
 			INSERT INTO activity (actor, kind, subject, detail)
-			VALUES ('operator', 'collie.resumed', ?, ?)`,
+			VALUES ('owner', 'collie.resumed', ?, ?)`,
 			sessionID, from.Surface+":"+from.ChannelRef); err != nil {
 			return err
 		}
@@ -748,7 +748,7 @@ func resumeBoundSessionForSend(ctx context.Context, q Q, sessionID string, from 
 	}
 	_, err := q.ExecContext(ctx, `
 		INSERT INTO activity (actor, kind, subject, detail)
-		VALUES ('operator', 'collie.resumed', ?, ?)`,
+		VALUES ('owner', 'collie.resumed', ?, ?)`,
 		sessionID, from.Surface+":"+from.ChannelRef)
 	return err
 }
@@ -1916,13 +1916,13 @@ func CollieDelete(db *sql.DB, id *RunIdentity, sessionID string) (any, error) {
 		if deleted.Valid {
 			return nil
 		}
-		if _, _, err := collieEndTx(ctx, q, "operator", sessionID, "The operator deleted the conversation."); err != nil {
+		if _, _, err := collieEndTx(ctx, q, "owner", sessionID, "The operator deleted the conversation."); err != nil {
 			return err
 		}
 		if _, err := q.ExecContext(ctx, `UPDATE collie_sessions SET deleted_at=datetime('now') WHERE id=?`, sessionID); err != nil {
 			return err
 		}
-		_, err = q.ExecContext(ctx, `INSERT INTO activity (actor,kind,subject,detail) VALUES ('operator','collie.deleted',?,'The operator deleted the conversation.')`, sessionID)
+		_, err = q.ExecContext(ctx, `INSERT INTO activity (actor,kind,subject,detail) VALUES ('owner','collie.deleted',?,'The operator deleted the conversation.')`, sessionID)
 		return err
 	})
 	if err != nil {
@@ -1958,7 +1958,7 @@ func CollieEnd(db *sql.DB, id *RunIdentity, sessionID, reason string) (any, erro
 				return err
 			}
 		}
-		actor := "operator"
+		actor := "owner"
 		if id != nil {
 			actor = "collie"
 		}
@@ -2004,7 +2004,7 @@ func collieEndTx(ctx context.Context, q Q, actor, sessionID, reason string) (boo
 		return false, status, nil // host/surface retry: preserve ended or reaped truth
 	}
 	terminal := []string{}
-	if actor == "operator" || actor == "collie" {
+	if actor == "owner" || actor == "collie" {
 		terminal = []string{"cancelled"}
 	}
 	if err := failSessionReplies(ctx, q, sessionID, "The session ended before the reply completed.", terminal...); err != nil {

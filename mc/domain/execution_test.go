@@ -628,7 +628,7 @@ func TestRevisionWaitsForActiveExecution(t *testing.T) {
 	version := taskInt(t, db, task, "record_version")
 	mustTx(t, db, func(ctx context.Context, q domain.Q) error {
 		_, err := domain.RequestRequirementsRevision(ctx, q, task, version, "revision",
-			"The revised requirement passes.", "The operator changed the scope.", "operator")
+			"The revised requirement passes.", "The operator changed the scope.", "owner")
 		return err
 	})
 	if got := oneStr(t, db, `SELECT state FROM requirements_revisions WHERE task_id=?`, task); got != "pending" {
@@ -856,7 +856,7 @@ func TestRevisionDoesNotWaitForAWikiExecution(t *testing.T) {
 	version := taskInt(t, db, task, "record_version")
 	mustTx(t, db, func(ctx context.Context, q domain.Q) error {
 		_, err := domain.RequestRequirementsRevision(ctx, q, task, version, "revision",
-			"The revised requirement passes.", "The operator changed the scope.", "operator")
+			"The revised requirement passes.", "The operator changed the scope.", "owner")
 		return err
 	})
 	mustTx(t, db, func(ctx context.Context, q domain.Q) error { return domain.ApplyPendingTaskRevisions(ctx, q) })

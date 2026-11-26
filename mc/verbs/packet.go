@@ -88,7 +88,7 @@ func PacketDecide(db *sql.DB, id *RunIdentity, task int64, decision, reason stri
 		}
 		result["decision"] = "cancelled"
 		result["archived"] = true
-		return domain.Cancel(ctx, q, task, reason, "operator")
+		return domain.Cancel(ctx, q, task, reason, "owner")
 	})
 	if err != nil {
 		return nil, err

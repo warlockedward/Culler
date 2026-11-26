@@ -62,6 +62,7 @@ func b08IdentitySpine(t *testing.T) *sql.DB {
 	db := provisionProductionSpine(t, filepath.Join(t.TempDir(), "spine.db"), testUUID, b08MapIdentity)
 	t.Cleanup(func() { db.Close() })
 	stripIdentityFoundation(t, db)
+	stripLegacyActorSealing(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:6] {
 		recordStep(t, db, step)
@@ -69,9 +70,9 @@ func b08IdentitySpine(t *testing.T) *sql.DB {
 	return db
 }
 
-// I1: the seventh step lands the identity foundation on a b08-baseline
-// spine: only the new step applies, the objects are present, the ledger and
-// the stamp follow, and the spine passes the schema check.
+// I1: crossing from the b08 baseline lands the identity foundation and the
+// legacy actor sealing: both steps apply, the objects are present, the
+// ledger and the stamp follow, and the spine passes the schema check.
 func TestIdentityFoundationStepFromB08Baseline(t *testing.T) {
 	db := b08IdentitySpine(t)
 	registry := ProductionMigrationRegistry()
@@ -79,8 +80,8 @@ func TestIdentityFoundationStepFromB08Baseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 1 || report.Applied[0] != "add-identity-foundation" {
-		t.Fatalf("report = %+v; want only the seventh step applied", report)
+	if !report.Migrated || len(report.Applied) != 2 || report.Applied[0] != "add-identity-foundation" || report.Applied[1] != "add-legacy-actor-sealing" {
+		t.Fatalf("report = %+v; want the seventh and eighth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('users','user_sessions','teams','team_members','grants','trusted_ctx')`); n != 6 {
 		t.Fatalf("identity tables present = %d; want 6", n)
@@ -88,8 +89,11 @@ func TestIdentityFoundationStepFromB08Baseline(t *testing.T) {
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'trigger' AND name IN ('grants_guarded_insert','user_sessions_guarded_insert','user_sessions_guarded_revoke','user_sessions_state_machine')`); n != 4 {
 		t.Fatalf("object-scope guards present = %d; want 4", n)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 7 {
-		t.Fatalf("ledger rows = %d; want 7", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'legacy_actor_mapping'`); n != 1 {
+		t.Fatalf("legacy actor mapping table present = %d; want 1", n)
+	}
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 8 {
+		t.Fatalf("ledger rows = %d; want 8", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {

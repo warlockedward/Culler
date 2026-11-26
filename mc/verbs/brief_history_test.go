@@ -142,10 +142,10 @@ func TestProposalBriefHistoryReflectsCancellationAndPreservesReason(t *testing.T
 					t.Fatal("The brief includes a task before its cancellation.")
 				}
 			}
-			if err := domain.Cancel(context.Background(), db, 1, tc.reason, "operator"); err != nil {
+			if err := domain.Cancel(context.Background(), db, 1, tc.reason, "owner"); err != nil {
 				t.Fatal(err)
 			}
-			dvExec(t, db, `INSERT INTO activity(actor,kind,subject,detail) VALUES('operator','task.updated','1','Unrelated text')`)
+			dvExec(t, db, `INSERT INTO activity(actor,kind,subject,detail) VALUES('owner','task.updated','1','Unrelated text')`)
 			for _, role := range roles {
 				brief := briefFor(t, db, role, nil, briefInputs{})
 				rows := historicalRows(t, brief, partCancelled)

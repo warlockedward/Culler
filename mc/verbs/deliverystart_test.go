@@ -730,7 +730,7 @@ func TestCancelledTaskCaptureStallsAndReleasesAgentRuns(t *testing.T) {
 	stSubmission(t, db, 1)
 	stTask(t, db, 2, "ws-test", dispatch.StatusSeeded)
 	if err := inTx(db, func(ctx context.Context, q Q) error {
-		return domain.Cancel(ctx, q, 1, "The operator cancelled the task.", "operator")
+		return domain.Cancel(ctx, q, 1, "The operator cancelled the task.", "owner")
 	}); err != nil {
 		t.Fatal(err)
 	}

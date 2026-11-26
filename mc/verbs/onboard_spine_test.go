@@ -187,7 +187,7 @@ func TestOnboardSpineResetsOnlyARequestedMatchingDeployment(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := db.Exec(`INSERT INTO activity (actor, kind, detail) VALUES ('operator', 'task.added', '{}')`); err != nil {
+	if _, err := db.Exec(`INSERT INTO activity (actor, kind, detail) VALUES ('owner', 'task.added', '{}')`); err != nil {
 		t.Fatal(err)
 	}
 	db.Close()
@@ -229,7 +229,7 @@ func TestOnboardSpineResetsOnlyARequestedMatchingDeployment(t *testing.T) {
 	if err := db.QueryRow(`SELECT count(*) FROM activity`).Scan(&rows); err != nil || rows != 0 {
 		t.Fatalf("records after the reset of a current database: %d %v", rows, err)
 	}
-	if _, err := db.Exec(`INSERT INTO activity (actor, kind, detail) VALUES ('operator', 'task.added', '{}')`); err != nil {
+	if _, err := db.Exec(`INSERT INTO activity (actor, kind, detail) VALUES ('owner', 'task.added', '{}')`); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := db.Exec(`ALTER TABLE meta RENAME COLUMN schema_id TO incompatible_id`); err != nil {
@@ -336,7 +336,7 @@ func TestOnboardSpineConcurrentResetProcess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := db.Exec(`INSERT INTO activity (actor, kind, detail) VALUES ('operator', 'task.added', ?)`, fmt.Sprint(os.Getpid())); err != nil {
+	if _, err := db.Exec(`INSERT INTO activity (actor, kind, detail) VALUES ('owner', 'task.added', ?)`, fmt.Sprint(os.Getpid())); err != nil {
 		t.Fatal(err)
 	}
 	db.Close()
@@ -488,7 +488,7 @@ func TestOnboardSpineResetKeepsHostFilesAndConfiguredSettings(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := db.Exec(`INSERT INTO activity (actor, kind, detail) VALUES ('operator', 'task.added', '{}')`); err != nil {
+	if _, err := db.Exec(`INSERT INTO activity (actor, kind, detail) VALUES ('owner', 'task.added', '{}')`); err != nil {
 		t.Fatal(err)
 	}
 	db.Close()

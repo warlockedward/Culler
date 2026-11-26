@@ -129,7 +129,7 @@ func TestActivitySubjectKindsNameTasksAndRuns(t *testing.T) {
 	dvInsertTask(t, db, dvTask(1, dispatch.ScopeTask, dispatch.StatusSeeded, 2))
 	dvExec(t, db, `INSERT INTO runs (id, tier, role, project, subject) VALUES ('0123456789abcdef', 'pipeline', 'worker', 'ws-test', 1)`)
 	dvExec(t, db, `INSERT INTO activity (actor, kind, subject, detail) VALUES
-		('operator', 'task.block_reason', '1', 'A task record.'),
+		('owner', 'task.block_reason', '1', 'A task record.'),
 		('mc', 'dispatch.reap', '0123456789abcdef', 'A run record.')`)
 	kinds := map[string]any{}
 	for _, row := range waitRecords(t, db, "task.block_reason", "dispatch.reap") {

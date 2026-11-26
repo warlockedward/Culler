@@ -112,7 +112,7 @@ func ProjectRoleSave(db *sql.DB, id *RunIdentity, a RoleSaveRequest) (any, error
 		if _, err := customizationCurrent(ctx, q, a.Project, a.Role); err != nil {
 			return err
 		}
-		author := "operator"
+		author := "owner"
 		if id != nil {
 			author = "collie:" + id.RunID
 		}
@@ -282,7 +282,7 @@ func ProjectRoleUnblock(db *sql.DB, id *RunIdentity, a RoleUnblockRequest) (any,
 		if err := requireOperatorVerbTx(ctx, q, id, "project.role-unblock"); err != nil {
 			return err
 		}
-		actor := "operator"
+		actor := "owner"
 		if id != nil {
 			actor = "collie:" + id.RunID
 		}

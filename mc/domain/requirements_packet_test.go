@@ -15,7 +15,7 @@ func TestRequirementsPacketUsesCurrentRequirementsAndPreservesHistory(t *testing
 	priorCreated := oneStr(t, db, `SELECT created_at FROM review_versions WHERE id=?`, priorReview)
 	version := taskInt(t, db, task, "record_version")
 	mustTx(t, db, func(ctx context.Context, q domain.Q) error {
-		_, err := domain.RequestRequirementsRevision(ctx, q, task, version, "packet-revision", "The revised requirements include the complete evidence.", "The operator requests a new result.", "operator")
+		_, err := domain.RequestRequirementsRevision(ctx, q, task, version, "packet-revision", "The revised requirements include the complete evidence.", "The operator requests a new result.", "owner")
 		return err
 	})
 	for _, stage := range []string{"worked", "verified", "packaged"} {

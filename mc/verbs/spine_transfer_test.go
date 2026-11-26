@@ -50,7 +50,7 @@ func transferFixture(t *testing.T) (string, string, SpineTransferRequest) {
 		db.Close()
 		t.Fatal(err)
 	}
-	if _, err := db.Exec(`INSERT INTO activity (id, actor, kind, detail) VALUES (7, 'operator', 'task.added', 'restore sentinel')`); err != nil {
+	if _, err := db.Exec(`INSERT INTO activity (id, actor, kind, detail) VALUES (7, 'owner', 'task.added', 'restore sentinel')`); err != nil {
 		db.Close()
 		t.Fatal(err)
 	}

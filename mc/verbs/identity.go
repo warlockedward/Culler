@@ -58,7 +58,7 @@ func IdentityUserCreate(db *sql.DB, id *RunIdentity, a IdentityUserCreateRequest
 		if !created {
 			return Domainf("The identity username is already taken.")
 		}
-		return recordActivity(ctx, q, "operator", "user.created", userID, "An identity account was created.")
+		return recordActivity(ctx, q, userID, "user.created", userID, "An identity account was created.")
 	}); err != nil {
 		return nil, classify(err)
 	}
@@ -348,9 +348,79 @@ func IdentityGrantRevoke(db *sql.DB, id *RunIdentity, a IdentityGrantRevokeReque
 	return map[string]any{"revoked": revoked}, nil
 }
 
+// IdentityLegacyMapRequest registers a retired legacy actor's successor
+// attribution (IG §7): which named user the legacy actor's standing
+// transfers to, on what basis, with what strength, and the independent
+// evidence where the owner holds stronger attribution.
+type IdentityLegacyMapRequest struct {
+	LegacyActor string `json:"legacy_actor"`
+	User        string `json:"user"`
+	Basis       string `json:"basis"`
+	Nature      string `json:"nature"`
+	Strength    string `json:"strength"`
+	Evidence    string `json:"evidence,omitempty"`
+}
+
+// IdentityLegacyMap registers the legacy actor mapping under the guard-bound
+// context: the mapping row and its Class A event commit together, and the
+// row is append only thereafter.
+func IdentityLegacyMap(db *sql.DB, id *RunIdentity, a IdentityLegacyMapRequest) (any, error) {
+	if err := RequireHostScope(id, "legacy actor mapping"); err != nil {
+		return nil, err
+	}
+	if a.LegacyActor == "" || len(a.LegacyActor) > 128 {
+		return nil, Usagef("The legacy actor value is invalid.")
+	}
+	for _, field := range []struct {
+		name, value string
+	}{
+		{"basis", a.Basis}, {"nature", a.Nature}, {"strength", a.Strength},
+	} {
+		if field.value == "" || len(field.value) > 256 {
+			return nil, Usagef("The mapping %s is invalid.", field.name)
+		}
+	}
+	if len(a.Evidence) > 4096 {
+		return nil, Usagef("The mapping evidence is too long.")
+	}
+	mapped := false
+	if err := inTx(db, func(ctx context.Context, q Q) error {
+		var userID string
+		err := q.QueryRowContext(ctx, `SELECT id FROM users WHERE username = ?`, a.User).Scan(&userID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return Domainf("The successor user is unknown.")
+			}
+			return err
+		}
+		var evidence any
+		if a.Evidence != "" {
+			evidence = a.Evidence
+		}
+		if _, err := q.ExecContext(ctx, `INSERT INTO legacy_actor_mapping
+			(legacy_actor, mapped_user_id, basis, nature, strength, evidence)
+			VALUES (?, ?, ?, ?, ?, ?)`,
+			a.LegacyActor, userID, a.Basis, a.Nature, a.Strength, evidence); err != nil {
+			return Domainf("The legacy actor is already mapped.")
+		}
+		mapped = true
+		return recordActivity(ctx, q, userID, "legacy.mapped", a.LegacyActor,
+			fmt.Sprintf("Legacy actor %s mapped to user %s.", a.LegacyActor, a.User))
+	}); err != nil {
+		return nil, classify(err)
+	}
+	return map[string]any{"mapped": mapped}, nil
+}
+
 // recordActivity lands the Class A event for the identity lifecycle on the
-// caller's transaction.
+// caller's transaction. The legacy operator actor is refused at this guard
+// point (IG §7 封存): the trigger is the execution-plane backstop, the guard
+// is the decision-plane front stop, and neither re-trusts a writer that names
+// the retired actor.
 func recordActivity(ctx context.Context, q Q, actor, kind, subject, detail string) error {
+	if actor == "operator" {
+		return Domainf("The legacy operator actor is sealed; the event must be attributed to a current actor.")
+	}
 	if _, err := q.ExecContext(ctx, `INSERT INTO activity (actor, kind, subject, detail) VALUES (?, ?, ?, ?)`,
 		actor, kind, subject, detail); err != nil {
 		return fmt.Errorf("record identity %s event: %w", kind, err)

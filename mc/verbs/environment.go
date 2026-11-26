@@ -245,7 +245,7 @@ func ProjectEnvironment(db *sql.DB, id *RunIdentity, action string, req Environm
 			if req.Configuration == nil {
 				return Usagef("The environment configuration is required.")
 			}
-			_, err = saveEnvironmentRevisionTx(ctx, q, state, *req.Configuration, req.Explanation, "operator")
+			_, err = saveEnvironmentRevisionTx(ctx, q, state, *req.Configuration, req.Explanation, "owner")
 		case "approve":
 			err = approveEnvironmentTx(ctx, q, state, req)
 		case "assist":

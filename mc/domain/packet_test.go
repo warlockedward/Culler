@@ -182,7 +182,7 @@ func TestReviewCapacitySurvivesCorrectionAndReleasesForRequirements(t *testing.T
 	})
 	version := taskInt(t, db, first, "record_version")
 	mustTx(t, db, func(ctx context.Context, q domain.Q) error {
-		_, err := domain.RequestRequirementsRevision(ctx, q, first, version, "replace-review-criteria", "The revised result includes the missing case.", "The operator revised the criteria.", "operator")
+		_, err := domain.RequestRequirementsRevision(ctx, q, first, version, "replace-review-criteria", "The revised result includes the missing case.", "The operator revised the criteria.", "owner")
 		return err
 	})
 	if taskInt(t, db, first, "review_slot_held") != 0 || taskInt(t, db, first, "current_review_id") != original {

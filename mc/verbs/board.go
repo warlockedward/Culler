@@ -167,7 +167,7 @@ func BoardWrite(db *sql.DB, id *RunIdentity, request BoardWriteRequest) (any, er
 		if err != sql.ErrNoRows {
 			return err
 		}
-		actor := "operator"
+		actor := "owner"
 		if id != nil {
 			actor = "collie:" + id.RunID
 		}

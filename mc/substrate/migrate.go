@@ -101,6 +101,11 @@ const b09ChainIdentity = "93f0515ee82941d3c884a21732c9ee4afebd569b027d18b408f5f2
 // Pinned as a historical fact like b09ChainIdentity.
 const b08MapIdentity = "bc32d91b58a17aaa81217c11b8dc26a24e2c355842e2ca43e2fe717327d9da0c"
 
+// d01FoundationIdentity is the schema identity the seventh step produced:
+// the identity foundation, before the legacy actor sealing existed. Pinned
+// as a historical fact like b08MapIdentity.
+const d01FoundationIdentity = "6be6f49be7555017684d7ce38ab08cf88fc2c7fb53f90f009670913f4751c535"
+
 // ProductionMigrationRegistry returns the ordered step registry this release
 // carries. The registry always terminates at CurrentSchemaID: a release that
 // changes the schema text must register the step that crosses that boundary,
@@ -119,8 +124,10 @@ func ProductionMigrationRegistry() []MigrationStep {
 	sixth.Migrate = migrateActivityToChain
 	sixth.Verify = VerifyActivityBackfill
 	registry = append(registry, sixth)
-	seventh := newMigrationStep(7, "add-identity-foundation", b08MapIdentity, CurrentSchemaID, identityFoundationDDL)
-	return append(registry, seventh)
+	seventh := newMigrationStep(7, "add-identity-foundation", b08MapIdentity, d01FoundationIdentity, identityFoundationDDL)
+	registry = append(registry, seventh)
+	eighth := newMigrationStep(8, "add-legacy-actor-sealing", d01FoundationIdentity, CurrentSchemaID, legacySealDDL)
+	return append(registry, eighth)
 }
 
 // MigrationReport describes one runner pass over a spine.
