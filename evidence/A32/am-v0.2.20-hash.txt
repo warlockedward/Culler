@@ -1,0 +1,10 @@
+AM v0.2.20 双面哈希登记（轮四十六收口窗：D02 撤销矩阵＋决策点零缓存证明＋派生即失效落地⇒EVIDENCED＝D-track 第二票；矩阵两可实测行＋IG-T8 验证面四项全绿）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 257bec3da6fd49277fd6fe714a3841bdcefb327c225ac2b8e35ab3cb0b30f72f
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 45873255b57b60349dccd2dc3e8e233b95a67b41b1e58b3db5a08ef0b1719fd3，与 am-v0.2.19-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.19 = 45873255b57b60349dccd2dc3e8e233b95a67b41b1e58b3db5a08ef0b1719fd3（evidence/A32/am-v0.2.19-hash.txt 实读）；再前 v0.2.18 = 94e8b49fc5b2fce830527a4c39b40a6cbe9a6c7530e6d36f8a1c11bb6aa12361（同件记载）
+- 同轮并入 dev 的提交: 04188df（D02 设计面＋范围裁定 D0：零 schema 变更[无 S8，基线 identity X 不变]＋矩阵五行逐行定性＋epoch fence 契约登记）＋e7e5957（D02：identity.GrantAllows 消费侧实时判定；verbs/identity.go scope 'user' 撤销同事务派生 grant 级联（不等原 TTL，DC §3.2）；R/Z 测试族×8[矩阵两行实测＋派生即死＋single 不级联＋零缓存四证＋执行点负控]；§8 补记 fixture 形态/决策形态/trigger 争用定性）；status.json D02=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（27 包 ok，verbs 572.290s 非缓存实跑，零 FAIL 零 UNVERIFIED，首跑无红点）；基线 identity X 不变（D02 零 schema 变更）
+- 诚实边界: GrantAllows 消费接线入业务操作面＝后续票（D05 五要件表或操作级 enforcement）；admin 跨用户撤销面不存在（候后续票）；epoch fence＝零代码零 schema（启用条件＝进程内缓存引入且进程模型变化，届时跨 fence 攻击例为 T8 前置义务）；矩阵 SP 行候 SP 创建面；agent_run G-B 构建维候 A12/A13 域
+- 账: dev tip＝e7e5957（本登记轮提交随后）/ worktrees＝main+dev+d02（d02 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明；完整审计重跑已候令）/ **D-chain 状态：D01＝D02＝EVIDENCED⇒D03/D04/D05/D09 就绪；D06 候 O11 裁决（deps 已齐）；D07/D08 需 D06；B-chain 余 B06（门 O3 硬件候所有者触发）＋B08 稳态后续票面候裁定**
