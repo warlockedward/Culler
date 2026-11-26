@@ -1,0 +1,10 @@
+AM v0.2.19 双面哈希登记（轮四十五收口窗：D01 P4 身份基础落地⇒EVIDENCED＝D-track 首票；IG-T1 四组攻击全绿）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 45873255b57b60349dccd2dc3e8e233b95a67b41b1e58b3db5a08ef0b1719fd3
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 94e8b49fc5b2fce830527a4c39b40a6cbe9a6c7530e6d36f8a1c11bb6aa12361，与 am-v0.2.18-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.18 = 94e8b49fc5b2fce830527a4c39b40a6cbe9a6c7530e6d36f8a1c11bb6aa12361（evidence/A32/am-v0.2.18-hash.txt 实读）；再前 v0.2.17 = 395042ffa121263ca8ed58df260f08805e2c4f9acbe885bc9cd5d5e00bbeefc6（同件记载）
+- 同轮并入 dev 的提交: 4f9a5a4（D01 设计面＋范围裁定 D0：存量身份基础＋guard 平面 only，稳态接线＝具名后续票）＋86dd9ff（D01：schema.sql 身份基础 6 表＋4 trigger；migrate.go b08MapIdentity V 钉定＋S6.to 钉 V＋S7 add-identity-foundation（V⇒CurrentSchemaID 符号）；mc/identity guard 单平面＋trusted_ctx 绑定/清除＋TokenHash 单一权威＋bcrypt；verbs/identity.go 五 verb；verbs.go inTx 入口/终结清除＋闭脊代理豁免（ClosedSpineProxy 标记）；cmd/mc 路由；go.mod 仅 +x/crypto v0.44.0[零传递升级]；IG-T1 N1-N4＋I1/I2＋registry 7 步全族更新）；status.json D01=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（27 包 ok，verbs 488.3s 非缓存实跑；首跑两红点：①go.mod 残留 go 1.26.0⇒culler-package 二进制身份三架构红⇒零传递升级裁定 ②inTx 清除被 attachment 代理 allowlist 拒⇒闭脊代理豁免⇒两面定向复绿后二跑全绿）；新基线 identity X = 6be6f49be7555017684d7ce38ab08cf88fc2c7fb53f90f009670913f4751c535（方法自校验＋S7 to 符号化链自检＋I1 stamp 断言交叉证据）
+- 诚实边界: D0 范围＝存量身份基础＋guard 平面（稳态接线＝具名后续票）；attachment RPC 进程侧事务自有生命周期＝D0 范围外；崩溃窗残余 D3″（不冒充零窗）；identity 稳态写入链候 B08 稳态面后续票
+- 账: dev tip＝86dd9ff（本登记轮提交随后）/ worktrees＝main+dev+d01（d01 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明；完整审计重跑已候令）/ **D-chain 状态：D01＝EVIDENCED⇒D02/D03/D04/D05/D09 直接解锁；D06 候 O11 裁决（deps 已齐）；B-chain 余 B06（门 O3 硬件候所有者触发）＋B08 稳态后续票面候裁定**
