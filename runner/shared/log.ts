@@ -74,6 +74,7 @@ export const EVENTS = [
   "cleanup.failed",
   "credential.projected", "credential.projection_failed", "credential.refresh_failed",
   "credential.acceptance_armed", "credential.acceptance_refused", "credential.grant_expired",
+  "usage.recovered", "usage.recovery_failed",
   "discord.connected", "discord.disconnected", "discord.reconnect_scheduled",
   "discord.inbound_ignored", "discord.delivery_failed", "discord.typing_failed",
   "liveness.probe_failed", "liveness.degraded", "liveness.recovered",

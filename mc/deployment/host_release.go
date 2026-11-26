@@ -204,6 +204,7 @@ var hostReleaseFiles = []string{
 	"resident/src/opencode-copy-worker.ts",
 	"resident/src/opencode-snapshot.ts",
 	"resident/src/trace-lane.ts",
+	"resident/src/usage-observation.ts",
 	"resident/src/setup-traces.ts",
 	"resident/src/types.ts",
 	"resident/src/wiki-lane.ts",

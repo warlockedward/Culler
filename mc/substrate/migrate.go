@@ -47,6 +47,12 @@ const b01BaselineIdentity = "362e88eaaed576fc0ef26d80403069c911f2c9b1017461d8988
 // chain table existed. Pinned as a historical fact like b01BaselineIdentity.
 const b02BaselineIdentity = "eb7ebcf932c3f52895412c9aef0b3c5f38e43c06d8ef64a6e0e33f273b243bcd"
 
+// b07BaselineIdentity is the schema identity the third step produced: the
+// ledger-baseline schema with the audit chain table, before the usage
+// observation tables existed. Pinned as a historical fact like
+// b02BaselineIdentity.
+const b07BaselineIdentity = "4a3159e3cef11986fd68eac67c0d53f7cadc6a992664b9f61b7c5a266150bf9a"
+
 // ProductionMigrationRegistry returns the ordered step registry this release
 // carries. The registry always terminates at CurrentSchemaID: a release that
 // changes the schema text must register the step that crosses that boundary,
@@ -55,7 +61,8 @@ func ProductionMigrationRegistry() []MigrationStep {
 	return []MigrationStep{
 		newMigrationStep(1, "add-schema-history-ledger", preLedgerBaselineIdentity, b01BaselineIdentity, schemaHistoryDDL),
 		newMigrationStep(2, "rename-health-alert-body", b01BaselineIdentity, b02BaselineIdentity, renameHealthAlertBodySQL),
-		newMigrationStep(3, "add-audit-events-chain", b02BaselineIdentity, CurrentSchemaID, auditEventsDDL),
+		newMigrationStep(3, "add-audit-events-chain", b02BaselineIdentity, b07BaselineIdentity, auditEventsDDL),
+		newMigrationStep(4, "add-usage-observations", b07BaselineIdentity, CurrentSchemaID, usageObservationsDDL),
 	}
 }
 

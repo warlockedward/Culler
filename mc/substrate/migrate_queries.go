@@ -100,3 +100,75 @@ WHEN NEW.seq > 1 AND NOT EXISTS (
     WHERE aggregate_id = NEW.aggregate_id AND seq = NEW.seq - 1
 )
 BEGIN SELECT RAISE(ABORT, 'audit_events seq prefix gap'); END;`
+
+// usageObservationsDDL is the fourth step's statements: the raw usage event
+// blobs, the derived observation rows, and their append-only discipline.
+// Every statement's text must stay byte-identical to the usage blocks in
+// schema.sql, so the sqlite_schema rows of a migrated spine hash like the
+// reference spine built from the baseline.
+const usageObservationsDDL = `CREATE TABLE usage_events (
+    request_identity    TEXT NOT NULL,
+    identity_origin     TEXT NOT NULL CHECK (identity_origin IN ('provider','local')),
+    local_request_id    TEXT NOT NULL,
+    provider_request_id TEXT,
+    native_event_id     TEXT,
+    event_seq           INTEGER NOT NULL CHECK (event_seq >= 1),
+    usage_family        TEXT NOT NULL,
+    raw_json            TEXT NOT NULL CHECK (json_valid(raw_json)),
+    occurred_at         TEXT NOT NULL
+                       CHECK (length(occurred_at) = 27 AND
+                              occurred_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    recorded_at         TEXT NOT NULL
+                       CHECK (length(recorded_at) = 27 AND
+                              recorded_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    PRIMARY KEY (request_identity, event_seq)
+);
+CREATE UNIQUE INDEX usage_events_native_event
+    ON usage_events (request_identity, native_event_id);
+CREATE INDEX usage_events_local ON usage_events (local_request_id);
+CREATE TRIGGER usage_events_no_update BEFORE UPDATE ON usage_events
+BEGIN SELECT RAISE(ABORT, 'usage_events is append-only'); END;
+CREATE TRIGGER usage_events_no_delete BEFORE DELETE ON usage_events
+BEGIN SELECT RAISE(ABORT, 'usage_events is append-only'); END;
+CREATE TABLE usage_observations (
+    observation_id            TEXT NOT NULL UNIQUE
+                             CHECK (length(observation_id) = 64 AND
+                                    length(CAST(observation_id AS BLOB)) = 64 AND
+                                    observation_id NOT GLOB '*[^0-9a-f]*'),
+    request_identity          TEXT NOT NULL,
+    local_request_id          TEXT NOT NULL,
+    provider_request_id       TEXT,
+    event_seq                 INTEGER NOT NULL CHECK (event_seq >= 1),
+    source_version            INTEGER NOT NULL CHECK (source_version >= 1),
+    origin                    TEXT NOT NULL CHECK (origin IN ('provider','local')),
+    usage_family              TEXT NOT NULL,
+    model_id                  TEXT NOT NULL,
+    output_tokens             TEXT NOT NULL,
+    input_tokens              TEXT NOT NULL,
+    report_kind               TEXT NOT NULL CHECK (report_kind IN ('cumulative','incremental')),
+    finality                  TEXT NOT NULL CHECK (finality IN ('interim','final')),
+    identity_provability      TEXT NOT NULL CHECK (identity_provability IN ('native','cursor','none')),
+    state                     TEXT NOT NULL CHECK (state IN ('reported','unknown','reconciliation')),
+    payload_digest            TEXT NOT NULL
+                             CHECK (length(payload_digest) = 64 AND
+                                    length(CAST(payload_digest AS BLOB)) = 64 AND
+                                    payload_digest NOT GLOB '*[^0-9a-f]*'),
+    supersedes_observation_id TEXT
+                             CHECK (supersedes_observation_id IS NULL OR
+                                    (length(supersedes_observation_id) = 64 AND
+                                     length(CAST(supersedes_observation_id AS BLOB)) = 64 AND
+                                     supersedes_observation_id NOT GLOB '*[^0-9a-f]*')),
+    occurred_at               TEXT NOT NULL
+                             CHECK (length(occurred_at) = 27 AND
+                                    occurred_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    recorded_at               TEXT NOT NULL
+                             CHECK (length(recorded_at) = 27 AND
+                                    recorded_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    PRIMARY KEY (request_identity, event_seq, source_version),
+    FOREIGN KEY (request_identity, event_seq) REFERENCES usage_events (request_identity, event_seq)
+);
+CREATE INDEX usage_observations_local ON usage_observations (local_request_id);
+CREATE TRIGGER usage_observations_no_update BEFORE UPDATE ON usage_observations
+BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;
+CREATE TRIGGER usage_observations_no_delete BEFORE DELETE ON usage_observations
+BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;`

@@ -337,7 +337,8 @@ func canonNow() string {
 }
 
 // auditor is the statement surface a chain path runs on: *sql.DB,
-// *sql.Tx, or the dedicated connection AppendAuditEvent takes when it
+// *sql.Tx, *sql.Conn (a connection with an open transaction the caller
+// owns), or the dedicated connection AppendAuditEvent takes when it
 // owns the transaction.
 type auditor interface {
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
@@ -350,10 +351,10 @@ type auditor interface {
 // aggregate type for a first event, the stored chain_digest of seq-1
 // otherwise); disagreement is refused fail-closed rather than repaired.
 //
-// When q is a *sql.Tx the append joins that transaction and the caller
-// owns the commit — this is the atomic-audit path, where the state change
-// and its chain evidence commit together. Otherwise q is a *sql.DB and
-// the append runs under its own BEGIN IMMEDIATE.
+// When q is a *sql.Tx or a *sql.Conn the append joins that transaction and
+// the caller owns the commit — this is the atomic-audit path, where the
+// state change and its chain evidence commit together. Otherwise q is a
+// *sql.DB and the append runs under its own BEGIN IMMEDIATE.
 func AppendAuditEvent(q auditor, ev map[string]any) error {
 	ctx := context.Background()
 	event := make(map[string]any, len(ev)+1)
@@ -371,6 +372,9 @@ func AppendAuditEvent(q auditor, ev map[string]any) error {
 	ownsTx := false
 	switch surface := q.(type) {
 	case *sql.Tx:
+		runner = surface
+	case *sql.Conn:
+		// The caller owns the open transaction and the commit, like *sql.Tx.
 		runner = surface
 	case *sql.DB:
 		c, err := surface.Conn(ctx)

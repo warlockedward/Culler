@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { networkErrorFromFetch, type NetworkErrorClass } from "../../runner/shared/network-error";
 import { providerTransport } from "./provider-transport";
+import { UsageStream, usageFamilyForOperation, type UsageEvents } from "./usage-observation";
 
 export interface ProviderOperation {
   id: string;
@@ -99,6 +100,9 @@ export interface ProviderProxyDependencies {
   credential(connection: string, signal: AbortSignal): Promise<ProviderCredential>;
   isLaunchCurrent?(spec: ProviderRunAuthorization, signal: AbortSignal): Promise<boolean | { allowed: boolean; attemptId?: string }>;
   observe?(observation: ProviderRequestObservation): Promise<void> | void;
+  /** Receives the collected usage events of one completed response, after
+   * the response has been relayed. Never blocks or alters the relay. */
+  onUsageEvents?(localRequestId: string, providerRequestId: string, events: UsageEvents): Promise<void> | void;
   now?(): number;
   /** Tests can replace transport without an address override in runtime configuration. */
   fetch?: typeof fetch;
@@ -134,6 +138,9 @@ const defaultRequestHeaders = ["accept", "content-type", "user-agent"];
 const defaultResponseHeaders = ["content-type", "retry-after", "request-id", "x-request-id"];
 const maxErrorBytes = 65_536;
 const maxSecretBytes = 16_384;
+// Bounded response scan for usage facts: the relay never blocks on it; an
+// overflow simply leaves the usage unrecorded, declared by its absence.
+const maxUsageScanBytes = 2 * 1024 * 1024;
 
 function digest(token: string): string {
   return createHash("sha256").update(token).digest("hex");
@@ -338,6 +345,44 @@ class ProviderEventEvidence {
   }
 }
 
+class UsageSseScan {
+  private line = "";
+  private data = "";
+  private overflow = false;
+  private decoder = new TextDecoder();
+  constructor(private stream: UsageStream) {}
+  push(bytes: Uint8Array, final = false): void {
+    const text = this.decoder.decode(bytes, { stream: !final });
+    for (let start = 0; start < text.length;) {
+      const end = text.indexOf("\n", start);
+      const part = text.slice(start, end < 0 ? text.length : end);
+      if (this.line.length + this.data.length + part.length > maxUsageScanBytes) this.overflow = true;
+      this.line += part.slice(0, Math.max(0, maxUsageScanBytes - this.line.length - this.data.length));
+      if (end < 0) break;
+      this.consumeLine(this.line.replace(/\r$/, ""));
+      this.line = "";
+      start = end + 1;
+    }
+    if (final) { if (this.line) this.consumeLine(this.line); this.consumeLine(""); }
+  }
+  private consumeLine(line: string): void {
+    if (line === "") {
+      if (this.data && !this.overflow) this.emit(this.data);
+      this.data = "";
+      return;
+    }
+    if (line.startsWith("data:")) this.data += line.slice(5).replace(/^ /, "") + "\n";
+  }
+  private emit(payload: string): void {
+    const text = payload.trim();
+    if (text === "" || text === "[DONE]") return;
+    try {
+      const value = JSON.parse(text);
+      if (value && typeof value === "object") this.stream.push(value);
+    } catch { /* A malformed data line carries no usage fact. */ }
+  }
+}
+
 class SecretFilter {
   private pending = Buffer.alloc(0);
   private readonly values: Buffer[];
@@ -468,6 +513,9 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
       const started = now();
       let held: Authorization | undefined;
       let operation: ProviderOperation | undefined;
+      let usageStream: UsageStream | undefined;
+      let usageFired = false;
+      let jsonUsageScan: { chunks: Uint8Array[]; size: number; overflow: boolean } | undefined;
       let requestAttempt: string | undefined;
       let attemptChecked = false;
       let credential: ProviderCredential | undefined;
@@ -587,6 +635,10 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
           modelRequest ||= route.openCode !== undefined && "model" in value;
           // The provider must receive the same object that passed the model check.
           body = Buffer.from(JSON.stringify(value));
+          {
+            const models = requestModels(value as Record<string, unknown>, operation);
+            usageStream = new UsageStream(usageFamilyForOperation(operation.path), typeof models[0] === "string" ? models[0] : "");
+          }
         } else if (body.byteLength || operation.modelRequired) {
           return await refuse(400, "proxy_authorization", "invalid_request");
         }
@@ -684,6 +736,30 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
           provider_request_id: safeCode(upstream.headers.get("request-id") ?? upstream.headers.get("x-request-id"), secrets),
           ...(Number.isFinite(new Date(retryTime).getTime()) ? { retry_after: new Date(retryTime).toISOString() } : {}),
         };
+        // Fire the collected usage facts exactly once, after the response is
+        // relayed. Persistence failures stay recoverable: the raw events
+        // already on the spine re-derive at startup (PS-F1①).
+        async function fireUsage(interrupted: boolean): Promise<void> {
+          if (usageFired || !usageStream) return;
+          usageFired = true;
+          const stream = usageStream;
+          usageStream = undefined;
+          if (jsonUsageScan !== undefined) {
+            const scan = jsonUsageScan;
+            jsonUsageScan = undefined;
+            if (!scan.overflow) {
+              try {
+                const parsed: unknown = JSON.parse(Buffer.concat(scan.chunks).toString("utf8"));
+                if (parsed && typeof parsed === "object") stream.push(parsed);
+              } catch { /* A body that does not parse holds no usage fact. */ }
+            }
+          }
+          const events = stream.events(interrupted);
+          if (events.facts.length === 0 && events.rawOnly.length === 0) return;
+          try {
+            await dependencies.onUsageEvents?.(requestId, facts.provider_request_id ?? "", events);
+          } catch { /* Usage persistence never blocks or alters the relay. */ }
+        }
         if (!upstream.ok) {
           // A harness sends a rejected request again after a renewal or in another form.
           // The rejection stays outside the request limit, so that request can pass.
@@ -725,6 +801,11 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
           ? new ProviderEventEvidence(secrets) : undefined;
         const normalize = evidence || contentType === "application/json" || contentType?.endsWith("+json")
           ? new JSONEscapeNormalizer() : undefined;
+        const usageScan = usageStream && contentType === "text/event-stream"
+          ? new UsageSseScan(usageStream) : undefined;
+        if (usageStream && (contentType === "application/json" || contentType?.endsWith("+json"))) {
+          jsonUsageScan = { chunks: [], size: 0, overflow: false };
+        }
         const stream = new ReadableStream<Uint8Array>({
           async pull(output) {
             try {
@@ -733,13 +814,23 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
                 evidence?.push(next.value ?? new Uint8Array(), next.done);
                 if (evidence?.failed) facts.provider_error_code = evidence.code;
                 const bytes = next.value ?? new Uint8Array();
+                usageScan?.push(bytes, next.done);
+                if (jsonUsageScan && !jsonUsageScan.overflow) {
+                  jsonUsageScan.size += bytes.byteLength;
+                  if (jsonUsageScan.size > maxUsageScanBytes) jsonUsageScan.overflow = true;
+                  else jsonUsageScan.chunks.push(bytes);
+                }
                 const safe = filter.push(normalize?.push(bytes, next.done) ?? bytes, next.done);
                 if (safe.byteLength) output.enqueue(safe);
-                if (evidence?.failed) void observe("provider", "interrupted", facts);
+                if (evidence?.failed) {
+                  void fireUsage(true);
+                  void observe("provider", "interrupted", facts);
+                }
                 if (next.done) {
                   output.close();
                   reader.releaseLock();
                   release();
+                  await fireUsage(evidence?.failed);
                   await observe("provider", evidence?.failed ? "interrupted" : "response_complete", facts);
                 }
                 if (next.done || safe.byteLength) return;
@@ -751,6 +842,7 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
               release();
               const origin = evidence?.failed ? "provider" : controller.signal.reason === "client_disconnected" ? "client"
                 : ["authorization_revoked", "request_timeout"].includes(controller.signal.reason) ? "proxy" : "provider_network";
+              void fireUsage(true);
               await observe(origin, "interrupted", { ...facts, ...(origin === "provider_network" ? { network_error: networkErrorFromFetch(error) } : {}) });
             }
           },
@@ -758,6 +850,7 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
             controller.abort("client_disconnected");
             void reader.cancel().catch(() => {});
             release();
+            void fireUsage(true);
             await observe(evidence?.failed ? "provider" : "client", "interrupted", facts);
           },
         }, { highWaterMark: 0 });

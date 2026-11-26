@@ -113,6 +113,99 @@ WHEN NEW.seq > 1 AND NOT EXISTS (
 )
 BEGIN SELECT RAISE(ABORT, 'audit_events seq prefix gap'); END;
 
+-- usage_events — raw provider usage events accumulated as blobs (C03 v1,
+-- the DC observation channel). (request_identity, event_seq) is the dedupe
+-- key: event_seq is assigned by the writer on first persistence (max+1 in
+-- the single-writer transaction) and never reassigned, so a redelivered
+-- input does not take a new number. native_event_id (a provider-native
+-- event ID or an upstream cursor) makes a redelivery addressable: the
+-- unique index re-enters the existing row instead of numbering it again.
+-- Provider-native identity claims require the provider request ID; every
+-- other identity is origin=local by construction.
+CREATE TABLE usage_events (
+    request_identity    TEXT NOT NULL,
+    identity_origin     TEXT NOT NULL CHECK (identity_origin IN ('provider','local')),
+    local_request_id    TEXT NOT NULL,
+    provider_request_id TEXT,
+    native_event_id     TEXT,
+    event_seq           INTEGER NOT NULL CHECK (event_seq >= 1),
+    usage_family        TEXT NOT NULL,
+    raw_json            TEXT NOT NULL CHECK (json_valid(raw_json)),
+    occurred_at         TEXT NOT NULL
+                       CHECK (length(occurred_at) = 27 AND
+                              occurred_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    recorded_at         TEXT NOT NULL
+                       CHECK (length(recorded_at) = 27 AND
+                              recorded_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    PRIMARY KEY (request_identity, event_seq)
+);
+
+CREATE UNIQUE INDEX usage_events_native_event
+    ON usage_events (request_identity, native_event_id);
+
+CREATE INDEX usage_events_local ON usage_events (local_request_id);
+
+CREATE TRIGGER usage_events_no_update BEFORE UPDATE ON usage_events
+BEGIN SELECT RAISE(ABORT, 'usage_events is append-only'); END;
+
+CREATE TRIGGER usage_events_no_delete BEFORE DELETE ON usage_events
+BEGIN SELECT RAISE(ABORT, 'usage_events is append-only'); END;
+
+-- usage_observations — the identity-carrying derived usage facts (PS §4.1).
+-- One row per (request_identity, event_seq, source_version): a version
+-- increment supersedes within its slot and stale versions are kept, never
+-- overwritten. state separates the provability channels: native/cursor
+-- facts are reported, none-provable facts and conflicting terminal claims
+-- are unknown/reconciliation, and no same-version content conflict is ever
+-- last-write-wins. payload_digest is the shz-canon-v1 digest of the frozen
+-- usage_observation payload (B03 field table); the row mirrors the payload
+-- so settlement (BL) can consume it without re-derivation.
+CREATE TABLE usage_observations (
+    observation_id            TEXT NOT NULL UNIQUE
+                             CHECK (length(observation_id) = 64 AND
+                                    length(CAST(observation_id AS BLOB)) = 64 AND
+                                    observation_id NOT GLOB '*[^0-9a-f]*'),
+    request_identity          TEXT NOT NULL,
+    local_request_id          TEXT NOT NULL,
+    provider_request_id       TEXT,
+    event_seq                 INTEGER NOT NULL CHECK (event_seq >= 1),
+    source_version            INTEGER NOT NULL CHECK (source_version >= 1),
+    origin                    TEXT NOT NULL CHECK (origin IN ('provider','local')),
+    usage_family              TEXT NOT NULL,
+    model_id                  TEXT NOT NULL,
+    output_tokens             TEXT NOT NULL,
+    input_tokens              TEXT NOT NULL,
+    report_kind               TEXT NOT NULL CHECK (report_kind IN ('cumulative','incremental')),
+    finality                  TEXT NOT NULL CHECK (finality IN ('interim','final')),
+    identity_provability      TEXT NOT NULL CHECK (identity_provability IN ('native','cursor','none')),
+    state                     TEXT NOT NULL CHECK (state IN ('reported','unknown','reconciliation')),
+    payload_digest            TEXT NOT NULL
+                             CHECK (length(payload_digest) = 64 AND
+                                    length(CAST(payload_digest AS BLOB)) = 64 AND
+                                    payload_digest NOT GLOB '*[^0-9a-f]*'),
+    supersedes_observation_id TEXT
+                             CHECK (supersedes_observation_id IS NULL OR
+                                    (length(supersedes_observation_id) = 64 AND
+                                     length(CAST(supersedes_observation_id AS BLOB)) = 64 AND
+                                     supersedes_observation_id NOT GLOB '*[^0-9a-f]*')),
+    occurred_at               TEXT NOT NULL
+                             CHECK (length(occurred_at) = 27 AND
+                                    occurred_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    recorded_at               TEXT NOT NULL
+                             CHECK (length(recorded_at) = 27 AND
+                                    recorded_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+    PRIMARY KEY (request_identity, event_seq, source_version),
+    FOREIGN KEY (request_identity, event_seq) REFERENCES usage_events (request_identity, event_seq)
+);
+
+CREATE INDEX usage_observations_local ON usage_observations (local_request_id);
+
+CREATE TRIGGER usage_observations_no_update BEFORE UPDATE ON usage_observations
+BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;
+
+CREATE TRIGGER usage_observations_no_delete BEFORE DELETE ON usage_observations
+BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;
+
 ------------------------------------------------------------------------------
 -- projects / sandbox_profiles — infrastructure records.
 ------------------------------------------------------------------------------

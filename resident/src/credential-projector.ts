@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import protocols from "./provider-protocols.json";
 import type { CredentialProjection, CredentialProjector, CredentialRefusal, ProviderLaunch, RuntimeCarrier } from "./types";
 import { startProviderProxy, type ProviderProxyHandle, type ProviderRoute, type ProviderRequestObservation } from "./provider-proxy";
+import type { UsageEvents } from "./usage-observation";
 import type { createProviderCredentials } from "./provider-credentials";
 
 export interface OpenCodeModel {
@@ -122,6 +123,7 @@ export interface CredentialProjectorDeps {
   tls: { ca: string; cert: string; key: string };
   hostname?: string;
   observe?(observation: ProviderRequestObservation): Promise<void>;
+  onUsageEvents?(localRequestId: string, providerRequestId: string, events: UsageEvents): Promise<void>;
   refreshConnection?(connection: string): Promise<void>;
   isLaunchCurrent?(runId: string, launchId: string, signal: AbortSignal): Promise<boolean | { allowed: boolean; attemptId?: string }>;
   fetch?: typeof fetch;
@@ -139,6 +141,7 @@ export function startCredentialProjector(deps: CredentialProjectorDeps, configur
       if (observation.origin === "provider" && observation.http_status === 401 && observation.credential_ref) deps.credentials.reject(observation.credential_ref);
       await deps.observe?.(observation);
     },
+    onUsageEvents: deps.onUsageEvents,
   });
 
   function authorize(row: RuntimeBindingSpec, profile: string, launch: ProviderLaunch, maxRequests?: number, purpose?: "model_list", managed = false): CredentialProjection {

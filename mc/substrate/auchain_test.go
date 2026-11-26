@@ -409,13 +409,14 @@ func TestOpenAggregateRegistersLifecycleOnly(t *testing.T) {
 	}
 }
 
-// W11: a spine at the second step's target identity takes only S3; the
+// W11: a spine at the second step's target identity takes S3 and S4; the
 // chain table lands and the spine passes the schema check.
 func TestMigrateAppliesAuditChainStepFromSecondStepBaseline(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "spine.db")
 	db := provisionProductionSpine(t, path, testUUID, b02BaselineIdentity)
 	defer db.Close()
 	stripAuditChain(t, db)
+	stripUsageTables(t, db)
 	registry := ProductionMigrationRegistry()
 	recordStep(t, db, registry[0])
 	recordStep(t, db, registry[1])
@@ -424,8 +425,8 @@ func TestMigrateAppliesAuditChainStepFromSecondStepBaseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 1 || report.Applied[0] != "add-audit-events-chain" {
-		t.Fatalf("report = %+v; want only the third step applied", report)
+	if !report.Migrated || len(report.Applied) != 2 || report.Applied[0] != "add-audit-events-chain" || report.Applied[1] != "add-usage-observations" {
+		t.Fatalf("report = %+v; want the third and fourth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'audit_events'`); n != 1 {
 		t.Fatalf("audit_events present = %d; want 1", n)
@@ -437,8 +438,8 @@ func TestMigrateAppliesAuditChainStepFromSecondStepBaseline(t *testing.T) {
 	if stamped != CurrentSchemaID {
 		t.Fatalf("meta.schema_id = %s; want %s", stamped, CurrentSchemaID)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'schema'`); n != 1 {
-		t.Fatalf("schema aggregate chain rows = %d; want 1 (S3 starts the chain)", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'schema'`); n != 2 {
+		t.Fatalf("schema aggregate chain rows = %d; want 2 (S3 starts the chain, S4 extends it)", n)
 	}
 	if err := CheckSchema(db); err != nil {
 		t.Fatalf("post-migration schema check: %v", err)
@@ -454,6 +455,7 @@ func TestMigrationStepRecordsClosedChainRow(t *testing.T) {
 	defer db.Close()
 	stripLedger(t, db)
 	stripAuditChain(t, db)
+	stripUsageTables(t, db)
 	revertHealthAlertTrigger(t, db)
 
 	registry := ProductionMigrationRegistry()
@@ -461,16 +463,16 @@ func TestMigrationStepRecordsClosedChainRow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if len(report.Applied) != 3 {
+	if len(report.Applied) != 4 {
 		t.Fatalf("report = %+v; want the full chain applied", report)
 	}
 
 	var aggregateID, eventType, family, prevHash, payloadJSON string
 	var seq int
-	err = db.QueryRow(`SELECT aggregate_id, seq, event_type, payload_family, prev_hash, payload_json FROM audit_events`).
+	err = db.QueryRow(`SELECT aggregate_id, seq, event_type, payload_family, prev_hash, payload_json FROM audit_events WHERE seq = 1`).
 		Scan(&aggregateID, &seq, &eventType, &family, &prevHash, &payloadJSON)
 	if err != nil {
-		t.Fatalf("read the migration chain row: %v", err)
+		t.Fatalf("read the S3 migration chain row: %v", err)
 	}
 	if aggregateID != "schema" || seq != 1 || eventType != "schema.migration.step" || family != "migration" {
 		t.Fatalf("migration row = (%s, %d, %s, %s); want (schema, 1, schema.migration.step, migration)", aggregateID, seq, eventType, family)
@@ -481,15 +483,32 @@ func TestMigrationStepRecordsClosedChainRow(t *testing.T) {
 	for _, want := range []string{
 		`"step_name":"add-audit-events-chain"`,
 		`"from_schema_id":"` + b02BaselineIdentity + `"`,
-		`"to_schema_id":"` + CurrentSchemaID + `"`,
+		`"to_schema_id":"` + b07BaselineIdentity + `"`,
 		`"version":"3"`,
 	} {
 		if !strings.Contains(payloadJSON, want) {
 			t.Fatalf("payload %s lacks %s", payloadJSON, want)
 		}
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events`); n != 1 {
-		t.Fatalf("chain rows = %d; want exactly the S3 mapping row (S1 and S2 ran before the table existed)", n)
+	if err := db.QueryRow(`SELECT aggregate_id, seq, payload_json FROM audit_events WHERE seq = 2`).
+		Scan(&aggregateID, &seq, &payloadJSON); err != nil {
+		t.Fatalf("read the S4 migration chain row: %v", err)
+	}
+	if aggregateID != "schema" || seq != 2 {
+		t.Fatalf("S4 migration row = (%s, %d); want (schema, 2)", aggregateID, seq)
+	}
+	for _, want := range []string{
+		`"step_name":"add-usage-observations"`,
+		`"from_schema_id":"` + b07BaselineIdentity + `"`,
+		`"to_schema_id":"` + CurrentSchemaID + `"`,
+		`"version":"4"`,
+	} {
+		if !strings.Contains(payloadJSON, want) {
+			t.Fatalf("S4 payload %s lacks %s", payloadJSON, want)
+		}
+	}
+	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events`); n != 2 {
+		t.Fatalf("chain rows = %d; want the S3 and S4 mapping rows (S1 and S2 ran before the table existed)", n)
 	}
 
 	verifierReport, err := VerifyAuditChain(db, "")

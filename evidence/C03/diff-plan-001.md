@@ -137,4 +137,14 @@ BEGIN SELECT RAISE(ABORT, 'usage_observations is append-only'); END;
 ## 7. 登记与收尾
 
 - 实施=单/少提交于 shz/TC03；全道绿后 ff 并 dev（合并前全道硬规则）；登记轮=AM＋status.json C03=EVIDENCED（或 CODED→EVIDENCED 依证据形）；blcheck 留痕入 evidence/C03/。
+
+## 8. 实施补记（先列后改的追加登记，实施中暴露的形状决定）
+
+- **D10 链追加面**：`inTx` 向 verb 传 `*sql.Conn`（已在该连接上 `BEGIN IMMEDIATE`），而 `AppendAuditEvent` 的 type switch 原只认 `*sql.Tx`/`*sql.DB`。最小加法＝switch 增 `*sql.Conn` 支（`ownsTx=false`，提交仍归调用方，与 `*sql.Tx` 同语义）；既有 Tx/DB 调用者行为零变更。`usage_observation.go` 以 `usageWriter`（三方法，与 `domain.Q` 同形互赋）承接 verb 侧，仅在链追加点断言回 `auditor`。
+- **D11 恢复读动词**：启动恢复（PS-F1①）需要一个列"raw 已落、observation 未落"事件的读面＝`usage pending`（`withSpineRead`，构造性只读⇒不贡献 B05 写集、无 registry 条目；query 上限 1000 缺省 200）。正清单 §2 原两写 verb 之外增此一读 verb。
+- **D12 raw 语义**：`usage_events.raw_json`＝**归一化 usage 片段**（族＋model＋双计数词法＋report_kind/finality/provability＋native_event_id），非 provider 原始响应体——响应体携会话内容，脊不积累会话内容（最小持久面）；片段是 PS-F1① 重派生的充分输入。`factFromFragment` 对不可完成片段（partial）返回 null＝raw-only 永久态，诚实不猜。
+- **D13 reconciliation 判据**：终版冲突比较**内容字段**（tokens/kind/origin/provability/family/model），不含 `source_version`——version 属行身份（B03 payload 表字段，入 digest），非声明内容；以 digest 比较会把"不同版本"误判为"内容冲突"（U8 实测自纠）。
+- **D14 provider_request_id 登记形**：B03 冻结表该字段为**必填**——不可得时载荷记字面值 `unverifiable`（PS §4.1④"显式登记 unverifiable，禁伪造"），非省略；wire 面仍以空串传递，登记形由 mc 侧施加（`unverifiableProviderRequestID` 常量）。
+- **B05 边界（既有，非本票引入）**：`usage-event`/`usage-observation` 经 `commandSystemSpine` 路径，与 `proxy-observe` 同先例，在 B05 gate 的两阶段源文本枚举面外（51 条写集不含 systemSpineCall 动作族）；gate 绿＝未捕获而非已登记。六维语义候 B05 面扩展票，本票不擅扩 gate（S3 条件不触发＝枚举器确实不覆盖此形态，与 proxy-observe 同态）。
+- **anthropic 收敛形**：PS §4"单请求收敛为一条累计快照（input 固定＋output 取末次 delta）"按第一句实施＝每请求一条快照 observation（interrupted 降 interim）；"事件级中间态=interim 按版本 supersedes"的机制在脊侧可用（source_version 槽），本波不产 per-delta 行（最小面，诚实登记）。
 - 本票落地后解锁：B09（usage v1→v2 首迁移＋回填证明，审方指定首战）／C05／C08。

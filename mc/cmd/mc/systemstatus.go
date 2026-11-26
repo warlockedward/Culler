@@ -413,6 +413,24 @@ func commandSystemSpine(action string, stdin io.Reader) (any, error) {
 			return nil, err
 		}
 		return withSpine(func(db *sql.DB) (any, error) { return verbs.ProviderAccessObserve(db, id, a) })
+	case "usage-event":
+		var a verbs.UsageEventRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.UsageRecordEvent(db, id, a) })
+	case "usage-observation":
+		var a verbs.UsageObservationRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.UsageRecordObservation(db, id, a) })
+	case "usage-pending":
+		var a verbs.UsagePendingRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpineRead(func(db *sql.DB) (any, error) { return verbs.UsagePending(db, id, a) })
 	case "launch-check":
 		var a struct {
 			Run          string                    `json:"run"`

@@ -56,6 +56,7 @@ import {
 } from "./credential-projector";
 import { createProviderLifetimeCheck, providerLaunchState } from "./provider-lifetime";
 import { createProviderCredentials } from "./provider-credentials";
+import { persistUsageEvents, recoverPendingUsage } from "./usage-observation";
 
 interface MainConfig extends ResidentConfig {
   mcPath: string;
@@ -321,6 +322,7 @@ async function startProjector(mcPath: string, mcHome: string, log: Logger,
   // Without that variable the option stays undefined and egress is unchanged.
   const fixtureFetch = process.env.SHZ_COLLIE_PROXY_FIXTURE ? globalThis.fetch : undefined;
   const handle = startCredentialProjector({ credentials, tls, hostname: proxyHost, refreshConnection, observe,
+    onUsageEvents: (localRequestId, providerRequestId, events) => persistUsageEvents(runMc, localRequestId, providerRequestId, events),
     fetch: fixtureFetch,
     isLaunchCurrent: (run, launch, signal) => providerLaunchState(runMc, run, launch, signal) }, catalog);
   try {
@@ -732,6 +734,11 @@ async function main(): Promise<void> {
     runMc, authorities: config.runtimeBindingAuthorities,
   });
   log.info("boot.projector_live", "The host provider proxy is available.");
+  // PS-F1①: re-derive the observations of the raw usage events a crashed
+  // persistence never finished; the dedupe key keeps a replay a no-op.
+  void recoverPendingUsage(runMc)
+    .then(count => { if (count > 0) log.info("usage.recovered", `Re-derived ${count} usage observations from persisted raw events.`); })
+    .catch(() => log.warn("usage.recovery_failed", "The usage observation recovery could not complete; it retries on the next start."));
   const providerAcceptance = await startProviderAcceptanceServer(config.mcHome, config.releaseBuildId, {
     authorize: async request => {
       await refreshAgentProfiles();

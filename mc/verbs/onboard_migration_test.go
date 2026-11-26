@@ -53,6 +53,42 @@ func buildPreLedgerSpineFile(t *testing.T, path, uuid string) {
 		db.Close()
 		t.Fatalf("strip audit chain table: %v", err)
 	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS usage_observations_no_delete`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage observations no delete trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS usage_observations_no_update`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage observations no update trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS usage_observations_local`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage observations index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS usage_observations`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage observations table: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS usage_events_no_delete`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events no delete trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS usage_events_no_update`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events no update trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS usage_events_local`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events index: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS usage_events_native_event`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events native event index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS usage_events`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events table: %v", err)
+	}
 	preID := substrate.ProductionMigrationRegistry()[0].FromSchemaID
 	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, preID); err != nil {
 		db.Close()
@@ -87,8 +123,8 @@ func TestOnboardSpineMigratesPreLedgerSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 3 {
-		t.Fatalf("ledger rows = %d (%v); want 3", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 4 {
+		t.Fatalf("ledger rows = %d (%v); want 4", ledgerRows, err)
 	}
 	db.Close()
 
@@ -333,6 +369,42 @@ func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
 		db.Close()
 		t.Fatalf("strip audit chain table: %v", err)
 	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS usage_observations_no_delete`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage observations no delete trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS usage_observations_no_update`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage observations no update trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS usage_observations_local`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage observations index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS usage_observations`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage observations table: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS usage_events_no_delete`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events no delete trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP TRIGGER IF EXISTS usage_events_no_update`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events no update trigger: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS usage_events_local`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events index: %v", err)
+	}
+	if _, err := db.Exec(`DROP INDEX IF EXISTS usage_events_native_event`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events native event index: %v", err)
+	}
+	if _, err := db.Exec(`DROP TABLE IF EXISTS usage_events`); err != nil {
+		db.Close()
+		t.Fatalf("strip usage events table: %v", err)
+	}
 	step1 := substrate.ProductionMigrationRegistry()[0]
 	if _, err := db.Exec(`INSERT INTO meta (id, deployment_uuid, schema_id) VALUES (1, ?, ?)`, uuid, step1.ToSchemaID); err != nil {
 		db.Close()
@@ -346,8 +418,9 @@ func buildFirstStepSpineFile(t *testing.T, path, uuid string) {
 }
 
 // U4: OnboardSpine crosses a spine left at the first step's target identity:
-// the recorded first step is skipped, the second and third steps land, the
-// deployment UUID is preserved, and the schema check passes on the result.
+// the recorded first step is skipped, the second, third and fourth steps
+// land, the deployment UUID is preserved, and the schema check passes on
+// the result.
 func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
 	spine := filepath.Join(t.TempDir(), "spine.db")
 	buildFirstStepSpineFile(t, spine, migrationTestUUID)
@@ -368,8 +441,8 @@ func TestOnboardSpineMigratesFirstStepBaselineSpine(t *testing.T) {
 		t.Fatalf("migrated spine schema check: %v", err)
 	}
 	var ledgerRows int
-	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 3 {
-		t.Fatalf("ledger rows = %d (%v); want 3", ledgerRows, err)
+	if err := db.QueryRow(`SELECT COUNT(*) FROM schema_history`).Scan(&ledgerRows); err != nil || ledgerRows != 4 {
+		t.Fatalf("ledger rows = %d (%v); want 4", ledgerRows, err)
 	}
 	db.Close()
 }
