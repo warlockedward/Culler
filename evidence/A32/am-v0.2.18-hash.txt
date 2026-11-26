@@ -1,0 +1,10 @@
+AM v0.2.18 双面哈希登记（轮四十四收口窗：B08 activity/存量域入链迁移落地⇒EVIDENCED＝B-chain 第六票；IG §7 零改写互验达成）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 94e8b49fc5b2fce830527a4c39b40a6cbe9a6c7530e6d36f8a1c11bb6aa12361
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 395042ffa121263ca8ed58df260f08805e2c4f9acbe885bc9cd5d5e00bbeefc6，与 am-v0.2.17-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.17 = 395042ffa121263ca8ed58df260f08805e2c4f9acbe885bc9cd5d5e00bbeefc6（evidence/A32/am-v0.2.17-hash.txt 实读）；再前 v0.2.16 = 2fcda6641a6729011754a46317e85891bf655ccfbe8da5aba7c9dd4d68de6987（同件记载）
+- 同轮并入 dev 的提交: 8e337f6（B08 设计面＋范围裁定 D0：存量迁移 only，稳态接线=具名后续票）＋5b0fbf3（B08：schema.sql activity_chain_map；migrate.go b09ChainIdentity W 钉定＋S5.to 钉 W＋S6 migrate-activity-to-chain＋MigrationStep.Migrate 同事务数据移动钩子（checksum 不含）＋applyMigrationStep runStepMigration 位；activity_chain.go migrateActivityToChain（id 升序投影/确定性 event ID/本地 prev 递推/SpineTime⇒规范形/D1b 无 open 事件）＋VerifyActivityBackfill 三验（覆盖/可达/序⇒ErrActivityBackfillProof 整步回滚）；auchain.go activity payload 家族（declared-pending 10 字段）；verbs/projectdelete.go D10 集成（反向序先删 map）；N1-N4 测试族＋既有 migrate/usage/auchain/onboard 族随 6 步 registry 更新）；status.json B08=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（27 包 ok，cmd/mc 479.652s 非缓存实跑；首跑唯一红点＝项目删除覆盖门按设计咬住新表⇒D10 修复⇒8/8 绿）；新基线 identity V = bc32d91b58a17aaa81217c11b8dc26a24e2c355842e2ca43e2fe717327d9da0c（方法自校验＋N4 失败输出交叉证据逐字一致）
+- 诚实边界: 稳态入链＝具名后续票（'activity' 聚合为迁移时点快照，DC §3.2 稳态半候后续票）；declared-pending 无向量 NOT verified；真实数据量回填耗时＝B06 域
+- 账: dev tip＝5b0fbf3（本登记轮提交随后）/ worktrees＝main+dev+b08（b08 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）/ **B-chain 状态：B01＝B02＝B05＝B07＝B08＝B09＝EVIDENCED；余 B06（门 O3 硬件候所有者触发）**
