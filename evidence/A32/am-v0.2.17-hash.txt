@@ -1,0 +1,10 @@
+AM v0.2.17 双面哈希登记（轮四十三收口窗：B09 usage v2 首迁移＋回填证明落地⇒EVIDENCED＝B-chain 第五票闭合；MASTER D10 票面闭合）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 395042ffa121263ca8ed58df260f08805e2c4f9acbe885bc9cd5d5e00bbeefc6
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-26 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 2fcda6641a6729011754a46317e85891bf655ccfbe8da5aba7c9dd4d68de6987，与 am-v0.2.16-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.16 = 2fcda6641a6729011754a46317e85891bf655ccfbe8da5aba7c9dd4d68de6987（evidence/A32/am-v0.2.16-hash.txt 实读）；再前 v0.2.15 = 3fa40847dbfba1f1103dfcffbd4b30e39aa5c24a99fe68585ca331ee642811f4（同件记载）
+- 同轮并入 dev 的提交: e71bc76（B09：mc/substrate/schema.sql usage v2 消费投影表（Class B 可变，v1 两表零触碰）；migrate.go c03UsageIdentity Z 钉定＋S4.to 钉 Z＋S5 migrate-usage-to-v2（DDL＋max 版本回填 INSERT）＋MigrationStep.Verify 同事务证明钩子（checksum 不含 Verify＝台账语义不扩）＋applyMigrationStep verifyStep 调用位；usage_v2.go VerifyUsageBackfill 三验（计数/多重集摘要/双向 anti-join⇒ErrBackfillProof 整步回滚）＋UpsertUsageCurrent 稳态投影；RecordUsageObservation 同事务接入；M1-M6 测试族＋既有 W11/W12/U13/U14/migrate 族随 5 步 registry 更新）；status.json B09=EVIDENCED 随本登记轮提交
+- 关键事实: M3 证明失败整步回滚实证（DDL 同回滚＋ledger 无第五行＋meta 钉 Z 不动＋v1 原文零触＝失败原文不丢双重保证）；M5 迁移脊与 fresh 脊 usage 对象 sqlite_master 逐字节相等；最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（27 包 ok，mc/verbs 574.594s 非缓存实跑）；TS 面零触碰（v2＝脊内部投影）；自纠×2（种子 SQL finality 槽误传⇒CHECK 咬住；派生表别名 SQL 语法错⇒Verify 首跑咬住）；新基线 identity W = 93f0515ee82941d3c884a21732c9ee4afebd569b027d18b408f5f20066b87fa8
+- 诚实边界: D-G6.3 悬空锚（正文不在现行树；以票面验收句为操作规范，不虚构门语义）；真实数据量回填性能＝B06 域；usage 表不预建 BL 结算状态列（C05 域，防第二权威）；v1 退役属独立治理事件（本票不擅删）
+- 账: dev tip＝e71bc76（本登记轮提交随后）/ worktrees＝main+dev+b09（b09 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa scanner_enobufs 兼容策略继续（不构成安全声明）/ **B-chain 状态：B01＝B02＝B05＝B07＝B09＝EVIDENCED；余 B06（门 O3 候令）＋B08（deps 已齐）**
