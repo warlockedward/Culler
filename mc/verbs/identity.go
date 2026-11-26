@@ -130,6 +130,7 @@ type IdentitySessionRevokeRequest struct {
 	Token     string `json:"token"`
 	Scope     string `json:"scope"`
 	SessionID string `json:"session_id,omitempty"`
+	Purpose   string `json:"purpose,omitempty"`
 }
 
 // sessionActor authenticates a caller from its session token: the actor is
@@ -174,10 +175,56 @@ func IdentitySessionRevoke(db *sql.DB, id *RunIdentity, a IdentitySessionRevokeR
 	guard := identity.NewGuard()
 	revoked := 0
 	derivedRevoked := 0
+	breakGlass := false
 	if err := inTx(db, func(ctx context.Context, q Q) error {
 		actor, err := sessionActor(ctx, q, a.Token)
 		if err != nil {
 			return err
+		}
+		if a.Scope == "global" {
+			// The break-glass path (IG-T7 frozen list): the purpose statement
+			// is mandatory, the guard ruling is the only thing that opens
+			// the administrative context binding, and the dedicated audit
+			// kind marks the high-density event.
+			if a.Purpose == "" {
+				return Usagef("The break-glass revocation requires a purpose statement.")
+			}
+			decision := guard.DecideBreakGlass("session-revoke:global")
+			if !decision.Allow {
+				return Domainf("%s", decision.Reason)
+			}
+			if err := identity.BindTrustedContext(ctx, q, actor, true); err != nil {
+				return err
+			}
+			var res sql.Result
+			res, err = q.ExecContext(ctx, `UPDATE user_sessions SET state = 'revoked', revoked_by = ?
+				WHERE state = 'active'`, actor)
+			if err != nil {
+				return err
+			}
+			if n, err := res.RowsAffected(); err == nil {
+				revoked = int(n)
+			}
+			// Every subject's active sessions are gone, so every granter is
+			// invalid: the derived grants die in this same transaction, not
+			// at their original TTL (IG §6, the global form of the D02
+			// ruling).
+			if err == nil {
+				var casc sql.Result
+				casc, err = q.ExecContext(ctx, `UPDATE grants SET revoked_at = datetime('now')
+					WHERE revoked_at IS NULL`)
+				if err == nil {
+					if n, derr := casc.RowsAffected(); derr == nil {
+						derivedRevoked = int(n)
+					}
+				}
+			}
+			breakGlass = true
+			detail := fmt.Sprintf("Break-glass global revocation (purpose: %s). Revoked %d session(s).", a.Purpose, revoked)
+			if derivedRevoked > 0 {
+				detail += fmt.Sprintf(" %d derived grant(s) invalidated with the granters.", derivedRevoked)
+			}
+			return recordActivity(ctx, q, actor, "session.breakglass_revoked", "", detail)
 		}
 		decision := guard.DecideSessionLifecycle(actor, a.Scope)
 		if decision.RequireSignoff || !decision.Allow {
@@ -227,7 +274,7 @@ func IdentitySessionRevoke(db *sql.DB, id *RunIdentity, a IdentitySessionRevokeR
 	}); err != nil {
 		return nil, classify(err)
 	}
-	return map[string]any{"revoked": revoked, "grants_revoked": derivedRevoked}, nil
+	return map[string]any{"revoked": revoked, "grants_revoked": derivedRevoked, "break_glass": breakGlass}, nil
 }
 
 // IdentityGrantIssueRequest issues a capability grant under the guard ruling.

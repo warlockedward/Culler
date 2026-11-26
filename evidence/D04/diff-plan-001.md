@@ -54,3 +54,9 @@
 ## 7. 登记与收尾
 
 实施＝少提交于 shz/TD04；全道绿后 ff dev；登记轮＝AM v0.2.23＋status.json D04=EVIDENCED＋blcheck；诚实边界（D5 五项）入登记；BREAK-GLASS.md 冻结成文＝验收句"清单成文"的交付物。
+
+## 8. 实施补记（先列后改的追加登记）
+
+- **global 路径含派生 grant 级联（合同一致性，超出 D3 最小面）**：D3 初稿 global 只翻 `user_sessions`。实施复核发现——全局 break-glass 使**每个主体**的活动会话清零，按 IG §6「派生 grant 随 granter 失效即失效（不等原 TTL）」，所有 granter 均失效⇒其派生 grant 须同事务级联（与 D02 的 scope 'user' 级联是同一规则的全局形态）。故 global 路径在同一 inTx 内追加 `UPDATE grants SET revoked_at=… WHERE revoked_at IS NULL`（全部未撤销 grant），计数入审计 detail＋result。BREAK-GLASS.md §2"最小数据范围"同步登记 `grants.revoked_at`。此为合同推导非扩权：级联只收紧（撤销更多派生授权），不放宽任何面。
+- **B3 负控需真实行**：row-level trigger 对 0 行匹配的 UPDATE 不触发（no-op 成功），故"无绑定全局撤销必被拒"负控须先种子真实活动会话行才咬得住——B3 补种 alice＋bob 各一会话，跨用户归属拒的负控也依赖 bob 行真实存在。
+- **wire 增字段 additive**：IdentitySessionRevokeRequest 增 `purpose`（omitempty），result 增 `break_glass`（bool）——既有 single/user 调用方零感知（purpose 缺省空、break_glass=false）。

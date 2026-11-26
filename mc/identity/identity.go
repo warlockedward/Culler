@@ -187,18 +187,43 @@ func (g *Guard) DecideGrantIssue(ctx context.Context, q interface {
 }
 
 // DecideSessionLifecycle is the guard's ruling on revoking sessions.
-// Single and user-scoped revocations reach only the caller's own sessions;
-// the global emergency scope has no D01 path (it is a later admin plane, and
-// the guard refuses it here rather than guess at it).
+// Single and user-scoped revocations reach only the caller's own sessions.
+// The global emergency scope is NOT a session-lifecycle ruling: it is a
+// break-glass operation decided by DecideBreakGlass against the frozen
+// single-person list, so the lifecycle plane refuses it here rather than
+// open a path that bypasses the break-glass controls.
 func (g *Guard) DecideSessionLifecycle(actor, scope string) Decision {
 	switch scope {
 	case "single", "user":
 		return Decision{Allow: true, Reason: "self session revocation"}
 	case "global":
-		return Decision{Reason: "the global revocation scope has no D01 authorization path"}
+		return Decision{Reason: "the global revocation scope is a break-glass operation, not a session-lifecycle ruling"}
 	default:
 		return Decision{Reason: "the revocation scope is unrecognized"}
 	}
+}
+
+// breakGlassOperations is the FROZEN single-person emergency list (IG-T7,
+// BREAK-GLASS.md). It is the only source the guard consults: any operation
+// not named here is refused, so the list cannot be extended from code,
+// configuration, or a caller. Changing the list is an owner ruling that
+// re-freezes the document, never an implementation-side addition.
+var breakGlassOperations = map[string]bool{
+	"session-revoke:global": true,
+}
+
+// DecideBreakGlass is the guard's ruling on a break-glass operation: allow
+// only when the operation is on the frozen single-person list (the
+// purpose-statement requirement is enforced by the verb, and the
+// administrative context binding is the only thing that lets the
+// object-scope trigger's admin exemption fire). Every operation off the
+// list — including any future two-person class, whose approval plane is the
+// signoff surface, not this one — is refused fail-closed.
+func (g *Guard) DecideBreakGlass(operation string) Decision {
+	if breakGlassOperations[operation] {
+		return Decision{Allow: true, Reason: "operation is on the frozen break-glass list"}
+	}
+	return Decision{Reason: "the operation is not on the frozen break-glass list"}
 }
 
 // DecideDegradedIssue is the guard's ruling on issuing a Degraded Operation
