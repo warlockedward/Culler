@@ -74,6 +74,7 @@
 | B07 | 链实现（prev_hash 触发器+aggregate_open+序列化器按 B03）+`shz verify-chain` | B02,B03,B04 | DC §3.4 全节 | F1：链测试全套；建成前链连续性=Planned（DC A6/§7.5） | |
 | B08 | activity/存量域入链迁移（v_n→v_n+1 实战第二迁移） | B07,B03 | DC §3.4 层规则；IG §7 历史零改写互验 | P4.0：第二迁移实战+零改写比对 | |
 | B09 | **usage 表 v1→v2 首迁移+blob 回填+回填证明**（计数/digest/双向核验，失败原文不丢） | B02,C03 | MASTER D10；DC §3.2 回填不丢弃 | F1：回填证明（计数/digest/双向核验） | 审方指定首战 |
+| B10 | activity 稳态写入链（分散调用点中央化＋源码级覆盖门＋dispatchseam 设计决策面处置） | B08,B07 | DC §3.2 稳态半；B08 D0 范围裁定（具名后续票） | P4.0：稳态新 activity 行同事务入链＋覆盖门（新写点不走中央 API 必红）＋零改写回归 | 所有者批准票面（轮四十八 Q4） |
 
 ### Track C · P2 Provider 与预算
 | ID | 标题 | depends | 契约锚 | 验收映射 | 备注/门 |
