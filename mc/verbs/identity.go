@@ -412,6 +412,134 @@ func IdentityLegacyMap(db *sql.DB, id *RunIdentity, a IdentityLegacyMapRequest) 
 	return map[string]any{"mapped": mapped}, nil
 }
 
+// IdentityDegradedGrantIssueRequest issues a Degraded Operation Authorization
+// (TM §8.1): all five elements — the specific risk, the operation scope, the
+// compensating control, the validity, and the revocation conditions — must be
+// present, and the authorization never extends beyond what was listed.
+type IdentityDegradedGrantIssueRequest struct {
+	Token                string `json:"token"`
+	Risk                 string `json:"risk"`
+	Scope                string `json:"scope"`
+	Resource             string `json:"resource,omitempty"`
+	Compensation         string `json:"compensation"`
+	RevocationConditions string `json:"revocation_conditions"`
+	TTLHours             int    `json:"ttl_hours,omitempty"`
+}
+
+// IdentityDegradedGrantIssue binds a fully-specified degraded authorization to
+// the acting (guard-derived) user under the guard-bound trusted context: the
+// attribution column must agree with the bound actor, which the object-scope
+// trigger enforces. Any missing element is refused before the write.
+func IdentityDegradedGrantIssue(db *sql.DB, id *RunIdentity, a IdentityDegradedGrantIssueRequest) (any, error) {
+	if err := RequireHostScope(id, "degraded authorization issuance"); err != nil {
+		return nil, err
+	}
+	if a.Risk == "" || len(a.Risk) > 128 {
+		return nil, Usagef("The degraded authorization risk is invalid.")
+	}
+	if a.Scope == "" || len(a.Scope) > 128 {
+		return nil, Usagef("The degraded authorization scope is invalid.")
+	}
+	if len(a.Resource) > 256 {
+		return nil, Usagef("The degraded authorization resource is invalid.")
+	}
+	if a.Compensation == "" || len(a.Compensation) > 1024 {
+		return nil, Usagef("The degraded authorization compensation is invalid.")
+	}
+	if a.RevocationConditions == "" || len(a.RevocationConditions) > 1024 {
+		return nil, Usagef("The degraded authorization revocation conditions are invalid.")
+	}
+	if a.TTLHours <= 0 || a.TTLHours > 24*90 {
+		return nil, Usagef("The degraded authorization validity is invalid.")
+	}
+	guard := identity.NewGuard()
+	out := map[string]any{"created": false}
+	if err := inTx(db, func(ctx context.Context, q Q) error {
+		actor, err := sessionActor(ctx, q, a.Token)
+		if err != nil {
+			return err
+		}
+		decision := guard.DecideDegradedIssue(actor)
+		if decision.RequireSignoff || !decision.Allow {
+			return Domainf("%s", decision.Reason)
+		}
+		if err := identity.BindTrustedContext(ctx, q, actor, false); err != nil {
+			return err
+		}
+		grantID, err := identity.NewOpaqueID()
+		if err != nil {
+			return Usagef("The degraded authorization could not be allocated.")
+		}
+		ttl := fmt.Sprintf("+%d hours", a.TTLHours)
+		var resource any
+		if a.Resource != "" {
+			resource = a.Resource
+		}
+		if _, err := q.ExecContext(ctx, `INSERT INTO degraded_grants
+			(grant_id, risk, scope, resource, compensation, revocation_conditions,
+			 issued_by_user_id, expires_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now', ?))`,
+			grantID, a.Risk, a.Scope, resource, a.Compensation, a.RevocationConditions, actor, ttl); err != nil {
+			return Domainf("The degraded authorization could not be recorded.")
+		}
+		out["grant_id"] = grantID
+		out["created"] = true
+		return recordActivity(ctx, q, actor, "degraded.grant_issued", grantID,
+			fmt.Sprintf("A degraded operation authorization for risk %s was issued.", a.Risk))
+	}); err != nil {
+		return nil, classify(err)
+	}
+	return out, nil
+}
+
+// IdentityDegradedGrantRevokeRequest revokes a degraded authorization the
+// caller issued; revoking another party's authorization is a sign-off path,
+// not a D05 one.
+type IdentityDegradedGrantRevokeRequest struct {
+	Token   string `json:"token"`
+	GrantID string `json:"grant_id"`
+}
+
+// IdentityDegradedGrantRevoke stamps the degraded authorization revoked under
+// the guard-bound context, making the per-operation decision refuse at the
+// very next read.
+func IdentityDegradedGrantRevoke(db *sql.DB, id *RunIdentity, a IdentityDegradedGrantRevokeRequest) (any, error) {
+	if err := RequireHostScope(id, "degraded authorization revocation"); err != nil {
+		return nil, err
+	}
+	revoked := false
+	if err := inTx(db, func(ctx context.Context, q Q) error {
+		actor, err := sessionActor(ctx, q, a.Token)
+		if err != nil {
+			return err
+		}
+		var issuer string
+		err = q.QueryRowContext(ctx, `SELECT issued_by_user_id FROM degraded_grants
+			WHERE grant_id = ? AND revoked_at IS NULL`, a.GrantID).Scan(&issuer)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return Domainf("The degraded authorization is unknown or already revoked.")
+			}
+			return err
+		}
+		if issuer != actor {
+			return Domainf("The degraded authorization was issued by another party; its revocation requires sign-off.")
+		}
+		if err := identity.BindTrustedContext(ctx, q, actor, false); err != nil {
+			return err
+		}
+		if _, err := q.ExecContext(ctx, `UPDATE degraded_grants SET revoked_at = datetime('now') WHERE grant_id = ?`, a.GrantID); err != nil {
+			return err
+		}
+		revoked = true
+		return recordActivity(ctx, q, actor, "degraded.grant_revoked", a.GrantID,
+			"A degraded operation authorization was revoked.")
+	}); err != nil {
+		return nil, classify(err)
+	}
+	return map[string]any{"revoked": revoked}, nil
+}
+
 // recordActivity lands the Class A event for the identity lifecycle on the
 // caller's transaction. The legacy operator actor is refused at this guard
 // point (IG §7 封存): the trigger is the execution-plane backstop, the guard

@@ -390,3 +390,40 @@ BEGIN SELECT RAISE(ABORT, 'legacy actor mappings are append only'); END;
 CREATE TRIGGER activity_legacy_actor_sealed BEFORE INSERT ON activity
 WHEN NEW.actor = 'operator'
 BEGIN SELECT RAISE(ABORT, 'the legacy operator actor is sealed after the identity migration'); END;`
+
+// degradedGrantsDDL is the ninth step's object definitions: the Degraded
+// Operation Authorization registry and its object-scope guard. Every
+// statement's text must stay byte-identical to the degraded grants block in
+// schema.sql, so the sqlite_schema rows of a migrated spine hash like the
+// reference spine built from the baseline.
+const degradedGrantsDDL = `CREATE TABLE degraded_grants (
+    grant_id              TEXT NOT NULL UNIQUE
+                        CHECK (length(grant_id) = 32 AND
+                               length(CAST(grant_id AS BLOB)) = 32 AND
+                               grant_id NOT GLOB '*[^0-9a-f]*'),
+    risk                  TEXT NOT NULL
+                        CHECK (length(risk) BETWEEN 1 AND 128),
+    scope                 TEXT NOT NULL
+                        CHECK (length(scope) BETWEEN 1 AND 128),
+    resource              TEXT
+                        CHECK (resource IS NULL OR length(resource) <= 256),
+    compensation          TEXT NOT NULL
+                        CHECK (length(compensation) BETWEEN 1 AND 1024),
+    revocation_conditions TEXT NOT NULL
+                        CHECK (length(revocation_conditions) BETWEEN 1 AND 1024),
+    issued_by_user_id     TEXT NOT NULL REFERENCES users (id),
+    created_at            TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at            TEXT NOT NULL,
+    revoked_at            TEXT,
+    PRIMARY KEY (grant_id)
+);
+
+CREATE INDEX degraded_grants_risk_scope ON degraded_grants (risk, scope);
+
+CREATE TRIGGER degraded_grants_guarded_insert BEFORE INSERT ON degraded_grants
+BEGIN
+    SELECT RAISE(ABORT, 'degraded grant insert requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'degraded grant attribution disagrees with the trusted context')
+    WHERE NEW.issued_by_user_id NOT IN (SELECT actor FROM trusted_ctx);
+END;`

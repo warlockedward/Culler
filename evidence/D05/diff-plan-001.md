@@ -59,3 +59,10 @@
 ## 7. 登记与收尾
 
 实施＝少提交于 shz/TD05；全道绿后 ff dev；登记轮＝AM v0.2.22＋status.json D05=EVIDENCED＋blcheck；新基线 identity 入册；诚实边界（D5 五项）入登记。
+
+## 8. 实施补记（先列后改的追加登记）
+
+- **新基线 identity**（S9 后）＝`f9d1090e71e57130bcb7821a25a7959177098bd435c9756fcef8a13c0681e615`（shell 三文件拼接哈希＝Go CurrentSchemaID 探针 go run 逐字节相等；S9.to 用 CurrentSchemaID 符号，S8.to 钉 d03SealIdentity 字面量）。
+- **lane 首跑一红点＝环境 flake，非本票回归**：`TestReleaseSkillWorksForExternalAgentWithoutSourceOrDevelopmentTools` 报 "resolve the installed host Bun fixture: exit status 1"（`mise exec -- bun -p process.execPath` 在并行全量负载下解析失败）。判定＝环境：(a) 本票 diff 不触 deployment/host-release/bun 任何面；(b) 单独复跑该测试 PASS（154s，真实走完 InstallHostRelease）；(c) 前三票（D01/D02/D03）同环境全道该测试均绿。故登记为 mise/bun 解析在 `-timeout 20m ./...` 并行下的瞬态失败，二跑全道验证。
+- **G 族测试复用 D01/D02 fixture**：igT1Spine（两 user）＋igT2Session（guard-bound 会话播种，无密码字面量——凭据形值不入候选，同 D02 裁定）。
+- **判定面与 D02 GrantAllows 同构**：DegradedAllows 为包级无状态函数（不进 Guard 实例），now 调用方注入并渲染 SpineTime 定长形；risk/scope 精确匹配、resource NULL 通配——"不得扩大到未列明项"由精确匹配结构性承载。

@@ -467,6 +467,18 @@ func commandSystemSpine(action string, stdin io.Reader) (any, error) {
 			return nil, err
 		}
 		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityLegacyMap(db, id, a) })
+	case "identity-degraded-grant-issue":
+		var a verbs.IdentityDegradedGrantIssueRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityDegradedGrantIssue(db, id, a) })
+	case "identity-degraded-grant-revoke":
+		var a verbs.IdentityDegradedGrantRevokeRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.IdentityDegradedGrantRevoke(db, id, a) })
 	case "launch-check":
 		var a struct {
 			Run          string                    `json:"run"`

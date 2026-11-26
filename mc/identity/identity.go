@@ -201,6 +201,19 @@ func (g *Guard) DecideSessionLifecycle(actor, scope string) Decision {
 	}
 }
 
+// DecideDegradedIssue is the guard's ruling on issuing a Degraded Operation
+// Authorization. The mechanism is the named, session-authenticated user
+// (TM §8.1: the deployment owner's designated named authorizing subject); the
+// guard requires that subject to be present. Selecting WHO that subject is,
+// and the separation-of-duties around self-approval, is a governance ruling
+// (break-glass / sign-off plane), not a decision this plane makes.
+func (g *Guard) DecideDegradedIssue(actor string) Decision {
+	if actor == "" {
+		return Decision{Reason: "a degraded authorization requires a named authorizing subject"}
+	}
+	return Decision{Allow: true, Reason: "named authorizing subject present"}
+}
+
 // GrantAllows is the consumption-side ruling on a capability grant: it
 // answers, at the moment of the authorization decision, whether the actor
 // currently holds a grant covering the scope and resource. The input is a
@@ -227,4 +240,36 @@ func GrantAllows(ctx context.Context, q interface {
 		return Decision{Allow: true, Reason: "a valid grant covers the request"}, nil
 	}
 	return Decision{Reason: "no valid grant covers the request"}, nil
+}
+
+// DegradedAllows is the consumption-side ruling on a Degraded Operation
+// Authorization (TM §8.1): at the moment of the degraded operation it
+// answers whether a live row binds ALL five elements — the specific risk,
+// the operation scope, the compensating control, the validity, and the
+// revocation conditions — to this operation. The input is a live read of the
+// spine only, so an expired or revoked authorization is refused at the very
+// next decision. risk and scope match exactly (an authorization never extends
+// beyond what was listed); resource matches the row's value or a NULL row
+// (unbound to an object). Review opinions, AI judgment, and historical
+// operation facts never enter this decision: only a stored, live, fully-bound
+// row does. An empty table refuses the degraded operation without stopping
+// anything else — the ordinary path never reads here.
+func DegradedAllows(ctx context.Context, q interface {
+	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+}, risk, scope, resource string, now time.Time) (Decision, error) {
+	nowStr := now.UTC().Format("2006-01-02 15:04:05")
+	var n int
+	err := q.QueryRowContext(ctx, `SELECT COUNT(*) FROM degraded_grants
+		WHERE risk = ? AND scope = ?
+		  AND (resource IS NULL OR resource = ?)
+		  AND revoked_at IS NULL
+		  AND expires_at >= ?`,
+		risk, scope, resource, nowStr).Scan(&n)
+	if err != nil {
+		return Decision{}, fmt.Errorf("query degraded authorization: %w", err)
+	}
+	if n > 0 {
+		return Decision{Allow: true, Reason: "a live degraded authorization binds every element"}, nil
+	}
+	return Decision{Reason: "no live degraded authorization binds every element"}, nil
 }

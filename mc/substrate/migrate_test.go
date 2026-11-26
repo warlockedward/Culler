@@ -102,6 +102,7 @@ func TestMigrateAppliesUnrecordedStepsFromPreLedgerBaseline(t *testing.T) {
 	stripActivityChainMap(t, db)
 	stripIdentityFoundation(t, db)
 	stripLegacyActorSealing(t, db)
+	stripDegradedGrants(t, db)
 	revertHealthAlertTrigger(t, db)
 
 	registry := ProductionMigrationRegistry()
@@ -109,10 +110,10 @@ func TestMigrateAppliesUnrecordedStepsFromPreLedgerBaseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 8 || report.Applied[0] != "add-schema-history-ledger" || report.Applied[1] != "rename-health-alert-body" || report.Applied[2] != "add-audit-events-chain" || report.Applied[3] != "add-usage-observations" || report.Applied[4] != "migrate-usage-to-v2" || report.Applied[5] != "migrate-activity-to-chain" || report.Applied[6] != "add-identity-foundation" || report.Applied[7] != "add-legacy-actor-sealing" {
+	if !report.Migrated || len(report.Applied) != 9 || report.Applied[0] != "add-schema-history-ledger" || report.Applied[1] != "rename-health-alert-body" || report.Applied[2] != "add-audit-events-chain" || report.Applied[3] != "add-usage-observations" || report.Applied[4] != "migrate-usage-to-v2" || report.Applied[5] != "migrate-activity-to-chain" || report.Applied[6] != "add-identity-foundation" || report.Applied[7] != "add-legacy-actor-sealing" || report.Applied[8] != "add-degraded-grants" {
 		t.Fatalf("report = %+v", report)
 	}
-	step1, step2, step3, step4, step5, step6, step7, step8 := registry[0], registry[1], registry[2], registry[3], registry[4], registry[5], registry[6], registry[7]
+	step1, step2, step3, step4, step5, step6, step7, step8, step9 := registry[0], registry[1], registry[2], registry[3], registry[4], registry[5], registry[6], registry[7], registry[8]
 	var checksum1, from1, to1 string
 	if err := db.QueryRow(`SELECT step_checksum, from_schema_id, to_schema_id FROM schema_history WHERE version = 1`).Scan(&checksum1, &from1, &to1); err != nil {
 		t.Fatal(err)
@@ -166,14 +167,21 @@ func TestMigrateAppliesUnrecordedStepsFromPreLedgerBaseline(t *testing.T) {
 	if err := db.QueryRow(`SELECT step_checksum, from_schema_id, to_schema_id FROM schema_history WHERE version = 8`).Scan(&checksum8, &from8, &to8); err != nil {
 		t.Fatal(err)
 	}
-	if checksum8 != step8.Checksum || from8 != d01FoundationIdentity || to8 != CurrentSchemaID {
-		t.Fatalf("ledger row 8 = (%s, %s, %s); want (%s, %s, %s)", checksum8, from8, to8, step8.Checksum, d01FoundationIdentity, CurrentSchemaID)
+	if checksum8 != step8.Checksum || from8 != d01FoundationIdentity || to8 != d03SealIdentity {
+		t.Fatalf("ledger row 8 = (%s, %s, %s); want (%s, %s, %s)", checksum8, from8, to8, step8.Checksum, d01FoundationIdentity, d03SealIdentity)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM activity WHERE kind = 'schema.migration.step'`); n != 8 {
-		t.Fatalf("migration events = %d; want 8", n)
+	var checksum9, from9, to9 string
+	if err := db.QueryRow(`SELECT step_checksum, from_schema_id, to_schema_id FROM schema_history WHERE version = 9`).Scan(&checksum9, &from9, &to9); err != nil {
+		t.Fatal(err)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'schema'`); n != 6 {
-		t.Fatalf("schema aggregate chain rows = %d; want 6 (the step that creates the table starts the chain)", n)
+	if checksum9 != step9.Checksum || from9 != d03SealIdentity || to9 != CurrentSchemaID {
+		t.Fatalf("ledger row 9 = (%s, %s, %s); want (%s, %s, %s)", checksum9, from9, to9, step9.Checksum, d03SealIdentity, CurrentSchemaID)
+	}
+	if n := countRows(t, db, `SELECT COUNT(*) FROM activity WHERE kind = 'schema.migration.step'`); n != 9 {
+		t.Fatalf("migration events = %d; want 9", n)
+	}
+	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'schema'`); n != 7 {
+		t.Fatalf("schema aggregate chain rows = %d; want 7 (the step that creates the table starts the chain)", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {
@@ -204,17 +212,18 @@ func TestMigrateAppliesSecondStepFromFirstStepBaseline(t *testing.T) {
 	stripActivityChainMap(t, db)
 	stripIdentityFoundation(t, db)
 	stripLegacyActorSealing(t, db)
+	stripDegradedGrants(t, db)
 	revertHealthAlertTrigger(t, db)
 
 	report, err := Migrate(db, ProductionMigrationRegistry(), CurrentSchemaID)
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 7 || report.Applied[0] != "rename-health-alert-body" || report.Applied[1] != "add-audit-events-chain" || report.Applied[2] != "add-usage-observations" || report.Applied[3] != "migrate-usage-to-v2" || report.Applied[4] != "migrate-activity-to-chain" || report.Applied[5] != "add-identity-foundation" || report.Applied[6] != "add-legacy-actor-sealing" {
-		t.Fatalf("report = %+v; want the second through eighth steps applied", report)
+	if !report.Migrated || len(report.Applied) != 8 || report.Applied[0] != "rename-health-alert-body" || report.Applied[1] != "add-audit-events-chain" || report.Applied[2] != "add-usage-observations" || report.Applied[3] != "migrate-usage-to-v2" || report.Applied[4] != "migrate-activity-to-chain" || report.Applied[5] != "add-identity-foundation" || report.Applied[6] != "add-legacy-actor-sealing" || report.Applied[7] != "add-degraded-grants" {
+		t.Fatalf("report = %+v; want the second through ninth steps applied", report)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 8 {
-		t.Fatalf("ledger rows = %d; want 8", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 9 {
+		t.Fatalf("ledger rows = %d; want 9", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {
@@ -246,6 +255,7 @@ func TestMigrateNoOpWhenLedgerCompleteAtCurrentIdentity(t *testing.T) {
 	recordStep(t, db, registry[5])
 	recordStep(t, db, registry[6])
 	recordStep(t, db, registry[7])
+	recordStep(t, db, registry[8])
 
 	report, err := Migrate(db, registry, CurrentSchemaID)
 	if err != nil {
@@ -254,8 +264,8 @@ func TestMigrateNoOpWhenLedgerCompleteAtCurrentIdentity(t *testing.T) {
 	if report.Migrated || len(report.Applied) != 0 {
 		t.Fatalf("report = %+v; want no-op", report)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 8 {
-		t.Fatalf("ledger rows = %d; want the eight recorded rows untouched", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 9 {
+		t.Fatalf("ledger rows = %d; want the nine recorded rows untouched", n)
 	}
 }
 

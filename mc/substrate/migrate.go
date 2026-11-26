@@ -106,6 +106,11 @@ const b08MapIdentity = "bc32d91b58a17aaa81217c11b8dc26a24e2c355842e2ca43e2fe7173
 // as a historical fact like b08MapIdentity.
 const d01FoundationIdentity = "6be6f49be7555017684d7ce38ab08cf88fc2c7fb53f90f009670913f4751c535"
 
+// d03SealIdentity is the schema identity the eighth step produced: the
+// legacy actor sealing, before the degraded grants registry existed. Pinned
+// as a historical fact like d01FoundationIdentity.
+const d03SealIdentity = "bd9ebc9c6a112e38410185ee1693b9966a3f48df9a58f24518cb77d366b049a8"
+
 // ProductionMigrationRegistry returns the ordered step registry this release
 // carries. The registry always terminates at CurrentSchemaID: a release that
 // changes the schema text must register the step that crosses that boundary,
@@ -126,8 +131,10 @@ func ProductionMigrationRegistry() []MigrationStep {
 	registry = append(registry, sixth)
 	seventh := newMigrationStep(7, "add-identity-foundation", b08MapIdentity, d01FoundationIdentity, identityFoundationDDL)
 	registry = append(registry, seventh)
-	eighth := newMigrationStep(8, "add-legacy-actor-sealing", d01FoundationIdentity, CurrentSchemaID, legacySealDDL)
-	return append(registry, eighth)
+	eighth := newMigrationStep(8, "add-legacy-actor-sealing", d01FoundationIdentity, d03SealIdentity, legacySealDDL)
+	registry = append(registry, eighth)
+	ninth := newMigrationStep(9, "add-degraded-grants", d03SealIdentity, CurrentSchemaID, degradedGrantsDDL)
+	return append(registry, ninth)
 }
 
 // MigrationReport describes one runner pass over a spine.
