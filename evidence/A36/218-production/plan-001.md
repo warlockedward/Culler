@@ -39,3 +39,16 @@
 - 本预案＝Linux 生产形态**首次真机部署**：A03 持久监管面（systemd install/enable/开机）与 A25 生命周期的 amd64 半面将一并暴露为验收对象，非预先承诺通过。
 - crash-loop 租户族（fastgpt/milvus）与部署轮共享磁盘与 DNS 出口：P1 闸不满足则本窗口不开。
 - 执行节奏＝逐条批准对应条目后动；预案批准≠P2 自扩。
+
+## §6 事实修正（轮六十三开工勘察·owner 指令「按建议顺序执行＋零冲突硬约束＋磁盘走 /data-shunhong」后实测；§2 表按本节作废/更新，正文保留为时点记录）
+
+| 条 | 修正 |
+|---|---|
+| P1 磁盘 | **已解＝/data-shunhong 是真独立磁盘**：`/dev/sdb2` ext4 3.6T 总/**2.0T 可用**（findmnt+df 实测；首轮 findmnt 截断致疑，二轮坐实）。MC_HOME＋Project workspace＋构建上下文→`/data-shunhong/shorizon-prod`＋`/data-shunhong/shorizon-workspace`。**不可迁移面如实**：镜像层/命名卷/容器 rw 层恒落主 daemon data-root（根盘 21G 可用）＝迁移需重启主 daemon＝租户可见干扰＝禁；预算＝mc-prod 镜像 ~6G＋runtime 卷数百 MB 级＋监控读数入册 |
+| P2 构建面 | **作废（陈旧记忆引错）**＝A04 账本实态 **EVIDENCED**（票面验收"CI 双架构矩阵全绿+amd64 净机安装"＝218 真机已跑：evidence/A04 s1/s2 剧本+原始件在册）；build-prod.sh 原生支持 x86_64→amd64（无 emulation 政策）；agentsview.linux-amd64.json 目录件在产。218 工具链实核＝mise go 1.25.12/bun 1.3.12＋git 2.34.1＋主 docker 29.4.0＋128 核/503G |
+| 端口冲突面 | **实测零冲突成立**＝产品三面默认全 loopback：dashboard 127.0.0.1:7333／agents-view :7334／wiki :7335（config 默认值）；218 现 184 监听清单内 7333-7335 **未占用**；provider proxy＝ephemeral 端口＋缺省绑回环（config.go:825 非回环绑必带 auth_token 闸）。不占用任何租户端口面 |
+| 网络冲突面 | **实测零新建桥成立**＝真实 agent 容器复用主 daemon **既有** default bridge（effects.ts `--add-host host.docker.internal:host-gateway`＋网络模式 default/bridge 白名单）；fake 族 `--network none`；产品不在主 daemon 创建自定义网络（全仓 create 面检索＝helper 容器旗标非网络） |
+| 镜像命名 | 主 daemon 现有 100+ 镜像无任何 `mc-*`/`shz-*` 前缀名（清单核对）＝生产镜像（mc-prod＋release build-id 标签）零撞名；CI 栈镜像（netns 内独立存储）与主 daemon 天然隔离互不可见 |
+| P5 网关 | 执行时以**产品码** `culler gateway allow --port <实测口>` 生成 scoped ufw 规则（带注释可点名 revoke）；本窗 R-a 批准面＝owner「按建议顺序执行」＋本节预案＝**执行时仍逐字呈报规则文本与撤销法** |
+| reboot | **移出本窗**（整机重启打断 64 租户容器＝非"按建议执行"可涵括的授权；boot 链证据已由停/起臂覆盖＝剩余 PID1 时序一项，候 owner 维护窗口） |
+| 验收臂凭据 | A36-F1/A31-F1③ 臂＝代理本体在场＋dial 可达，**不需要付费 provider 调用**（ephemeral 监听/产品自持面即成臂）＝成本纪律保持 |
