@@ -1,0 +1,10 @@
+AM v0.2.29 双面哈希登记（轮五十四收口窗：三事件齐登＝Q7 完整审计执行＋push 执行（bba39ef..877c2a0 纯 ff，main PRISTINE）＋B06 O3 包络基线 EVIDENCED⇒B-chain B01-B10 全清＋D-chain D01-D08 全清＝代码票穷尽，前沿转 owner 裁决面）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 8b73f50efe09be1bf5b4db7ad9af6377bf7b7dc5214f5070801062cfc87ac669
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = fb9cc96ac6e50274a6d7c5ebe3444a4d5c55ec23a66023e51d29cd0b13edd203，与 am-v0.2.28-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.28 = fb9cc96ac6e50274a6d7c5ebe3444a4d5c55ec23a66023e51d29cd0b13edd203（evidence/A32/am-v0.2.28-hash.txt 实读）；再前 v0.2.27 = 59a9bf52d45c432a85eb1fc099b4ca45fbc2522a14ff2969f62591b70c894359（同件记载）
+- 同轮并入 dev 的提交: ac97efd（push 验证记录）＋ede2d66（B06 设计面：两臂方法学＋直方图诚实声明＋钩子定义）＋c41b3b2（B06 实施 15 files +856：mc/spinewrite 两臂驱动＋run.sh capture 形编排＋report.py 默认-SOFT 门＋README＋envelope-001/002 证物 10 件）；status.json B06=EVIDENCED 随本登记轮提交
+- 关键事实: envelope-002（O3 218 实跑，正式 Provisional 基线）＝四档 1/8/32/64 mean 2.59/10.81/54.09/120.35 ms 单调劣化/21000 真实多进程写/吞吐≈220-260 写每秒/64 档 p99 2.06s+3 超时可疑+2 未 recorded 如实入数/链 seq 21000 verify ok；build 绑定=a23d91c→2f07dec 载荷（mc 5ca5dcae…/driver 37bebce9… 双端逐字等值）；最终树全道 MC_CHECK_EXIT=0（29 包零红零 UNVERIFIED；首跑 1 红=OpenCode live 网络瞬断族单跑 ok+复跑绿定性）；identity 不变 4786047e…8be1；审计=sealed scan-…2e2724cedeb1（inconclusive 如实登记，campaign 11 条真值否定）；push=bba39ef..877c2a0 纯 ff 服务端复核
+- 诚实边界: lane 直方图=墙钟近似非 kernel 锁统计；代表写=signoff 单形制；v0.2 绑定纪律全文不在树内=可判定面实现；中段窗口残余（B10 语）仍册；上游既有 548 审计发现+依赖 40 advisory+CI deployment-linux 既有红=owner 面未处置；中止事故过宽 pkill 误杀 runner（11s 自恢复/CI 零丢失取证）留档 §9
+- 账: dev tip=c41b3b2（本登记轮提交随后）/ worktrees=main+dev+b06（b06 收口后回收）/ origin/main=877c2a0（dev 领先含本登记共 5 commits，下轮 push 候令）/ 本地 main 未触碰 PRISTINE b22df40 / upstream vinchenkov 未配置未指向 / **前沿：代码票穷尽（B01-B10+D01-D08 全 EVIDENCED，D09 缓行）⇒owner 裁决面**
