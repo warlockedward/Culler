@@ -81,3 +81,14 @@
 - jobId＝scan-job-mwyvtyrz-45cc8e0f20e4a8f2；**scanId＝scan-2026-11-27T11-13-19.367Z-796d04fbbe4a；封印＝sha256:58da6a2ede6b5349a7b2c880423ce5ae7eb2ad8482f9d3f188d857a0b383add2**。
 - **559／435/120/4 逐域与基线全等；mc=157 未增＝新增码行零新发现**；cli_install.go 名下 4 条＝轮五十三 §3 已真值分诊的既有项（command-injection 面，同一委托设计）。
 - 诚实核心沿用 §1（partial/inconclusive/static-only/verdictEffect none）。
+
+## 13. D-2/C11 生产码扫描＝**基线 559→560（真实 +1），已定位与定性**
+
+- 树＝dev tip dafb3a6（C11 三切片＋D-2 入站穿越修复）；jobId scan-job-mwz11ok5-76efc90f3be75d52；**scanId=scan-2026-11-27T13-39-22.683Z-28b9e0799b97；封印=sha256:6f2db9997ea4cd109607d9a603334646d79575014101b8f56073858b673e20af**。
+- 逐域：dashboard 161／mc **157（未增＝Go 面零新发现）**／runner 144／evals 19／performance 10／release 7／**resident 61→62**。**+1 全在 resident**＝`provider-proxy.ts → provider-transport.ts:282`（HTTP 请求输入 → SSRF）。
+- **这是真实攻击面变化，不是误报，也不是"扫过了就安全"**：C11 引入 http 明文客户端后，污点图新增一条到 `http.request` 的路径（此前 provider 流量恒 https）。定性与缓解（代码实证，非声称）：
+  1. `:282` 是导出函数 `providerTransport` 声明行；真实连接在函数体内 `canonicalDestination`（:287）**之后**——scheme→port→字面 IP 形式→本地地址类→**操作者显式声明集合成员**五重校验全部前置，任一不过＝throw，socket 不打开；
+  2. 目的地 `route.baseURL` 来源＝credential-projector 的 `inference_url`＝self-host 时取 registry entry `base_url`，该值已过 Go 侧 `validateRegistry`（§2.2 同源规则）＝**双重独立闸**（配置期＋连接期）；
+  3. 明文仅可达**字面环回/私有 IP 且端口∈显式 allowlist 且在该 credential 声明的 endpoint 集合内**——公网主机名/公网 IP/link-local/0.0.0.0 四类各配向量必拒（transport.test.ts 新增 9 向量＋§2.1 旧向量转写后仍守）。
+- **残余（如实、不吞并）**：本地环回/私有段明文链路＝本机 root 或同宿主租户可旁观推理流量（无 TLS）＝owner §2.2 裁文明确接受的取舍（"私有段可 http"）；跨网络明文被裁文禁（http 仅字面本地）。此残余属威胁模型变更候 Authority 于 TM/PS 记一笔，本 agent 不自授接受。
+- 诚实核心沿用 §1：static-only／verdictEffect none／runStatus inconclusive；本节的"已缓解"是**代码路径级 E1 论证**，非扫描器给出的通过判定，亦非独立审查结论。

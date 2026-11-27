@@ -30,5 +30,5 @@
 - 修复（owner 甲案，2026-11-27）：入站读取链 `in/published`+`sha256`+shard 三级 → **0711**（execute-only，容器可穿越已知路径、不可列目录＝防越目录界性质保住）；published 文件仍 0444；outbound 链与 `/mc/private` 闸、宿主侧父链（home/attachments/session/in）**一律保持 0700**（canary 双向断言中"private gate EACCES"与"outbound EACCES"原样）。
   - 实现面：`openOrCreateAttachmentDirectory`/`requireAttachmentDirectory` 加 mode 参数＋**建后 Fchmod**（mkdir 受 umask 影响，部署 umask 077 会削 o+x＝不显式 chmod 则白改）；`verifyPublishedAttachment` 按层级传期望 mode；canary `os.Mkdir(shard)`→0711＋`os.Chmod`；shard 创建四处入站化。
   - 测试转写：树走查断言改按路径期望 mode（in/published+sha256=0711 其余 0700）；新增**入站加宽（0755）必拒**负向量＝锁死"可读不可列"边界不随改漂移。
-- 验证：`go build` 0／vet（修前暴露测试签名漏改已补）／verbs 551s ok；全道 MC_CHECK_EXIT 见下笔；**真机终证＝218 重建 mc/mc-prod 后 canary 过、resident tick 成、supervision 激活、F1 双臂跑通**。
+- 验证：`go build` 0／`go vet` 0／gofmt 净；`mc/verbs` 551s ok（含新增"入站加宽 0755 必拒"负向量）；`mc/config` ok；曾红两测定向复跑 `ok mc/cmd/mc`；**全道 `./mc/check.sh` → MC_CHECK_EXIT=0，29 包 ok、零 FAIL/零 UNVERIFIED/零 gofmt**；提交＝dafb3a6（前置 KEY-CLEAN 硬门＝全树 grep 无 key 字面量方 add）；深度扫描（含 D-2 生产码工作树）封号见 AM v0.2.46；**真机终证＝218 重建 mc/mc-prod 后 canary 过、resident tick 成、supervision 激活、F1 双臂跑通（r12 段）**。
 - 等级如实：canary 激活前拦截＝安全护栏按设计工作（它拦下了一个真实 Linux 生产故障），非护栏误报；我改的是被护栏揭示的缺陷本体。
