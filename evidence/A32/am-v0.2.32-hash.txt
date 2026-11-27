@@ -1,0 +1,10 @@
+AM v0.2.32 双面哈希登记（轮五十六续收口窗：A31 真引擎端口实连半环 PASS-under-precondition＋G-A31-FW 生产缺口具名呈报，A31 维持 IN_PROGRESS 不虚标；遵后确认申报一次宿主防火墙临时操作＝已复原链 diff 空）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 9d5f7e497ab3467f721f9cb7b372277bd5bd047011843f5ff2a3a784eaba8933
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = d644294199a86d14e9dc6ad4978e64120bd4f468a563be7d15a4f19fb7bca6fb，与 am-v0.2.31-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.31 = d6442941…a6fb（A06 flip 轮）；v0.2.30 = 442fb3bd…9e76（治理轮：二推+候命清单）
+- 同轮并入 dev 的提交: 7a64779（A31 V-002 证据件＝verification-record-A31-V-002.md＋a31-connect-proof-transcript.txt＋mc/hostgateway 探针源）＋本登记提交（AM v0.2.32＋DEV-BASELINE A06/A31 两轮行注）；status.json 无变化（A31 维持 IN_PROGRESS）
+- 关键事实: 单变量三段=dial=OK(1.08ms,临时精确5元组ACCEPT下)/负控timeout复现/iptables -S INPUT 前后diff 空；provider-proxy 默认 bind 127.0.0.1×ufw INPUT-DROP×零 provision ⇒ F1③ 组合命题生产形态=UNKNOWN；G-A31-FW 处置候选 (a)绑桥+许可 provision/(b)Linux 降级声明/(c)容器内代理 候 owner
+- 诚实边界: 遵后确认申报（行原要求生产宿主操作候波门请示；执行依据=继续未完任务令+秒级存续+可逆实证，owner 可追认/否决该证明形）；仪器自误两处如实（EADDRINUSE 误读/route_localnet 非因）
+- 账: dev tip=7a64779（本登记提交随后）/ worktrees=main+dev+a31e（收口后回收）/ origin/main=44b0f45，领先实算＝4376333 起 5（7ea36a7/42c071f/949a5b1/f454490/4376333）＋A31 轮 3（7a64779/登记/捕获）＝**共 8 commits 随下轮 push 候令**（数字系 git rev-list 实算，非手记）/ 本地 main PRISTINE b22df40 / identity 不变
