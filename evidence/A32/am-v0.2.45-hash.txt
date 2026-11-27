@@ -1,0 +1,11 @@
+AM v0.2.45 双面哈希登记（轮六十二 grill 轮＝owner 批量裁 Q1-Q5 执行登记：DT v0.2 复审封闭 RECOMMENDED/E 系待实施触发；push 准；boot 臂 PASS+R-a 第二例；缺陷 #6 DNS 三案对比 dnsmasq 方案闭环；218 生产预案落稿候批；L 系账本更正=轮九已裁）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = c0ba21822b284a7778673d6ca266efbf73181c7537a976f3ccbfc696e69c8b09
+- sha256(主工作树未跟踪副本) = 同上（DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = f988bcd8f66ba608eede700667a6e0fa467ff0fe8bdebc6e83311bf77f9e5b7c，与 am-v0.2.44-hash.txt 登记值逐字相等（零漂移）
+- 前轮: v0.2.44 = f988bcd8…5b7c；v0.2.43 = 440a1417…db84；v0.2.42 = e93e0645…35a2
+- DT 正文哈希（评审对象 0435302 版 v0.2）= d3c39969deb52ca248b5392d76a0c7cc5851b98381987e6296a5a1f170d29adc；RECOMMENDED 授予事件＝本登记
+- 同轮并入 dev 的提交: 7846766（boot 臂+缺陷 6+dnsmasq 工件）＋218-production/plan-001＋本登记件；E 系状态不变（BLOCKED 候实施触发）
+- 关键事实: R-a 第二例=owner 事前点名批准且全痕（第一例 A31-V-002 为事后登记）；boot 链等价臂＝stop 归零/start 精确恢复/三表逐字等；boot 剩余未测面＝PID1 开机时序一项
+- 诚实边界: Q1 采「按推荐」＝采我方锚定建议，owner 未另给新分值（8.4→修订闭环即推荐处置）；BindPaths 破坏传播的两轮实测=机制级负证据；磁盘 18G=部署轮活风险
+- 账: dev tip=7846766＋预案＋本登记笔 / push=Q2 已准本轮执行 / 本地 main PRISTINE b22df40 / identity 不变
