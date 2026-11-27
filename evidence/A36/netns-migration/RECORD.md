@@ -55,3 +55,9 @@
 - INPUT 方向（宿主本机服务暴露给 CI 容器）未开放，也无需开放（R-a 约束；CI 仅需 egress）。
 - 现状 ufw routed=allow；DOCKER-USER 规则是显式意图声明，routed 策略若被管理员改变，CI 规则自持。
 - 断电重启全链（netns→containerd→dockerd→容器恢复）未实测——脚本语法、幂等运行、单元依赖链、enable 状态均单独验证；全链 reboot 验证留待下次维护窗口。
+
+## 附录 · push 后只读现状核查（2026-11-27，轮六十二续窗）
+
+- 主 daemon nat DOCKER 链＝**28 条规则完整重建**（DNAT 映射在位，nat MASQUERADE 15 条）——v0.2.41 登记的「链空＝他租户转发预期不通」快照已过期：租户容器（fastgpt/milvus/nexusflow 族）窗口内重启驱动主 dockerd 自愈重建。**owner 无需再专门重启主 docker.service**（该处置项自动消解）。
+- 本核查为纯只读（iptables -S / docker ps / systemctl is-active），零变更，符合共享宿主零伤害约束 (b)。
+- CI 栈终态复核＝shz-ci-docker/shz-ci-containerd/shz-ci-netns 三 active＋容器 egress 回归 0% 丢包。
