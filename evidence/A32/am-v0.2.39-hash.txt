@@ -1,0 +1,10 @@
+AM v0.2.39 双面哈希登记（轮六十收口窗＝218 窗口轮：第四次 push（1053fe4..925eb7d 纯 ff 11c，服务端逐字复核）＋R-a 新规首个完整适用例闭环（事前请示→批准→产品码执行→全痕）＋A36 验收臂路径层全 PASS＋ufw 链字节级零残留＋真机缺陷×2 根因修复全道绿＋A36 维持 CODED 如实不 flip——F1 字面两要素（装后形态/代理本体在场）挂部署轮，执行侧建议权归 owner）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 43ff60d78725f9d077b99b9a8ab75ec19db9c54043d736dcd70d066b131b360e
+- sha256(主工作树未跟踪副本) = 同上（DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件（git HEAD 态）sha256 = 0b64ebc51db71006be4a50c915a7a4fff2582e5b14ca3d2150d7296f80244525，与 am-v0.2.38-hash.txt 登记值逐字相等（零漂移）
+- 前轮: v0.2.38 = 0b64ebc5…4525（图边定案）；v0.2.37 = 68a19f8c…1947e
+- 同轮并入 dev 的提交: f90e2ec（真机缺陷根因修复＝FHS 路径＋内核型别分类＋2 回归钉＋§9 登记）＋ce13bf8（验收臂证据 6 件＝V-001＋218-acceptance/ 原始件）＋本登记提交
+- 关键事实: F-1 规则文本逐字＝请示包承诺；往返 dial=OK 1.12ms（生产同形旗）；F-2 仅删带标；复拨 timeout 惰化；ufw diff 空＝零残留金标准；主 daemon 53/173 窗始终逐字等；修复树全道 MC_CHECK_EXIT=0 29 包首跑；载荷 mc=b6b12515d56b36dc…/probe=95d1c04e… 双端对读
+- 诚实边界: A36=CODED 非 EVIDENCED（F1 字面"装后"＋"代理本体"未达，臂界 V-001 §2；flip 或补臂请示=owner 活球）；真 provider 上游段需凭据=另一事件；R-a 适用贯穿
+- 账: dev tip=本提交＋捕获 / worktrees=main+dev+a36b（收口后回收）/ origin/main=925eb7d，dev 领先 4（实算以 push 前为准）/ 本地 main PRISTINE b22df40 / identity 不变 / 无新外发
