@@ -74,3 +74,10 @@
 - jobId＝scan-job-mwyt71wo-61700bccf25bacd9（attempt 1 完成，无 enobufs）；**scanId＝scan-2026-11-27T09-59-31.590Z-4bcfb0e77ab7；封印＝sha256:81d37f28fbff0f5c5cb44d1cfb22a77c3408a25b7d469f094092283c980aa765**。
 - **findingCount=559／依赖面 572 包／advisory 4 包 40 条＝与轮五十三基线及 §9/§10 各封完全一致＝本窗批量裁执行（契约/evidence/部署预案，零生产码）零新增发现面**。
 - 本登记提交＝§11 自尾追加（登记文档性质，同 §9 声明）；诚实核心沿用 §1（partial/inconclusive/static-only/verdictEffect none），不构成安全背书。
+
+## 12. 轮六十三生产码提交扫描（D-1 zsh 修复树）
+
+- 树＝dev tip 50e137c（含本campaign内首个生产码改动 4fe3052＝cli_install.go 缺失壳跳过＋回归测试）。
+- jobId＝scan-job-mwyvtyrz-45cc8e0f20e4a8f2；**scanId＝scan-2026-11-27T11-13-19.367Z-796d04fbbe4a；封印＝sha256:58da6a2ede6b5349a7b2c880423ce5ae7eb2ad8482f9d3f188d857a0b383add2**。
+- **559／435/120/4 逐域与基线全等；mc=157 未增＝新增码行零新发现**；cli_install.go 名下 4 条＝轮五十三 §3 已真值分诊的既有项（command-injection 面，同一委托设计）。
+- 诚实核心沿用 §1（partial/inconclusive/static-only/verdictEffect none）。
