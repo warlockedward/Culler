@@ -1,0 +1,10 @@
+AM v0.2.42 双面哈希登记（轮六十二收口窗＝218 CI dockerd netns 迁移实施轮：迁移完成＋全链路验证绿＋真机抓错×5 修复入 RECORD；三表归一化终局 diff＝唯一删除项为 CI 自家残留规则；引导链三单元 enabled＝disable 问题解除；诚实边界＝reboot 全链未实测＋Mimosa scanner_enobufs 兼容放行补跑挂队）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = e93e06455afcd599302cee0f9fe3984274311799c5913cfe6cb4fff102af35a2
+- sha256(主工作树未跟踪副本) = 同上（DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = b4a887f761826dca2784fd4e4e2e4864f968ed30cbab9c798ed82cc994e91bd7，与 am-v0.2.41-hash.txt 登记值逐字相等（零漂移）
+- 前轮: v0.2.41 = b4a887f7…af35→e93e 本笔；v0.2.40 = 139624a5…e5e9；v0.2.39 = 43ff60d7…360e
+- 同轮并入 dev 的提交: 85a41f4（netns 迁移工件＝RECORD/setup/teardown/unit/dropin）＋本登记件；零代码/零 status 变化
+- 关键事实: 迁移后 CI 栈在 netns 内运行中，宿主三表仅余 3 条 shz-ci-gw 注释规则＋1 条 scoped 路由；disable 问题按 owner 指令解除（三单元 enabled＋Requires 链）；断电 reboot 全链验证留待维护窗口
+- 诚实边界: Mimosa 完整审计提交前未拿到结论（scanner_enobufs）＝按兼容策略放行且不宣称项目安全；两窗并读（v0.2.41 归因修正＋本笔实施）构成完整事件链
+- 账: dev tip=85a41f4＋本登记笔 / CI 栈运行中（netns 内）/ push 队列登记时点=10（rev-list 实算）候令 / 本地 main PRISTINE b22df40 / identity 不变 / 无新外发
