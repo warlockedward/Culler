@@ -92,6 +92,7 @@
 | C08 | 逐家族向量验收（A5：解析器存在≠口径正确） | C03 | PS §8/§9 | P2b：逐家族向量全绿（A5） | |
 | C09 | RR-3 关闭五项包（V-6+环境登记+config↔执行一致+反证+变更守卫） | C02,A14 | TM §8 RR-3 | RR-3：五项包+Authority 接受（治理） | 门:V-6 执行 |
 | C10 | chargeback 三列报表+价格快照版本表（unsettled-cost 态） | C05 | BL §5(c)/§6/§7；D-G7.2 | P5：对账报表测试+unsettled 态 | |
+| C11 | 自托管 OpenAI 兼容 provider 接入面（新 kind 受控引用 registry 条目；proxy 按登记目的地连接；连接策略豁免=仅操作者声明条目；scheme 按地址类划界（公网 https/私有段字面 IP 可 http）；OpenCode 发布目录不动） | C01,C02 | PS §1/§2.1-2.5 | P2：缺省拒向量族+策略命中/未命中向量+218 真机 stub e2e+既有通道零回归 | **轮六十三立票＝owner 裁「A 立案、产品化、边界按建议钉」（裁文=diff-plan §2）**；设计件=evidence/C11/diff-plan-001.md（S1 推荐/S2 备择）；DNS 再绑定残余=RR 候选候 Authority 具名，不随票关闭；**BACKLOG＝设计已交、代码授权待另发** |
 
 ### Track D · P4 身份与治理
 | ID | 标题 | depends | 契约锚 | 验收映射 | 备注/门 |
