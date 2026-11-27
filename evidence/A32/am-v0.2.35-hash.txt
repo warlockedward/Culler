@@ -1,0 +1,10 @@
+AM v0.2.35 双面哈希登记（轮五十八收口窗：UIP 常设约束立法——fork 父仓更新的处置规程完成治理化；功能脱离已成立+观察不脱离的研判定案；冲突面数据基=热点 11 文件/1%）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 3e3d0cc1e100fc8d110331fddc10e811077e412c795d85acabe12c3e7c4b57be
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 69664251aca7bdbb009b793083fa3608f48c19ecd3436c5f3fefb51d4f28badb，与 am-v0.2.34-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.34 = 69664251…badb（上游追踪机制）；v0.2.33 = a43ebec4…56abf（六裁+LoopForge）
+- 同轮并入 dev 的提交: 本登记提交（DEV-BASELINE §2 UIP 条款＋台账 §6/§7/§8 升级＋AM v0.2.35＋本件＋blcheck 捕获=r58）
+- 关键事实: blcheck 74/0（§2 文本条款不影响图解析，实测）；冲突面实测=上游 40×我方 1093 文件，交集 11（含 A36 现役 provider-proxy 族，diff-plan 注记义务即刻生效）；品牌漂移实测上游新增 culler token 行=15（mc 2）⇒逐笔改写形态的数据支撑
+- 诚实边界: "永不宣告分叉关闭"＝本约束自身的不可逆条款（关闭观察需未来另一次 owner 裁决，立法时点=轮五十八）；分叉点清单=活册（当前仅版本/converter 语义）；计数惯例=push 前 rev-list 实算（本行登记时点 5）
+- 账: dev tip=<本捕获提交> / worktrees=main+dev / origin/main=1053fe4 / 本地 main PRISTINE b22df40 / identity 不变 4786047e…8be1（治理轮零代码）/ 无新外发（队列候令）

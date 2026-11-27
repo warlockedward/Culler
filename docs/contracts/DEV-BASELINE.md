@@ -20,6 +20,7 @@
 - 工具链：一律 `mise exec --`；每工单跑其验收锚对应的 check lane（`mc/check.sh` 全链为合并前置）；**工单间禁隐式共享未登记改动**（一工单一 worktree 一分支）。
 - 权限边界：合并进 `main`、提交、push、launchd 相关脚本执行（redeploy/dev-reset/uninstall）——全部等部署所有者点名（AGENTS.md）。
 - 环境事实缺口（工单不得自行推测）：O1/O2/O3/O9 + V-1/3/5/6/7 建立绑定表（TM §7.3）；届时由部署所有者供给。
+- **上游代码处置规程（UIP，轮五十八 owner「全按推荐」批准为常设约束）**：父仓 `vinchenkov/Culler` 追踪＝常设观察制（blobless 镜像＋台账 `docs/facts/culler-upstream-tracking-ledger-001.md` 三步义务），**永不 bulk-merge、永不宣告分叉关闭**。上游代码进本仓须三条件齐：①相关性实证（其修复命中我方仍存在的缺陷，或其改动面我方未独立演化——冲突面数据以台账 §6 为准）；②逐笔形态＝cherry-pick/改写（非 merge），提交信息附上游 SHA 钉记，**分叉点清单面默认不采**（现册：版本/converter 语义，D20 教义在先）；③owner 逐笔点名批准（立票或裁决轮），移植后过我方全部门（全道＋B10 覆盖闸＋清单闭包＋verb 域——违不变量的移植会被构造性拦红）。热点文件（台账 §6 清单）在任何工单 diff-plan 期显式注记撞面。
 
 ## 3. 工单图
 

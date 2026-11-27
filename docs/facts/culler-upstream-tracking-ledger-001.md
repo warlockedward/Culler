@@ -31,3 +31,17 @@
 ## 5. 与 LoopForge 台账的分工
 
 LoopForge＝同业竞品（设计模式对照）；本台账＝血统父仓（行为差异/缺陷修复/惯例演化对照，兼"如果我们不 fork 会怎样"的反事实基线）。两份台账同放 `docs/facts/`，刷新义务同形，机制已可平移第三仓。
+
+## 6. 冲突面数据与热点文件（UIP 证据基，轮五十八实测 @b22df40..9e29e98 vs b22df40..shz/dev）
+
+- 上游改动文件 **40**；我方改动文件 **1 093**；**交集（热点＝未来移植撞面）仅 11 文件 ≈ 我方演化面的 1%**：`CHANGELOG.md`／`README.md`／`INSTALL.md`／`dashboard/src/ui/app.js`／`mc/cmd/mc/agentprofiles.go`／`mc/cmd/mc/main.go`／`mc/cmd/mc/systemstatus.go`／`mc/routing/routing.go`／`resident/src/main.ts`／`resident/src/provider-proxy.ts`／`resident/src/provider-proxy.test.ts`。
+- 注记义务：任何工单 diff-plan 触及上列 11 文件＝显式写明"与上游热点撞面"（现行例：**A36 正在改 provider-proxy.ts 族**——上游 0.1.1 恰同触其测试文件，移植评审时先看此撞）。
+- 品牌迁移面复核：上游 0.1.1 新增行含 culler 品牌 token 仅 15 行（mc 内核 2 行）——A09 S1 的 `CULLER_*→SHZ_*` 迁移使任何直接 cherry-pick 上游新代码**必然带品牌漂移**，进一步佐证"逐笔改写而非 merge"的 UIP 形态 ②。
+
+## 7. 机制检验记录
+
+2026-11-27（轮五十七c）：双镜像 fetch 后本地 HEAD 与远端 main **逐字一致**（LoopForge=be6918d／Culler=9e29e98）＝追踪通路全绿，日常成本一条 fetch。2026-11-27（轮五十八）：owner 批准 UIP 为常设约束（DEV-BASELINE §2 条款）——**持续观察制＋三条件选择性移植＋永不 bulk-merge＋永不宣告分叉关闭**立法完成。
+
+## 8. 完全脱离父仓？——研判结论（轮五十八，owner 问"除非可以完全脱离"）
+
+功能独立性**已经成立**：CI/构建/发布/分发全链路自给（我方 release 工具＋自有 origin），无任何 git 或 artifact 依赖父仓——"脱离"在运行面是既成事实，无需动作。因此真正的问题只是"要不要停止关注上游"，研判＝**不要**：父仓是同一问题域的第一方实现（缺陷修复＝我方可对照的免费回归样本；惯例演化＝分叉代价的实时读数；0.1.1 的 converter 信号＝验证我方 D20 教义代价的活体实验）。观察成本≈零（204KB 镜像＋按需一条 fetch），信息价值随时间单调增——**保留追踪是占优策略**；若未来某时点判定价值归零，关闭动作本身走一次 owner 裁决（不在本卡默认）。
