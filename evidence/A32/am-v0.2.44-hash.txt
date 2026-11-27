@@ -1,0 +1,10 @@
+AM v0.2.44 双面哈希登记（轮六十二 grill 续窗＝netns 迁移目的验收臂 PASS（金标准零删除＋机制级 netns 视野封死＋CI 面逐字未动）＋DT v0.2 有界复审材料包九格核对表入册候 owner 复审）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = f988bcd8f66ba608eede700667a6e0fa467ff0fe8bdebc6e83311bf77f9e5b7c
+- sha256(主工作树未跟踪副本) = 同上（DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 440a14171716e90b4146b953311e5aaeeba8ca5b53a30bdec0de1640ce01db84，与 am-v0.2.43-hash.txt 登记值逐字相等（零漂移）
+- 前轮: v0.2.43 = 440a1417…db84；v0.2.42 = e93e0645…35a2；v0.2.41 = b4a887f7…1bd7
+- 同轮并入 dev 的提交: 3dd85b0（restart-arm-001 金标准臂＋rereview-pack-v0.2-001 九格表）＋本登记件；零代码/status 变化；E01–E05 维持 BLOCKED
+- 关键事实: CI dockerd 重启＝宿主 nat DOCKER 链删除项零（事故类关闭＝机制级不可能＋实测零删除双证）；journalctl 清理例程 netns 内报错=视野隔离直接证据；主 daemon 窗口内新增 5 条全部归因租户 crash-loop 自管（E2 强推断标注）
+- 诚实边界: 归因基于时间线＋规则归属＝E2 非逐字节进程归因；reboot 全链仍未测（候维护窗口）；Mimosa 各笔 scanner_enobufs 兼容放行＝final-tip 补跑随下轮清账
+- 账: dev tip=3dd85b0＋本登记笔 / push 队列=实算以 push 前为准候令 / 本地 main PRISTINE b22df40 / identity 不变 / 外发=无新增（origin/main=aa71207）
