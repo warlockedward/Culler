@@ -1,0 +1,10 @@
+AM v0.2.33 双面哈希登记（轮五十七裁决轮收口窗：grilling 六裁「全按推荐」执行＋LoopForge 对照双层制裁定＝不进仓（NOASSERTION 许可/78MB/漂移三硬因），仓外 blobless 镜像＋仓内台账钉记 be6918d[+101 commits 动向摘要]；R-a 追认＋宿主防火墙事前请示常设新规；G-A31-FW=(a) 立票 A36＋(b) 过渡事实卡；D09/H-2 维持；第三次 push 执行）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = a43ebec433e1c30e310bc6164d67b1582e63c6393ec48b362422f22c52756abf
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 9d5f7e497ab3467f721f9cb7b372277bd5bd047011843f5ff2a3a784eaba8933，与 am-v0.2.32-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.32 = 9d5f7e49…8933（A31 条件证明轮）；v0.2.31 = d6442941…a6fb（A06 flip 轮）
+- 同轮并入 dev 的提交: 本轮登记提交（两台账卡＋A31 行追认注＋A36 行＋AM v0.2.33＋本件）＋blcheck 捕获提交；证据件＝docs/facts/loopforge-comparison-ledger-001.md＋docs/facts/linux-provider-path-status-001.md
+- 关键事实: blcheck **74 票**（A36 入图）violations=0 warnings=2 稳定；status.json 零变化（A36 缺省 BACKLOG）；push 队列实算含本轮＝11 commits，第三次纯 ff 上行 origin/main；identity 不变 4786047e…8be1（治理轮零代码）
+- 诚实边界: A36 进码前需设计面（含信任域论证）经 owner 批；LoopForge 动向摘要＝log 主题级（未逐文件深研，深研按域触发）；DT ADV 九卡＝下轮 owner 线；218 专窗＝owner 点名制
+- 账: dev tip=<本捕获提交> / worktrees=main+dev[r57 收口后回收] / origin/main=本轮捕获 tip（push 后服务端复核）/ 本地 main PRISTINE b22df40 / 余 IN_PROGRESS=A14/A24/A31/L01/L03＋E×5 BLOCKED＋A36(BACKLOG 新立) / D09 缓行 / H-2 候命
