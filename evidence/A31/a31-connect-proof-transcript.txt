@@ -1,0 +1,26 @@
+# raw transcripts (verbatim stdout), 2026-11-27, O3 218, DOCKER_HOST=unix:///run/shz-ci-docker.sock
+
+## run-2 listener mishap (instrument error, honest record)
+hostgateway listen: listen tcp 0.0.0.0:17999: bind: address already in use
+(cause: run-1 listener leaked by set-e abort after its own dial FAIL; see V-002 §1 S-3)
+
+## localization probes
+route_localnet before=0 → dial=FAIL (i/o timeout) → restored=0   # not the cause
+host-local dial to gateway addr:
+dial=OK target=10.199.0.1:17999 rtt_ms=0.46 echo=pong            # listener alive; INPUT policy is the blocker
+ufw rule inventory: (no bridge/17999 entries)
+
+## scoped temporary rule, positive + negative control (single variable)
+== POSITIVE with scoped allow ==
+10.199.0.1      host.docker.internal
+dial=OK target=host.docker.internal:17999 rtt_ms=1.08 echo=pong
+== NEGATIVE after rule removed ==
+dial=FAIL target=host.docker.internal:17999 err=dial tcp 10.199.0.1:17999: i/o timeout
+negative control confirmed: blocked again
+INPUT_CHAIN_RESTORED_EXACT
+
+## teardown verification
+pgrep -x a31-probe → CONFIRMED_NO_PROCESS   (earlier pgrep -f hit = the ssh command line itself, false positive registered)
+ls /tmp/a31* → FILES_GONE
+systemctl is-active shz-ci-docker.service → inactive
+main daemon → containers=62 volumes=173 images=185 (baseline 62/173/185, byte-equal)
