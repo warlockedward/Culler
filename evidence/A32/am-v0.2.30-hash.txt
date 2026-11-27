@@ -1,0 +1,10 @@
+AM v0.2.30 双面哈希登记（轮五十五收口窗：owner「全按推荐」三笔＝第二次 push 执行＋上游既有面候命清单（不立票）＋D09/方向维持；campaign 代码票穷尽后的治理轮）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 442fb3bdb02a571412c98e51856bac9cea4a4f08501b9b775750ec2dd4af9e76
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 8b73f50efe09be1bf5b4db7ad9af6377bf7b7dc5214f5070801062cfc87ac669，与 am-v0.2.29-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.29 = 8b73f50efe09be1bf5b4db7ad9af6377bf7b7dc5214f5070801062cfc87ac669（evidence/A32/am-v0.2.29-hash.txt 实读）；再前 v0.2.28 = fb9cc96ac6e50274a6d7c5ebe3444a4d5c55ec23a66023e51d29cd0b13edd203（同件记载）
+- 同轮并入 dev 的提交: 66ff0d1（上游既有面候命清单＝H-1 审计 548/H-2 advisory 40/H-3 CI 既有红，三面九段触发器登记，不立票）＋本登记提交；push 目标＝本轮捕获提交（第二次 ff 877c2a0..本轮 tip，verification 记 external-push-2026-11-27-r55.md）
+- 关键事实: 纯文档轮（零代码/schema/identity 变化；identity 不变 4786047e…8be1；blcheck 73 票图不变 status.json 无新键）；push 形态=fast-forward，远端仅 origin=warlockedward/Culler，本地 main PRISTINE b22df40
+- 诚实边界: 候命清单＝触发器登记非缺陷承认书非安全声明；H-3 绿面基线（fast-suite-macos SUCCESS＝合并码不回归判据）与红面同登；D09/新方向维持候令
+- 账: dev tip=本登记轮＋捕获提交 / worktrees=main+dev[r55 收口后回收] / origin/main 推进至本轮 tip（push 后服务端复核）/ 无未登记外发
