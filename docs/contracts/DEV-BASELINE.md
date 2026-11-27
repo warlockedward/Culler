@@ -21,6 +21,7 @@
 - 权限边界：合并进 `main`、提交、push、launchd 相关脚本执行（redeploy/dev-reset/uninstall）——全部等部署所有者点名（AGENTS.md）。
 - 环境事实缺口（工单不得自行推测）：O1/O2/O3/O9 + V-1/3/5/6/7 建立绑定表（TM §7.3）；届时由部署所有者供给。
 - **上游代码处置规程（UIP，轮五十八 owner「全按推荐」批准为常设约束）**：父仓 `vinchenkov/Culler` 追踪＝常设观察制（blobless 镜像＋台账 `docs/facts/culler-upstream-tracking-ledger-001.md` 三步义务），**永不 bulk-merge、永不宣告分叉关闭**。上游代码进本仓须三条件齐：①相关性实证（其修复命中我方仍存在的缺陷，或其改动面我方未独立演化——冲突面数据以台账 §6 为准）；②逐笔形态＝cherry-pick/改写（非 merge），提交信息附上游 SHA 钉记，**分叉点清单面默认不采**（现册：版本/converter 语义，D20 教义在先）；③owner 逐笔点名批准（立票或裁决轮），移植后过我方全部门（全道＋B10 覆盖闸＋清单闭包＋verb 域——违不变量的移植会被构造性拦红）。热点文件（台账 §6 清单）在任何工单 diff-plan 期显式注记撞面。
+- **共享宿主零伤害约束（轮六十一 owner 指示常设化，与 R-a 并列）**：O3 218 承载他租户负载——(a) 任何窗口的动作域＝专用栈＋scratch 域＋显式点名的对象；**主 docker.service 与非本部署网桥/容器的 netfilter 状态＝只读**；(b) 窗口纪律＝**三表全快照**（`iptables-save` filter/nat/mangle＋`ufw status numbered` 窗始窗终各一次，快照入证据件，diff 空或逐条解释）——计数级对读（容器/卷数）不足以证明转发面无扰；(c) 他租户故障（crash-loop、转发失效类）＝发现即如实呈报并止于证据，不代修不代重启（处置权 owner）；(d) 既有先例账：轮五十六/六十窗口的主 daemon 计数窗始窗终逐字等（53/173），(b) 条自下个窗口起把等值证明从计数级升到规则级。取证纪要＝evidence/A36/netfilter-forensics-218-001.md。
 
 ## 3. 工单图
 

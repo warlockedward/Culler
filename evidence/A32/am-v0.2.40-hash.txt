@@ -1,0 +1,10 @@
+AM v0.2.40 双面哈希登记（轮六十一收口窗＝共享宿主零伤害约束常设化＋218 netfilter 归属取证定案"非我造成"三重证据；owner 症状机制画像呈报；三表全快照窗口纪律自下窗口起生效；DT 起草按 owner 条件暂停待本定案认可）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 139624a55d246a374ef72ee33a195ac26a8b329244dd8b789a6fde226d76e5e9
+- sha256(主工作树未跟踪副本) = 同上（DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM（git HEAD=991876f 态）sha256 = 43ff60d78725f9d077b99b9a8ab75ec19db9c54043d736dcd70d066b131b360e，与 am-v0.2.39-hash.txt 登记值逐字相等（零漂移；纪律＝校验对提交态做，轮五十九自纠沿袭）
+- 前轮: v0.2.39 = 43ff60d7…360e（218 窗口轮）；v0.2.38 = 0b64ebc5…4525
+- 同轮并入 dev 的提交: DEV-BASELINE §2 共享宿主零伤害约束 (a)-(d)＋evidence/A36/netfilter-forensics-218-001.md 取证纪要＋本件；status.json 无变化
+- 关键事实: 三重独立证据定案 DNAT 非 campaign 所造（零 -t nat 命令可枚举/端口归属他服务配置与窗始基线先存/主 daemon 重启 05:38:38 与我窗口互错）；crash-loop 三容器（restartCount 115+）＝转发闪现主嫌呈报；取证空洞自认＝nat 未做窗始快照⇒三表全快照纪律入 §2
+- 诚实边界: 计数级对读是下限证据非规则级——升级条款自下个窗口生效；他租户故障处置权 owner 我不代修
+- 账: dev tip=<本提交+捕获> / worktrees=main+dev+r61（收口后回收）/ origin/main=925eb7d，dev 领先 3 候令 / 本地 main PRISTINE b22df40 / identity 不变 / 无新外发
