@@ -242,6 +242,18 @@ type PrivateRuntimeBinding struct {
 	BaseURL                string   `json:"base_url"`
 	TokenURL               string   `json:"token_url"`
 	ClientID               string   `json:"client_id"`
+	// A self-hosted connection names its operator-declared endpoint. The
+	// carrier holds the entry itself, not only its name: the structural fence
+	// rebuilds the whole reference so the rebuilt config validates the exact
+	// registry rules (address class, port allowlist, pooling) the operator's
+	// config owed. An absent entry on a self-hosted kind still refuses.
+	RegistryEntry   string `json:"registry_entry,omitempty"`
+	RegistryBaseURL string `json:"registry_base_url,omitempty"`
+	// RegistryPorts keeps the nil/empty rule of the other list carrier fields:
+	// an unset allowlist (the shipped 443 default) encodes as absent, and the
+	// fence rebuilds it as nil so the default applies identically on both sides.
+	RegistryPorts   []int  `json:"registry_ports,omitempty"`
+	RegistryPooling string `json:"registry_pooling,omitempty"`
 }
 
 type PrivateDispatchCommitRequest struct {
@@ -746,13 +758,26 @@ func validatePrivateRuntimeBindingShape(binding PrivateRuntimeBinding, harness, 
 	// The carrier names its credential source. The rebuilt one-binding config
 	// keys the source by that name, so the same validation the operator
 	// config passes applies to the carried shape.
-	source := operatorconfig.CredentialSource{Kind: binding.AuthKind, CatalogEntry: binding.CatalogEntry, TokenURL: binding.TokenURL, ClientID: binding.ClientID}
+	source := operatorconfig.CredentialSource{Kind: binding.AuthKind, CatalogEntry: binding.CatalogEntry, TokenURL: binding.TokenURL, ClientID: binding.ClientID, RegistryEntry: binding.RegistryEntry}
 	cfg := operatorconfig.Default()
 	cfg.Runtimes.EnabledBindings = []string{id}
 	cfg.Runtimes.Credentials = map[string]operatorconfig.CredentialSource{binding.Credential: source}
 	cfg.Runtimes.Bindings = map[string]operatorconfig.RuntimeBinding{id: {
 		Harness: harness, Model: binding.Model, Effort: binding.Effort, BaseURL: binding.BaseURL, Credential: binding.Credential,
 	}}
+	// A self-hosted connection is only valid against the entry it names, so the
+	// fence restores that entry from the carrier and lets validateRegistry apply
+	// the operator's own address-class, port, and pooling rules to it. A missing
+	// or empty entry leaves the reference undefined and the config refuses.
+	if binding.RegistryEntry != "" {
+		cfg.Runtimes.Registry = map[string]operatorconfig.RegistryEntry{
+			binding.RegistryEntry: {
+				BaseURL:       binding.RegistryBaseURL,
+				PortAllowlist: append([]int(nil), binding.RegistryPorts...),
+				Pooling:       binding.RegistryPooling,
+			},
+		}
+	}
 	if err := cfg.Validate(); err != nil {
 		return Domainf("dispatch: private runtime binding is malformed")
 	}

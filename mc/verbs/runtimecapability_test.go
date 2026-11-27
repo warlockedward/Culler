@@ -187,3 +187,65 @@ func TestResolveFrozenCollieBinding(t *testing.T) {
 		}
 	})
 }
+
+func selfHostConfig(t *testing.T) operatorconfig.Config {
+	t.Helper()
+	cfg := operatorconfig.Default()
+	cfg.Runtimes.Registry = map[string]operatorconfig.RegistryEntry{}
+	cfg.Runtimes.Registry["newapi"] = operatorconfig.RegistryEntry{
+		BaseURL:       "http://127.0.0.1:38011/v1",
+		PortAllowlist: []int{38011},
+	}
+	cfg.Runtimes.Credentials["newapi"] = operatorconfig.CredentialSource{
+		Kind: "openai-compatible", RegistryEntry: "newapi", Name: "new-api",
+	}
+	cfg.Runtimes.Bindings["newapi"] = operatorconfig.RuntimeBinding{
+		Harness: "codex", Model: "qwen3.8-27b", Credential: "newapi",
+	}
+	cfg.Runtimes.EnabledBindings = []string{"newapi"}
+	if err := cfg.Validate(); err != nil {
+		t.Fatalf("self-host test config invalid: %v", err)
+	}
+	return cfg
+}
+
+// TestSelfHostedCapabilityCarriesItsRegistryEndpoint is the C11 dispatch carrier
+// gate: a self-hosted connection's endpoint travels with the carrier so the
+// structural fence re-applies the operator's registry rules without holding
+// config.toml, and every tampering of that endpoint is refused.
+func TestSelfHostedCapabilityCarriesItsRegistryEndpoint(t *testing.T) {
+	cfg := selfHostConfig(t)
+	digest, err := operatorconfig.RuntimeCatalogDigest(cfg.Runtimes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	authority := runtimeAuthority{config: cfg, bindings: routing.EnabledBindings(cfg.Runtimes), digest: digest}
+	capability := authority.capability()
+	if len(capability.Bindings) != 1 {
+		t.Fatalf("self-host catalog projected %d bindings, want 1", len(capability.Bindings))
+	}
+	binding := capability.Bindings[0]
+	if binding.RegistryEntry != "newapi" || binding.RegistryBaseURL != "http://127.0.0.1:38011/v1" {
+		t.Fatalf("carrier lost its registry endpoint: %+v", binding)
+	}
+	if err := validatePrivateRuntimeBindingShape(binding, binding.Harness, binding.ID); err != nil {
+		t.Fatalf("a faithful self-host carrier was refused: %v", err)
+	}
+	// Tamperings the fence must catch: an endpoint that no longer satisfies the
+	// registry rules, and a carrier that drops the entry it references.
+	tamperings := map[string]func(*PrivateRuntimeBinding){
+		"cleartext public address": func(b *PrivateRuntimeBinding) { b.RegistryBaseURL = "http://8.8.8.8/v1" },
+		"port off the allowlist":   func(b *PrivateRuntimeBinding) { b.RegistryBaseURL = "http://127.0.0.1:9999/v1" },
+		"dropped endpoint":         func(b *PrivateRuntimeBinding) { b.RegistryBaseURL = "" },
+		"userinfo in url":          func(b *PrivateRuntimeBinding) { b.RegistryBaseURL = "http://u:p@127.0.0.1:38011/v1" },
+	}
+	for name, breakIt := range tamperings {
+		t.Run(name, func(t *testing.T) {
+			bent := binding
+			breakIt(&bent)
+			if err := validatePrivateRuntimeBindingShape(bent, bent.Harness, bent.ID); err == nil {
+				t.Fatalf("fence accepted a tampered registry endpoint (%s)", name)
+			}
+		})
+	}
+}

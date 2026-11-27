@@ -93,9 +93,30 @@ func (a runtimeAuthority) capability() PrivateRuntimeCapability {
 		Bindings: make([]PrivateRuntimeBinding, 0, len(ids)),
 	}
 	for _, id := range ids {
-		capability.Bindings = append(capability.Bindings, privateRuntimeBindingFromSpec(a.bindings[id]))
+		binding := privateRuntimeBindingFromSpec(a.bindings[id])
+		a.fillRegistry(&binding)
+		capability.Bindings = append(capability.Bindings, binding)
 	}
 	return capability
+}
+
+// fillRegistry carries the operator-declared endpoint a self-hosted connection
+// names, so the structural fence can rebuild the reference and re-apply the
+// registry rules without the carrier's consumer holding config.toml. A non-
+// self-hosted credential names no entry and stays as built.
+func (a runtimeAuthority) fillRegistry(binding *PrivateRuntimeBinding) {
+	source, ok := a.config.Runtimes.Credentials[binding.Credential]
+	if !ok || source.RegistryEntry == "" {
+		return
+	}
+	entry, ok := a.config.Runtimes.Registry[source.RegistryEntry]
+	if !ok {
+		return
+	}
+	binding.RegistryEntry = source.RegistryEntry
+	binding.RegistryBaseURL = entry.BaseURL
+	binding.RegistryPorts = append([]int(nil), entry.PortAllowlist...)
+	binding.RegistryPooling = entry.Pooling
 }
 
 // UnavailableRuntimeCapability is the explicit "this host resolved no catalog"
