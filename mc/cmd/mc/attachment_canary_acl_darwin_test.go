@@ -19,7 +19,7 @@ func TestAttachmentCanaryScratchRefusesGrantingNativeACL(t *testing.T) {
 	if err := os.Mkdir(health, 0o700); err != nil {
 		t.Fatal(err)
 	}
-	if err := trustAttachmentCanaryDirs(home, health); err != nil {
+	if err := trustAttachmentCanaryDirs(os.Getuid(), home, health); err != nil {
 		t.Fatalf("clean canary ancestry = %v", err)
 	}
 	if out, err := exec.Command(
@@ -30,7 +30,7 @@ func TestAttachmentCanaryScratchRefusesGrantingNativeACL(t *testing.T) {
 	t.Cleanup(func() {
 		_ = exec.Command("chmod", "-N", health).Run()
 	})
-	err := trustAttachmentCanaryDirs(home, health)
+	err := trustAttachmentCanaryDirs(os.Getuid(), home, health)
 	if err == nil || !strings.Contains(err.Error(), "ACL") {
 		t.Fatalf("granting canary scratch ACL = %v, want refusal", err)
 	}

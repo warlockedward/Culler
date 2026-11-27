@@ -443,7 +443,7 @@ func requireCurrentAttachmentCanaryReceipt(generation string) (string, error) {
 		return "", verbs.Usagef("resolve attachment canary MC_HOME: %v", err)
 	}
 	root := filepath.Join(home, "health", "attachment-canary")
-	if err := trustAttachmentCanaryDirs(home, filepath.Join(home, "health"), root); err != nil {
+	if err := trustAttachmentCanaryDirs(os.Getuid(), home, filepath.Join(home, "health"), root); err != nil {
 		return "", err
 	}
 	body, err := readAttachmentCanaryFile(filepath.Join(root, "last.json"), 0o600, 4096)

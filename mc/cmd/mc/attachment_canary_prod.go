@@ -107,7 +107,7 @@ func runAttachmentCanary(home string) (out verbs.AttachmentCanaryReceipt, retErr
 		image = configured
 	}
 	root := filepath.Join(home, "health", "attachment-canary")
-	if err := trustAttachmentCanaryDirs(home); err != nil {
+	if err := trustAttachmentCanaryDirs(os.Getuid(), home); err != nil {
 		return out, err
 	}
 	if err := ensureAttachmentCanaryDir(filepath.Join(home, "health")); err != nil {
@@ -116,7 +116,7 @@ func runAttachmentCanary(home string) (out verbs.AttachmentCanaryReceipt, retErr
 	if err := ensureAttachmentCanaryDir(root); err != nil {
 		return out, err
 	}
-	if err := trustAttachmentCanaryDirs(filepath.Join(home, "health"), root); err != nil {
+	if err := trustAttachmentCanaryDirs(os.Getuid(), filepath.Join(home, "health"), root); err != nil {
 		return out, err
 	}
 	lock, err := lockAttachmentCanary(root)
@@ -159,7 +159,8 @@ func runAttachmentCanary(home string) (out verbs.AttachmentCanaryReceipt, retErr
 		return out, fmt.Errorf("prepare attachment canary tree: %w", err)
 	}
 	sessionRoot := filepath.Join(attempt.root, "attachments", "probe")
-	if err := trustAttachmentCanaryDirs(
+	outOwner, _ := verbs.AttachmentOutboundOwner()
+	if err := trustAttachmentCanaryDirs(os.Getuid(),
 		attempt.root,
 		filepath.Join(attempt.root, "attachments"),
 		sessionRoot,
@@ -168,6 +169,13 @@ func runAttachmentCanary(home string) (out verbs.AttachmentCanaryReceipt, retErr
 		filepath.Join(sessionRoot, "in", "journal"),
 		filepath.Join(sessionRoot, "in", "published"),
 		filepath.Join(sessionRoot, "in", "published", "sha256"),
+	); err != nil {
+		return out, err
+	}
+	// The outbound chain is written by the container publisher and owned by the
+	// declared container writer on Linux (operator uid elsewhere), matching what
+	// PrepareAttachmentTree set.
+	if err := trustAttachmentCanaryDirs(int(outOwner),
 		filepath.Join(sessionRoot, "out"),
 		filepath.Join(sessionRoot, "out", "staging"),
 		filepath.Join(sessionRoot, "out", "journal"),
@@ -358,11 +366,11 @@ func ensureAttachmentCanaryDir(path string) error {
 	return nil
 }
 
-func trustAttachmentCanaryDirs(paths ...string) error {
+func trustAttachmentCanaryDirs(ownerUID int, paths ...string) error {
 	for _, path := range paths {
 		// TrustHomeDirTraversal admits the execute-only inbound read chain but
 		// still refuses any group/other read or write and any granting macOS ACL.
-		if err := boundary.TrustHomeDirTraversal(path, os.Getuid()); err != nil {
+		if err := boundary.TrustHomeDirTraversal(path, ownerUID); err != nil {
 			return verbs.Domainf(
 				"attachment canary scratch ACL trust refused %q: %v",
 				path, err,

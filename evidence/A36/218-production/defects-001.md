@@ -35,3 +35,7 @@
   - 测试转写：树走查/canary 预建改用 `AttachmentInboundReadMode()` 断言（Linux 得 0711、macOS 得 0700，跨平台各自成立）；新增**入站加宽（0755 含 group/other read）必拒**负向量＝锁死"可穿越不可列"边界不随改漂移；`...RefusesGrantingNativeACL`（macOS chmod +a 授予 list）红→改后**必须仍拒**（故走完整 ACL 检测的新谓词而非纯 mode 判断）。
 - 验证：`go build` 0／`go vet` 0／gofmt 净；`mc/boundary` ok（含新谓词向量＋codes_test 双门）；`mc/verbs` ok；曾红两测定向复跑 ok；**全道 `./mc/check.sh` → MC_CHECK_EXIT=0，29 包 ok、零 FAIL/零 UNVERIFIED/零 gofmt**；提交＝见本轮（前置 KEY-CLEAN 硬门＝全树 grep 无 key 字面量方 add）；深度扫描封号见 AM v0.2.46（**560＝基线 559+1**，增量＝C11 http 客户端引入的 `provider-proxy→provider-transport:282` SSRF 面，已代码路径级定性与缓解，残余登记不吞并）；**真机终证＝218 重建后 canary 过、resident tick 成、supervision 激活、F1 双臂跑通（r12 段，Linux 平台）**。
 - 等级如实：canary 激活前拦截＝安全护栏按设计工作（它先拦下"读不到"的 Linux 生产故障，又拦下我首版"0711 未过信任闸"的半成品），非误报；我改的是被护栏揭示的缺陷本体。macOS 与 Linux 两台必须各自成立（owner 明令），已用 `AttachmentInboundReadMode()` 单一真值保证代码/测试/canary 三处同步。
+
+## 环境性测试脆弱（登记非本轮引入，A35 全道唯一红）
+
+`TestReleaseSkillWorksForExternalAgentWithoutSourceOrDevelopmentTools` 在全道并发下于 `agent_skill_external_test.go:54` 的 `mise exec -- bun -p process.execPath` 子进程返回 exit 1（耗时 120s）；隔离重跑同树（含 A35 改动）`ok`（但该步本身耗时 173s）。判定＝该测试对宿主机 mise/bun 外部工具的固有脆弱＋并发放大，**不触 attachment/canary/broker 任何代码路径**，非 A35 回归。归 A32 上游既有面候命清单式处理（不借 A35 域顺手改他人断言）；如后续要根治＝把该 fixture 的 bun 解析改为预取常量或加超时余量，属独立测试卫生票。

@@ -155,30 +155,44 @@ func TestPrepareAttachmentTreeCreatesAndRevalidatesStableSessionRoots(t *testing
 		first.Outbound != filepath.Join(home, "attachments", "h-tree", "out") {
 		t.Fatalf("tree receipt = %#v", first)
 	}
+	outUID, _ := AttachmentOutboundOwner()
+	selfUID := uint32(os.Getuid())
 	for _, entry := range []struct {
 		relative string
 		mode     os.FileMode
+		owner    uint32
 	}{
-		{"attachments", 0o700},
-		{"attachments/h-tree", 0o700},
-		{"attachments/h-tree/in", 0o700},
-		{"attachments/h-tree/in/staging", 0o700},
-		{"attachments/h-tree/in/journal", 0o700},
-		{"attachments/h-tree/in/published", os.FileMode(attachmentInboundReadMode)},
-		{"attachments/h-tree/in/published/sha256", os.FileMode(attachmentInboundReadMode)},
-		{"attachments/h-tree/out", 0o700},
-		{"attachments/h-tree/out/staging", 0o700},
-		{"attachments/h-tree/out/journal", 0o700},
-		{"attachments/h-tree/out/published", 0o700},
-		{"attachments/h-tree/out/published/sha256", 0o700},
+		{"attachments", 0o700, selfUID},
+		{"attachments/h-tree", 0o700, selfUID},
+		{"attachments/h-tree/in", 0o700, selfUID},
+		{"attachments/h-tree/in/staging", 0o700, selfUID},
+		{"attachments/h-tree/in/journal", 0o700, selfUID},
+		{"attachments/h-tree/in/published", os.FileMode(attachmentInboundReadMode), selfUID},
+		{"attachments/h-tree/in/published/sha256", os.FileMode(attachmentInboundReadMode), selfUID},
+		// The outbound chain is owned by the declared container writer (root
+		// Linux) or the operator (macOS / non-root); AttachmentOutboundOwner is
+		// the single source, so this holds in every environment the suite runs.
+		{"attachments/h-tree/out", 0o700, outUID},
+		{"attachments/h-tree/out/staging", 0o700, outUID},
+		{"attachments/h-tree/out/journal", 0o700, outUID},
+		{"attachments/h-tree/out/published", 0o700, outUID},
+		{"attachments/h-tree/out/published/sha256", 0o700, outUID},
 	} {
-		info, err := os.Lstat(filepath.Join(home, entry.relative))
+		path := filepath.Join(home, entry.relative)
+		info, err := os.Lstat(path)
 		if err != nil {
 			t.Fatalf("%s missing: %v", entry.relative, err)
 		}
 		if !info.IsDir() || info.Mode().Perm() != entry.mode {
-			t.Fatalf("%s = mode %v, want operator-owned %03o directory",
+			t.Fatalf("%s = mode %v, want %03o directory",
 				entry.relative, info.Mode(), entry.mode)
+		}
+		var stat unix.Stat_t
+		if err := unix.Stat(path, &stat); err != nil {
+			t.Fatalf("%s stat: %v", entry.relative, err)
+		}
+		if stat.Uid != entry.owner {
+			t.Fatalf("%s = owner %d, want %d", entry.relative, stat.Uid, entry.owner)
 		}
 	}
 	sentinel := filepath.Join(first.Outbound, "published", "retained")
@@ -191,6 +205,32 @@ func TestPrepareAttachmentTreeCreatesAndRevalidatesStableSessionRoots(t *testing
 	}
 	if body, err := os.ReadFile(sentinel); err != nil || string(body) != "old" {
 		t.Fatalf("tree replay changed retained bytes = %q err %v", body, err)
+	}
+}
+
+func TestRequireAttachmentDirectoryEnforcesDeclaredOwner(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.Chmod(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	fd, err := unix.Open(dir, unix.O_RDONLY|unix.O_DIRECTORY|unix.O_NOFOLLOW, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer unix.Close(fd)
+	// The operator owns the fresh temp directory: the operator uid is accepted.
+	if err := requireAttachmentDirectory(fd, "dir", 0o700, uint32(os.Getuid())); err != nil {
+		t.Fatalf("self-owned directory refused for its owner: %v", err)
+	}
+	// Any other declared owner is refused, never silently repaired.
+	foreign := uint32(os.Getuid())
+	if foreign == 0 {
+		foreign = 1
+	} else {
+		foreign = 0
+	}
+	if err := requireAttachmentDirectory(fd, "dir", 0o700, foreign); err == nil {
+		t.Fatal("directory accepted for a foreign owner")
 	}
 }
 
@@ -543,7 +583,7 @@ func TestAttachmentPublicationCreatorRecoveryRehashesExactLocation(t *testing.T)
 			tamperPath := filepath.Join(
 				home, "attachments", session, "in", "staging", plan.stagingName)
 			if location == "canonical" {
-				shard, err := openOrCreateAttachmentDirectory(tree.sha256, plan.digest[:2], attachmentInboundReadMode)
+				shard, err := openOrCreateAttachmentDirectory(tree.sha256, plan.digest[:2], attachmentInboundReadMode, uint32(os.Getuid()))
 				if err != nil {
 					t.Fatal(err)
 				}

@@ -158,7 +158,7 @@ func verifyPublishedAttachment(home string, a AttachmentBytesArgs) (string, erro
 	if err != nil {
 		return "", Domainf("open attachment MC_HOME: %v", err)
 	}
-	if err := requireAttachmentDirectory(fd, "attachment MC_HOME", attachmentOwnerMode); err != nil {
+	if err := requireAttachmentDirectory(fd, "attachment MC_HOME", attachmentOwnerMode, uint32(os.Getuid())); err != nil {
 		_ = unix.Close(fd)
 		return "", classify(err)
 	}
@@ -175,7 +175,7 @@ func verifyPublishedAttachment(home string, a AttachmentBytesArgs) (string, erro
 		if a.Direction == "in" && index >= 3 {
 			segmentMode = attachmentInboundReadMode
 		}
-		if err := requireAttachmentDirectory(next, "attachment tree directory", segmentMode); err != nil {
+		if err := requireAttachmentDirectory(next, "attachment tree directory", segmentMode, uint32(os.Getuid())); err != nil {
 			_ = unix.Close(next)
 			return "", classify(err)
 		}

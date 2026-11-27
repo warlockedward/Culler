@@ -568,7 +568,7 @@ func cleanupAttachmentCanonicalObject(
 	if state != "delete_pending" {
 		return nil
 	}
-	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode)
+	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode, uint32(os.Getuid()))
 	if err != nil {
 		return err
 	}
@@ -666,45 +666,49 @@ func openAttachmentTree(home, session string) (*attachmentTree, error) {
 		home: -1, attachments: -1, session: -1, inbound: -1,
 		staging: -1, journal: -1, published: -1, sha256: -1,
 	}
+	rootUID := uint32(os.Getuid())
+	outUID, _ := AttachmentOutboundOwner()
 	tree.home, err = unix.Open(absolute,
 		unix.O_RDONLY|unix.O_DIRECTORY|unix.O_NOFOLLOW|unix.O_CLOEXEC, 0)
 	if err != nil {
 		return nil, fmt.Errorf("open attachment MC_HOME: %w", err)
 	}
-	if err := requireAttachmentDirectory(tree.home, "attachment MC_HOME", attachmentOwnerMode); err != nil {
+	if err := requireAttachmentDirectory(tree.home, "attachment MC_HOME", attachmentOwnerMode, rootUID); err != nil {
 		tree.close()
 		return nil, err
 	}
-	if tree.attachments, err = openOrCreateAttachmentDirectory(tree.home, "attachments", attachmentOwnerMode); err != nil {
+	if tree.attachments, err = openOrCreateAttachmentDirectory(tree.home, "attachments", attachmentOwnerMode, rootUID); err != nil {
 		tree.close()
 		return nil, err
 	}
-	if tree.session, err = openOrCreateAttachmentDirectory(tree.attachments, session, attachmentOwnerMode); err != nil {
+	if tree.session, err = openOrCreateAttachmentDirectory(tree.attachments, session, attachmentOwnerMode, rootUID); err != nil {
 		tree.close()
 		return nil, err
 	}
 	for _, direction := range []string{"in", "out"} {
-		directionFD, err := openOrCreateAttachmentDirectory(tree.session, direction, attachmentOwnerMode)
+		// The container binds in/published as its inbound root and reads a known
+		// digest there, so the inbound read chain gains execute-only traversal but
+		// stays operator-owned (the host writes it). The outbound chain is written
+		// by the container's setuid publisher through the bind, so on Linux it is
+		// owned by the declared container writer at owner-only 0700.
+		owner, publishedMode := rootUID, attachmentInboundReadMode
+		if direction == "out" {
+			owner, publishedMode = outUID, attachmentOwnerMode
+		}
+		directionFD, err := openOrCreateAttachmentDirectory(tree.session, direction, attachmentOwnerMode, owner)
 		if err != nil {
 			tree.close()
 			return nil, err
 		}
-		// The container binds in/published as its inbound root, so the inbound
-		// read chain gains execute-only traversal; the outbound chain, which the
-		// container reaches only through the setuid publisher, stays owner-only.
-		publishedMode := attachmentOwnerMode
-		if direction == "in" {
-			publishedMode = attachmentInboundReadMode
-		}
 		staging, journal, published, shaFD := -1, -1, -1, -1
-		if staging, err = openOrCreateAttachmentDirectory(directionFD, "staging", attachmentOwnerMode); err == nil {
-			journal, err = openOrCreateAttachmentDirectory(directionFD, "journal", attachmentOwnerMode)
+		if staging, err = openOrCreateAttachmentDirectory(directionFD, "staging", attachmentOwnerMode, owner); err == nil {
+			journal, err = openOrCreateAttachmentDirectory(directionFD, "journal", attachmentOwnerMode, owner)
 		}
 		if err == nil {
-			published, err = openOrCreateAttachmentDirectory(directionFD, "published", publishedMode)
+			published, err = openOrCreateAttachmentDirectory(directionFD, "published", publishedMode, owner)
 		}
 		if err == nil {
-			shaFD, err = openOrCreateAttachmentDirectory(published, "sha256", publishedMode)
+			shaFD, err = openOrCreateAttachmentDirectory(published, "sha256", publishedMode, owner)
 		}
 		if direction == "in" && err == nil {
 			tree.inbound, tree.staging, tree.journal = directionFD, staging, journal
@@ -732,8 +736,12 @@ type AttachmentTreeReceipt struct {
 
 // PrepareAttachmentTree materializes and revalidates the stable per-session
 // two-direction tree before the resident creates the Collie's first launch
-// artifact. It is host-only and idempotent; a symlink, widened directory, or
-// non-operator owner refuses rather than being repaired in place.
+// artifact. It is host-only and idempotent. The inbound chain is operator-owned
+// (the host writes it, execute-only traversal for the container reader); the
+// outbound chain is owned by the declared container writer on Linux (where the
+// container's publisher writes it through the bind) and by the operator on
+// macOS. A symlink, a widened permission, or an owner other than the one this
+// platform declares for that chain refuses rather than being repaired in place.
 func PrepareAttachmentTree(
 	id *RunIdentity,
 	home string,
@@ -800,7 +808,30 @@ func AttachmentInboundReadMode() os.FileMode {
 	return os.FileMode(attachmentInboundReadMode)
 }
 
-func openOrCreateAttachmentDirectory(parent int, name string, mode uint32) (int, error) {
+// attachmentContainerWriterUID is the container-side publisher identity that
+// writes the outbound attachment chain (image: install -d -o 10001
+// /mc/private/attachments/out). The container reaches out only through the
+// setuid publisher, so on Linux the host directory the bind mount covers must
+// be owned by this uid, not the operator root, or the publisher's open fails
+// EACCES (macOS virtiofs ignores ownership, so it stays operator-owned).
+const attachmentContainerWriterUID uint32 = 10001
+
+// AttachmentOutboundOwner reports the uid that owns the outbound attachment
+// chain and whether it differs from the operator. Re-owning the outbound chain
+// to the container writer is a privileged (root) concern: the setuid publisher
+// and its bind mount only ever run under the root systemd deployment, and a
+// non-root process could neither chown there nor run the container. So only a
+// root Linux deployment widens ownership; every other case (macOS, and Linux
+// unit tests or non-root use) keeps the chain operator-owned and needs no
+// privilege, which is also what the container-bind model ignores on macOS.
+func AttachmentOutboundOwner() (uint32, bool) {
+	if runtime.GOOS == "linux" && os.Getuid() == 0 {
+		return attachmentContainerWriterUID, true
+	}
+	return uint32(os.Getuid()), false
+}
+
+func openOrCreateAttachmentDirectory(parent int, name string, mode uint32, ownerUID uint32) (int, error) {
 	if name == "" || name == "." || name == ".." || filepath.Base(name) != name {
 		return -1, fmt.Errorf("refuse unsafe attachment directory name %q", name)
 	}
@@ -824,7 +855,25 @@ func openOrCreateAttachmentDirectory(parent int, name string, mode uint32) (int,
 			return -1, fmt.Errorf("set attachment directory %q mode: %w", name, err)
 		}
 	}
-	if err := requireAttachmentDirectory(fd, name, mode); err != nil {
+	// A newly created outbound directory is set to the declared container
+	// writer; so is an outbound directory an earlier (pre-Linux) release left
+	// operator-owned. A foreign owner on a reused directory is never taken over:
+	// the require below refuses it rather than repairing an unexpected owner.
+	reown := created
+	if !created && ownerUID != uint32(os.Getuid()) {
+		var stat unix.Stat_t
+		reown = unix.Fstat(fd, &stat) == nil && stat.Uid == uint32(os.Getuid())
+	}
+	if reown {
+		var stat unix.Stat_t
+		if unix.Fstat(fd, &stat) == nil && stat.Uid != ownerUID {
+			if err := unix.Fchown(fd, int(ownerUID), int(ownerUID)); err != nil {
+				_ = unix.Close(fd)
+				return -1, fmt.Errorf("set attachment directory %q owner: %w", name, err)
+			}
+		}
+	}
+	if err := requireAttachmentDirectory(fd, name, mode, ownerUID); err != nil {
 		_ = unix.Close(fd)
 		return -1, err
 	}
@@ -837,14 +886,14 @@ func openOrCreateAttachmentDirectory(parent int, name string, mode uint32) (int,
 	return fd, nil
 }
 
-func requireAttachmentDirectory(fd int, label string, mode uint32) error {
+func requireAttachmentDirectory(fd int, label string, mode uint32, ownerUID uint32) error {
 	var stat unix.Stat_t
 	if err := unix.Fstat(fd, &stat); err != nil {
 		return fmt.Errorf("inspect %s: %w", label, err)
 	}
 	if stat.Mode&unix.S_IFMT != unix.S_IFDIR || uint32(stat.Mode&0o777) != mode ||
-		int(stat.Uid) != os.Getuid() {
-		return fmt.Errorf("%s must be an operator-owned mode-%03o directory", label, mode)
+		stat.Uid != ownerUID {
+		return fmt.Errorf("%s must be a mode-%03o directory owned by uid %d", label, mode, ownerUID)
 	}
 	return nil
 }
@@ -1288,7 +1337,7 @@ func materializeAttachmentObject(
 	plan attachmentPublicationPlan,
 	reused bool,
 ) error {
-	shard, err := openOrCreateAttachmentDirectory(tree.sha256, plan.digest[:2], attachmentInboundReadMode)
+	shard, err := openOrCreateAttachmentDirectory(tree.sha256, plan.digest[:2], attachmentInboundReadMode, uint32(os.Getuid()))
 	if err != nil {
 		return err
 	}
@@ -1441,7 +1490,7 @@ func verifyAttachmentCanonical(
 	if !safeAttachmentHex(digest, 64) {
 		return attachmentFileEvidence{}, Domainf("invalid canonical attachment digest")
 	}
-	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode)
+	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode, uint32(os.Getuid()))
 	if err != nil {
 		return attachmentFileEvidence{}, err
 	}
@@ -1452,7 +1501,7 @@ func verifyAttachmentCanonical(
 func verifyAttachmentCanonicalIdentity(
 	tree *attachmentTree, digest string, size int64, device, inode string,
 ) error {
-	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode)
+	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode, uint32(os.Getuid()))
 	if err != nil {
 		return err
 	}
