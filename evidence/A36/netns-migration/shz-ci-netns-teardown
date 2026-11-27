@@ -1,0 +1,14 @@
+#!/bin/sh
+# S-Horizon CI network namespace teardown (idempotent).
+# Removes every shz-ci-gw-tagged host rule, the return route, the transit
+# veth, and the netns itself. After this the host carries no CI networking.
+set -eu
+ip route del 10.199.0.0/16 via 10.200.0.2 dev veth-ci-h 2>/dev/null || true
+iptables -D DOCKER-USER -i veth-ci-h -s 10.200.0.0/30 -m comment --comment shz-ci-gw -j ACCEPT 2>/dev/null || true
+iptables -D DOCKER-USER -o veth-ci-h -d 10.200.0.0/30 -m conntrack --ctstate ESTABLISHED,RELATED -m comment --comment shz-ci-gw -j ACCEPT 2>/dev/null || true
+WAN_IF=$(ip route show default | awk '{print $5; exit}')
+if [ -n "$WAN_IF" ]; then
+  iptables -t nat -D POSTROUTING -s 10.200.0.0/30 -o "$WAN_IF" -m comment --comment shz-ci-gw -j MASQUERADE 2>/dev/null || true
+fi
+ip link del veth-ci-h 2>/dev/null || true
+ip netns del shz-ci 2>/dev/null || true

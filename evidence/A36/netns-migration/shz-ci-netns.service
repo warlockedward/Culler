@@ -1,0 +1,13 @@
+[Unit]
+Description=S-Horizon CI network namespace for the dedicated dockerd
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/shz-ci-netns-setup
+ExecStop=/usr/local/sbin/shz-ci-netns-teardown
+
+[Install]
+WantedBy=multi-user.target
