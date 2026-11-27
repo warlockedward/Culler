@@ -1,0 +1,8 @@
+AM v0.2.46 双面哈希登记（轮六十三＝218 生产部署轮真机账：部署达配置/安装/录入/网关许可结构面 E1＋D-1/D-2 修复＋C11 三切片进码＋监督激活卡于 A35 缺陷②出站面＋B 双臂捷径取证证伪收回＋零干扰五路终证；状态如实不虚标）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 862223c0111159605d4e02d1685f142cd22c9f031991e1ff4857eca88402e7e0
+- sha256(主工作树未跟踪副本) = 862223c0111159605d4e02d1685f142cd22c9f031991e1ff4857eca88402e7e0（DUAL-EQUAL）
+- 链自检: 登记前 AM 文件 sha256 = f988bcd8…（v0.2.44）后接 v0.2.45=c0ba2182、本笔 v0.2.46；逐轮哈希以各自 hash.txt 为准
+- 关键事实: 部署轮=Linux amd64 生产形态首次真机推进至监督激活门前；home/spine/D-1/C11配置链/key入库/surfaces配置全 E1；supervision 卡 canary 出站 publisher 宿主 bind 遮蔽镜像 10001 所有权=A35 缺陷②第二面
+- 诚实边界: C11=IN_PROGRESS 不升（端到端真实回合待 A35，EXEC-2）；A36 CODED 不升、A31 IN_PROGRESS（双臂未跑，代理在场依赖监督激活）；B 双臂捷径我上轮推荐经本轮取证证伪并收回；D-2 端到端待 A35 后复验；扫描560=基线+1(SSRF 面已定性不吞并)；零干扰五路证实、窗始快照格式疏忽已记
+- 账: dev tip=本登记笔 / origin/main=8bf944b(D-2) 本登记笔随下推 / push 累计九次 / 本地 main PRISTINE b22df40 / identity 不变
