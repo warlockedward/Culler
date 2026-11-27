@@ -6,6 +6,7 @@ import { join } from "node:path";
 import {
   CLAUDE_BIN,
   claudeAdapterEnv,
+  claudeBin,
   claudeOptions,
   claudeReplyFromMessage,
   makeClaudeTextExtractor,
@@ -17,6 +18,7 @@ import {
   CODEX_BIN,
   codexAdapterEnv,
   codexArgv,
+  codexBin,
   codexReplyFromEvent,
   makeCodexTextExtractor,
   findCodexNativeFile,
@@ -430,12 +432,18 @@ test("explicit native effort and output controls preserve ordinary run defaults"
   expect(limited.env?.CLAUDE_CODE_MAX_OUTPUT_TOKENS).toBe("1024");
 });
 
-test("the adapters start the Linux arm64 harness programs by their runtime paths", () => {
+test("the adapters locate the harness program for the running architecture", () => {
   const store = new NativeSessionStore("/tmp/unused-native-session");
   const options = claudeOptions("fixture", "/tmp", {}, store);
   expect(options.pathToClaudeCodeExecutable).toBe(CLAUDE_BIN);
-  expect(CLAUDE_BIN).toBe("/app/node_modules/@anthropic-ai/claude-agent-sdk-linux-arm64/claude");
-  expect(CODEX_BIN).toBe("/app/node_modules/@openai/codex-linux-arm64/vendor/aarch64-unknown-linux-musl/bin/codex");
+  // The exported constants resolve to the running host's architecture; the
+  // explicit pair below pins both images regardless of where the suite runs.
+  expect(CLAUDE_BIN).toBe(claudeBin(process.arch, false));
+  expect(CODEX_BIN).toBe(codexBin(process.arch, false));
+  expect(claudeBin("x64", false)).toBe("/app/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude");
+  expect(claudeBin("arm64", true)).toBe("/opt/culler-runtime/app/node_modules/@anthropic-ai/claude-agent-sdk-linux-arm64/claude");
+  expect(codexBin("x64", true)).toBe("/opt/culler-runtime/app/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin/codex");
+  expect(codexBin("arm64", false)).toBe("/app/node_modules/@openai/codex-linux-arm64/vendor/aarch64-unknown-linux-musl/bin/codex");
 });
 
 test("native effort controls preserve the selected level", () => {

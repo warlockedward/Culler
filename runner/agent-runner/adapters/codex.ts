@@ -27,8 +27,24 @@ const FORBIDDEN = new Set([
   "NODE_TLS_REJECT_UNAUTHORIZED", "NODE_EXTRA_CA_CERTS", "SSL_CERT_FILE", "CODEX_CA_CERTIFICATE", "SHZ_PROXY_TOKEN",
   "CLAUDE_CODE_CLIENT_CERT", "CLAUDE_CODE_CLIENT_KEY", "CLAUDE_CODE_CLIENT_KEY_PASSPHRASE", "CODEX_HOME",
 ]);
+// The runtime image installs the codex program for exactly one architecture,
+// selected at build by the harness manifest pair (package.json for arm64,
+// package.linux-x64.json for x64). Locate it by the running process's own
+// architecture — the same axis the manifests split on — so an x64 image finds
+// its x64 program instead of a hard-coded arm64 path that is absent there.
+// An unrecognised architecture yields a package name that was never installed,
+// so the spawn fails honestly rather than silently reaching for arm64.
+const CODEX_VENDOR_TRIPLE: Record<string, string> = {
+  x64: "x86_64-unknown-linux-musl",
+  arm64: "aarch64-unknown-linux-musl",
+};
+export function codexBin(arch: string, privateBun: boolean): string {
+  const root = privateBun ? "/opt/culler-runtime/app" : "/app";
+  const triple = CODEX_VENDOR_TRIPLE[arch] ?? "unknown";
+  return `${root}/node_modules/@openai/codex-linux-${arch}/vendor/${triple}/bin/codex`;
+}
 export const CODEX_BIN = process.env["MC_CODEX_BIN"] ||
-  `${process.env.MC_PRIVATE_BUN ? "/opt/culler-runtime/app" : "/app"}/node_modules/@openai/codex-linux-arm64/vendor/aarch64-unknown-linux-musl/bin/codex`;
+  codexBin(process.arch, Boolean(process.env.MC_PRIVATE_BUN));
 
 export function codexAdapterEnv(
   base: Record<string, string | undefined>, access: ProviderAccess, caPath: string, home: string,

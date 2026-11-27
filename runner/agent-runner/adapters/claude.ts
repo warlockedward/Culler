@@ -33,9 +33,15 @@ const ALL_CREDENTIAL_KEYS = [
   "CLAUDE_CODE_CLIENT_CERT", "CLAUDE_CODE_CLIENT_KEY", "CLAUDE_CODE_CLIENT_KEY_PASSPHRASE", "CODEX_HOME",
 ];
 
-// The SDK starts this program. The runtime holds the Linux arm64 build only.
+// The SDK starts this program. The runtime image installs it for exactly one
+// architecture (the harness manifest pair), so locate it by the running
+// process's architecture; an unrecognised one yields a never-installed package.
+export function claudeBin(arch: string, privateBun: boolean): string {
+  const root = privateBun ? "/opt/culler-runtime/app" : "/app";
+  return `${root}/node_modules/@anthropic-ai/claude-agent-sdk-linux-${arch}/claude`;
+}
 export const CLAUDE_BIN = process.env["MC_CLAUDE_BIN"] ||
-  `${process.env.MC_PRIVATE_BUN ? "/opt/culler-runtime/app" : "/app"}/node_modules/@anthropic-ai/claude-agent-sdk-linux-arm64/claude`;
+  claudeBin(process.arch, Boolean(process.env.MC_PRIVATE_BUN));
 
 /** The harness keeps a turn open while a background command runs. The adapter stops a wait that has no new event for this time. */
 export const BACKGROUND_WAIT_MS = 600_000;
