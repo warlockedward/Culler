@@ -1,0 +1,10 @@
+AM v0.2.41 双面哈希登记（轮六十二收口窗＝归因修正：owner 反诘成立——CI dockerd 起停的生命周期级 netfilter 副作用是我的直接操作，v0.2.40"非我造成"限定为命令层；当前 nat DOCKER 链空＝他租户转发此刻预期不通的只读快照入证；§2 (e) 进程级隔离≠数据面隔离常设化）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = b4a887f761826dca2784fd4e4e2e4864f968ed30cbab9c798ed82cc994e91bd7
+- sha256(主工作树未跟踪副本) = 同上（DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 139624a55d246a374ef72ee33a195ac26a8b329244dd8b789a6fde226d76e5e9，与 am-v0.2.40-hash.txt 登记值逐字相等（零漂移）
+- 前轮: v0.2.40 = 139624a5…e5e9（命令层取证轮，本笔机制层升格）；v0.2.39 = 43ff60d7…360e
+- 同轮并入 dev 的提交: 6fbded6（纪要 §4 后记＝生命周期归因+当前链空快照+等级自纠）＋§2 (e) 条款＋本登记件；零代码/零 status 变化
+- 关键事实: 今日四次 CI 起停全部为我的窗口操作且与症状时间线咬合；DOCKER(nat) 链空主 daemon 活着＝官方"双 daemon 共宿主不支持"现实化；处置三批候 owner（disable 冻结/主 docker 重启时机/netns 修复选案 (b) 推荐）
+- 诚实边界: 两笔 AM 并读才完整（40=命令层，41=机制层）——不覆盖不改写历史；我此前多轮"零触碰"证明的等级不足如实自纠
+- 账: dev tip=<本提交+捕获> / CI 栈冻结申请中 / origin/main=925eb7d，dev 领先登记时点=5（实算以 push 前为准）/ 本地 main PRISTINE b22df40 / identity 不变 / 无新外发
