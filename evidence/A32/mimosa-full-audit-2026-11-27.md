@@ -98,3 +98,9 @@
 - 树＝dev tip fbab35e（AM v0.2.46＋A35 注记＋部署证据件）；jobId scan-job-mwz2u6xo-fc5b101380c1b48e；**scanId=scan-2026-11-27T14-29-27.850Z-2eb07012519d；封印=sha256:46da12c6ae3aa493ad7d8485848bc6ae22484fdf9e78d5557ef95380e44ea85c**。
 - **560＝与 D-2 码树（§13）逐级逐域全等＝本轮纯文档/证据提交零新增发现面**；+1 相对 559 基线仍是 §13 那条 C11 http SSRF 面（非本轮引入，已定性）。
 - 诚实核心沿用 §1（static-only／verdictEffect none／inconclusive），不构成安全背书。
+
+## 15. A35 ②出站＋C11 dispatch 载体两笔生产码扫描（轮六十四）
+
+- credential-projector 放行树＝scan 20ffbfa31d9b/f10d8610（§14 续）560；dispatch 载体自包含扩展树 e0e7d41＝jobId scan-job-mwzlkqed-cd6e05debd5ee358，**scanId=scan-2026-11-27T23-13-58.247Z-6de91ee57dcb；封印=sha256:f986e9dbb74c3fa16ba72178a22f5da11f14fc1068f86ac449d7e5b196f96abd**。
+- **560＝基线全等（逐域逐级不变＝mc 157 含新码＝自包含载体与 registry 重建零新发现面）**。
+- wire 兼容性代码路径级论证已入 A35 diff-plan（历史 effect 零值退化＝与改动前逐字同行为；live/replayed 走同一 struct→JSON→map 归一化；drift digest 哈希 config.Runtimes 与载体无关）。诚实核心沿用 §1（static-only/verdictEffect none）。
