@@ -38,3 +38,11 @@
 - agent 分诊：**campaign 新增面 11 条全部真值否定（逐条有据）**；其余＝上游既有面登记。
 - Acceptance 归属：本记录＝agent E1 证据；**push 门的最终接受权在 owner**（AI 永不做风险接受权威）。
 - 账：dev tip 随本登记前进／identity 不变／main 仍 PRISTINE／无外发（push 待 owner 确认，形态＝shz/dev→origin/main 纯 fast-forward，113 commits ahead，origin＝warlockedward/Culler 唯一远端）。
+
+## 8. 轮六十二补跑＝enobufs 欠账清偿（2026-11-27 09:11 UTC）
+
+- 背景：轮六十二两笔提交（85a41f4 netns 迁移工件＋bc3202f AM 登记）commit 前 hook 报 scanner_enobufs，按兼容策略放行并挂队补跑。
+- 补跑＝security_scan_start depth=deep，shz/dev @ bc3202f 全树；jobId＝scan-job-mwyrhsqf-37d0fbcfae5e625a，attempt 1 完成。
+- **scanId＝scan-2026-11-27T09-11-52.345Z-c650fb7b257f；封印＝sha256:695759603cd5ee4fbc626f3c6dcbed56cc0eea86a6ec48b479ee669fb25d78ad**；历史目录＝/Users/raistlin/.mimosa/security-scans/project-05846d035334cfe0b42fb29c/<scanId>（仓外）。
+- 对照轮五十三基线（§1/§2，scanId 2e2724cedeb1）：**total 559／high 435／medium 120／low 4；逐域 dashboard 161／mc 157／runner 144／resident 61／evals 19／performance 10／release 7——两份 findings.json 逐域逐级完全一致＝本两笔提交（纯 evidence/docs 面，零代码）零新增发现面**。依赖面同为 572 包、advisory 4 包 40 条。
+- 诚实核心沿用 §1：coverage partial／runStatus inconclusive／static-only／verdictEffect none——UNKNOWN≠PASS，本节同样不构成安全背书。
