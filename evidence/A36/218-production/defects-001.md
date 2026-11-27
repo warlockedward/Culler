@@ -14,3 +14,10 @@
 
 - 本修复属 owner「按建议顺序执行」部署轮内阻塞缺陷（预案 §3 步骤 2 的安装路径自身）＝执行域最小修复，不改任何已裁不变量。
 - 拒语文案未动＝AGENTS 终端设置对抗评审门不触发（非 setup 文案变更）。
+
+## D-1 验证记录（2026-11-27）
+
+- 定向：`./test.sh ./deployment/ -run 'TestVerifyCLIShell|TestCLIPath'`＝ok（新 3 面单测通过：缺失壳跳过/在场壳不解析仍拒/解析成功通过）。
+- 静态：gofmt 清零＋`go vet ./deployment/` exit 0。
+- **全道**：`./mc/check.sh` → `MC_CHECK_EXIT=0`，29 包 ok、零 FAIL、零 UNVERIFIED（含新测试行）。
+- 真机终证＝218 安装器第 4/5 轮 `home` 段过闸（spine provisioned＝缺陷路径实战通过）。
