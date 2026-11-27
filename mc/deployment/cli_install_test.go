@@ -27,6 +27,26 @@ func cliInstallFixture(t *testing.T) (string, string, string) {
 	return home, userHome, directory
 }
 
+func TestVerifyCLIShellSkipsShellsTheHostDoesNotHave(t *testing.T) {
+	if err := verifyCLIShell(filepath.Join(t.TempDir(), "absent-shell"), "-ic", "/bin/shz", t.TempDir(), t.TempDir(), "/bin"); err != nil {
+		t.Fatalf("absent shell refused: %v", err)
+	}
+	quiet := filepath.Join(t.TempDir(), "quiet-shell")
+	if err := os.WriteFile(quiet, []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := verifyCLIShell(quiet, "-c", "/no/such/shz", t.TempDir(), t.TempDir(), "/bin"); err == nil {
+		t.Fatal("shell without the command verified")
+	}
+	fake := filepath.Join(t.TempDir(), "fake-shz-shell")
+	if err := os.WriteFile(fake, []byte("#!/bin/sh\nprintf '\\nSHZ_COMMAND=%s\\n' \"/custom bin/shz\"\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := verifyCLIShell(fake, "-c", "/custom bin/shz", t.TempDir(), t.TempDir(), "/bin"); err != nil {
+		t.Fatalf("resolving shell refused: %v", err)
+	}
+}
+
 func TestCLIPathPreservesShellTextAndRemovesOnlyOwnedFiles(t *testing.T) {
 	home, userHome, directory := cliInstallFixture(t)
 	profile := filepath.Join(userHome, ".bash_profile")

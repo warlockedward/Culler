@@ -274,6 +274,10 @@ func installCLIPath(home, userHome, directory, release, parentPath string, verif
 }
 
 func verifyCLIShell(shell, mode, path, userHome, zdot, parentPath string) error {
+	if _, err := os.Lstat(shell); err != nil {
+		// The host has no such shell, so it is not an operator login environment.
+		return nil
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	command := exec.CommandContext(ctx, shell, mode, "printf '\\nSHZ_COMMAND=%s\\n' \"$(command -v shz)\"")
