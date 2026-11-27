@@ -1,0 +1,10 @@
+AM v0.2.28 双面哈希登记（轮五十三收口窗：B10 稳态活动入链落地⇒EVIDENCED＝DC §3.2 activity 入链义务稳态半闭合；B08 D0/D4/D5 具名后续全部兑现；可立实施票穷尽，前沿转 owner 裁决面）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = fb9cc96ac6e50274a6d7c5ebe3444a4d5c55ec23a66023e51d29cd0b13edd203
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 59a9bf52d45c432a85eb1fc099b4ca45fbc2522a14ff2969f62591b70c894359，与 am-v0.2.27-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.27 = 59a9bf52d45c432a85eb1fc099b4ca45fbc2522a14ff2969f62591b70c894359（evidence/A32/am-v0.2.27-hash.txt 实读）；再前 v0.2.26 = 5a8535ce3a7353dc9aa487df3ba4798e0945c4f9ecfb2b753a86d189a9d8db6d（同件记载）
+- 同轮并入 dev 的提交: 664005a（B10 设计面：diff-plan 先列后改，D0 seam 裁决＋D1-D7＋STOP 条件 S1-S5）＋c2bee33（B10 实施 32 files +891/−86：substrate.AppendActivity 中央写者[行+链+映射同事务／存储行回读渲染／Tx/Conn 事务面闸]＋pre-chain 回退臂[sqlite_master 探针，S6 回填恰投影一次]＋36 位点全改接[substrate 1+verbs 27+domain 8；any 原值透传设计修正]＋覆盖门 CG1-CG3[B05 两阶段形制，旁路必红/fail-closed/枚举器负控]＋S1-S3 稳态族＋N1/N4 全表覆盖升级＋T5 seam 全脊映射不变量＋T7 json_object 字节保真；recordActivity 委托⇒identity 全家自动入链）；status.json B10=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（29 包 ok[零新包]，零 FAIL 零 UNVERIFIED；verbs 全量非缓存实跑）；identity 不变＝4786047e098a0c6b830c1cde532cbbd3289b735d1aa047fd7f9b6d32ae7b8be1（B10 无迁移步骤，schema 三文件零 diff）；seam prepare/attest 冻结 JSON wire 零接触（dispatch_result 存储字节不变）
+- 诚实边界: 中段窗口残余（旧版 S6 后～B10 前的行不链上＝有界可见例外，当前零脊处于该窗口）；覆盖断言限定 B10 后新行；闸为源级非行为级；'activity' 聚合 head 随稳态移动（D07 heads_json 自动涵盖）
+- 账: dev tip＝c2bee33（本登记轮提交随后）/ worktrees＝main+dev+b10（b10 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa 完整审计重跑候 push 门（Q7 裁定）/ **B-chain：B01-B05/B07-B10 除 B06（门 O3 硬件候 218）外全 EVIDENCED；D-chain：D01-D08 全 EVIDENCED，D09 缓行（Q2）⇒可立实施票穷尽，前沿＝owner 裁决面（Q7 push 门／Mimosa 完整审计／B06 上 218／D09 启停）**
