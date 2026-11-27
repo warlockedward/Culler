@@ -3553,3 +3553,45 @@ BEGIN SELECT RAISE(ABORT, 'anchor checkpoints are append only'); END;
 
 CREATE TRIGGER anchor_checkpoints_no_delete BEFORE DELETE ON anchor_checkpoints
 BEGIN SELECT RAISE(ABORT, 'anchor checkpoints are append only'); END;
+
+-- signoffs — the approval registry (D18): one immutable row per recorded
+-- approval or rejection, bound to a specific subject (approval is never
+-- generic). The subject class is a closed whitelist; break-glass
+-- ratification carries the mandatory separation-of-duties rule (the
+-- executor of the ratified operation may never approve it themselves, IG
+-- §3). Rows are append only: a rewritten approval is a forged one.
+CREATE TABLE signoffs (
+    signoff_id    TEXT NOT NULL UNIQUE
+                CHECK (length(signoff_id) = 32 AND
+                       length(CAST(signoff_id AS BLOB)) = 32 AND
+                       signoff_id NOT GLOB '*[^0-9a-f]*'),
+    subject_class TEXT NOT NULL
+                CHECK (subject_class IN ('breakglass.ratification','generic')),
+    subject_ref   TEXT NOT NULL
+                CHECK (length(subject_ref) BETWEEN 1 AND 256),
+    requested_by  TEXT
+                CHECK (requested_by IS NULL OR length(requested_by) = 32),
+    approved_by   TEXT NOT NULL REFERENCES users (id),
+    decision      TEXT NOT NULL
+                CHECK (decision IN ('approved','rejected')),
+    reason        TEXT NOT NULL
+                CHECK (length(reason) BETWEEN 1 AND 1024),
+    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (signoff_id)
+);
+
+CREATE INDEX signoffs_subject ON signoffs (subject_class, subject_ref);
+
+CREATE TRIGGER signoffs_guarded_insert BEFORE INSERT ON signoffs
+BEGIN
+    SELECT RAISE(ABORT, 'signoff insert requires a guard-bound trusted context')
+    WHERE NOT EXISTS (SELECT 1 FROM trusted_ctx);
+    SELECT RAISE(ABORT, 'signoff attribution disagrees with the trusted context')
+    WHERE NEW.approved_by NOT IN (SELECT actor FROM trusted_ctx);
+END;
+
+CREATE TRIGGER signoffs_no_update BEFORE UPDATE ON signoffs
+BEGIN SELECT RAISE(ABORT, 'signoffs are append only'); END;
+
+CREATE TRIGGER signoffs_no_delete BEFORE DELETE ON signoffs
+BEGIN SELECT RAISE(ABORT, 'signoffs are append only'); END;

@@ -61,3 +61,13 @@
 ## 7. 登记与收尾
 
 实施＝少提交于 shz/TD08；全道绿后 ff dev；登记轮＝AM v0.2.27＋status.json D08=EVIDENCED＋blcheck；新基线 identity 入册；诚实边界（D5 五项）入登记；D04/D05 悬挂面闭合情况随登记说明。
+
+## 8. 实施补记
+
+- **新基线 identity＝`4786047e098a0c6b830c1cde532cbbd3289b735d1aa047fd7f9b6d32ae7b8be1`**（S12；双方法核验：三文件拼接 `cat schema.sql + "\n" + delivery.sql + "\n" + environments.sql` 的 SHA-256 与 `substrate.CurrentSchemaID` 运行值逐字节相等）。
+- **Mimosa 兼容（P5 修正兑现）**：verb 路径无 `exec`——签署节点经 `signNodeServe` 进程内 seam 提供服务（盘 ledger＋flock 语义不变）；`__sign-node` 子进程保留为 CLI 形态。
+- **迁移族 12 步全量改写**：9 个 substrate 测试文件＋onboard_migration（双 strip 尾插 signoffs 五 drop＋ledger 12×2）＋identity_ig_t5；历史步骤端点钉死为字面量（d01/d03/d05/d06/d07），S12.to＝CurrentSchemaID。
+- **两处 ledger 计数勘误**（定向测试暴露）：`TestMigrateAppliesSecondStepFromFirstStepBaseline`（1 记录＋11 应用＝12）与 `TestMigrateNoOpWhenLedgerCompleteAtCurrentIdentity`（12 记录行）——修正属期望值更新，非生产代码缺陷。
+- **测后检视**：`d07Spine`（registry[:11] 记 S1-S11）与 `d06Spine`（registry[:10] 记 S1-S10）各补 `stripSignoffs`；零行 UPDATE 教训复用（SO1 以真实行断言 lattice）。
+- **首跑环境闪断（登记，非缺陷）**：`TestReleaseSkillWorksForExternalAgentWithoutSourceOrDevelopmentTools` 于 check.sh 中途 `mise exec -- bun` 解析 exit 1，`set -eu` 截断该步之后的全部步骤；该测试源码对 D08 改动面零接触（解析宿主 Bun 路径＋部署闭合，与本票 schema/verb/guard 无交）。同测试单跑＝ok（69.4s）；与 D07 登记过的同源闪断（host Bun fixture mise 解析）同因。全道重跑证明干净收口。
+- **包数勘误**：§5 预计「30 包」系笔误——D08 零新包（signoff 面全在 verbs 与 cmd/mc 内），收口基线＝29 包（与 D07 登记同数）。全道重跑＝MC_CHECK_EXIT=0，29 包 ok，零 FAIL 零 UNVERIFIED。

@@ -31,6 +31,7 @@ func b08Spine(t *testing.T) *sql.DB {
 	stripDegradedGrants(t, db)
 	stripSignRequests(t, db)
 	stripAnchorCheckpoints(t, db)
+	stripSignoffs(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:5] {
 		recordStep(t, db, step)
@@ -144,8 +145,8 @@ func TestActivityBackfillProjectsStockRowsInOrder(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 6 || report.Applied[0] != "migrate-activity-to-chain" || report.Applied[1] != "add-identity-foundation" || report.Applied[2] != "add-legacy-actor-sealing" || report.Applied[3] != "add-degraded-grants" || report.Applied[4] != "add-sign-requests" || report.Applied[5] != "add-anchor-checkpoints" {
-		t.Fatalf("report = %+v; want the sixth through eleventh steps applied", report)
+	if !report.Migrated || len(report.Applied) != 7 || report.Applied[0] != "migrate-activity-to-chain" || report.Applied[1] != "add-identity-foundation" || report.Applied[2] != "add-legacy-actor-sealing" || report.Applied[3] != "add-degraded-grants" || report.Applied[4] != "add-sign-requests" || report.Applied[5] != "add-anchor-checkpoints" || report.Applied[6] != "add-signoffs" {
+		t.Fatalf("report = %+v; want the sixth through twelfth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'activity'`); n != 2 {
 		t.Fatalf("activity chain rows = %d; want 2 (one per stock row)", n)

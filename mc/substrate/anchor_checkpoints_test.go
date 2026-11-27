@@ -34,6 +34,7 @@ func d06Spine(t *testing.T) *sql.DB {
 	db := provisionProductionSpine(t, filepath.Join(t.TempDir(), "spine.db"), testUUID, d06SigningIdentity)
 	t.Cleanup(func() { db.Close() })
 	stripAnchorCheckpoints(t, db)
+	stripSignoffs(t, db)
 	registry := ProductionMigrationRegistry()
 	for _, step := range registry[:10] {
 		recordStep(t, db, step)
@@ -53,8 +54,8 @@ func TestAnchorCheckpointsStepFromD06Baseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 1 || report.Applied[0] != "add-anchor-checkpoints" {
-		t.Fatalf("report = %+v; want only the eleventh step applied", report)
+	if !report.Migrated || len(report.Applied) != 2 || report.Applied[0] != "add-anchor-checkpoints" || report.Applied[1] != "add-signoffs" {
+		t.Fatalf("report = %+v; want the eleventh and twelfth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'anchor_checkpoints'`); n != 1 {
 		t.Fatalf("anchor_checkpoints table = %d; want 1", n)
@@ -62,8 +63,8 @@ func TestAnchorCheckpointsStepFromD06Baseline(t *testing.T) {
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'trigger' AND name LIKE 'anchor_checkpoints_%'`); n != 3 {
 		t.Fatalf("anchor registry triggers = %d; want 3", n)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 11 {
-		t.Fatalf("ledger rows = %d; want 11", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 12 {
+		t.Fatalf("ledger rows = %d; want 12", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {

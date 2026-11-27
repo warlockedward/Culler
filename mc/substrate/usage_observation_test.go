@@ -432,14 +432,14 @@ func TestMigrateAppliesUsageStepFromB07Baseline(t *testing.T) {
 	if err != nil {
 		t.Fatalf("migrate = %v", err)
 	}
-	if !report.Migrated || len(report.Applied) != 8 || report.Applied[0] != "add-usage-observations" || report.Applied[1] != "migrate-usage-to-v2" || report.Applied[2] != "migrate-activity-to-chain" || report.Applied[3] != "add-identity-foundation" || report.Applied[4] != "add-legacy-actor-sealing" || report.Applied[5] != "add-degraded-grants" || report.Applied[6] != "add-sign-requests" || report.Applied[7] != "add-anchor-checkpoints" {
-		t.Fatalf("report = %+v; want the fourth through eleventh steps applied", report)
+	if !report.Migrated || len(report.Applied) != 9 || report.Applied[0] != "add-usage-observations" || report.Applied[1] != "migrate-usage-to-v2" || report.Applied[2] != "migrate-activity-to-chain" || report.Applied[3] != "add-identity-foundation" || report.Applied[4] != "add-legacy-actor-sealing" || report.Applied[5] != "add-degraded-grants" || report.Applied[6] != "add-sign-requests" || report.Applied[7] != "add-anchor-checkpoints" || report.Applied[8] != "add-signoffs" {
+		t.Fatalf("report = %+v; want the fourth through twelfth steps applied", report)
 	}
 	if n := countRows(t, db, `SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('usage_events','usage_observations','usage')`); n != 3 {
 		t.Fatalf("usage tables present = %d; want 3", n)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 11 {
-		t.Fatalf("ledger rows = %d; want 11", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM schema_history`); n != 12 {
+		t.Fatalf("ledger rows = %d; want 12", n)
 	}
 	var stamped string
 	if err := db.QueryRow(`SELECT schema_id FROM meta WHERE id = 1`).Scan(&stamped); err != nil {
@@ -548,4 +548,5 @@ func stripUsageTables(t *testing.T, db *sql.DB) {
 	stripDegradedGrants(t, db)
 	stripSignRequests(t, db)
 	stripAnchorCheckpoints(t, db)
+	stripSignoffs(t, db)
 }

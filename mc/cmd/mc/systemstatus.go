@@ -503,6 +503,12 @@ func commandSystemSpine(action string, stdin io.Reader) (any, error) {
 			return nil, err
 		}
 		return withSpine(func(db *sql.DB) (any, error) { return verbs.AnchorPublish(db, id, a) })
+	case "signoff-record":
+		var a verbs.SignoffRecordRequest
+		if err := decodeDiagnosticRequest(stdin, &a); err != nil {
+			return nil, err
+		}
+		return withSpine(func(db *sql.DB) (any, error) { return verbs.SignoffRecord(db, id, a) })
 	case "identity-degraded-grant-issue":
 		var a verbs.IdentityDegradedGrantIssueRequest
 		if err := decodeDiagnosticRequest(stdin, &a); err != nil {

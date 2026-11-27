@@ -298,3 +298,33 @@ func DegradedAllows(ctx context.Context, q interface {
 	}
 	return Decision{Reason: "no live degraded authorization binds every element"}, nil
 }
+
+// sodMandatoryClasses is the FROZEN set of signoff subject classes where
+// separation of duties is a hard rule (IG §3: the executor of the ratified
+// operation may never approve it themselves). Classes off this list do not
+// demand SoD (D18: SoD is configurable, not a default) — extending the set
+// is an owner ruling, never an implementation-side addition.
+var sodMandatoryClasses = map[string]bool{
+	"breakglass.ratification": true,
+}
+
+// signoffSubjectClasses is the closed whitelist of signoff subject classes:
+// an approval is always bound to a specific, recognized subject kind.
+var signoffSubjectClasses = map[string]bool{
+	"breakglass.ratification": true,
+	"generic":                 true,
+}
+
+// DecideSignoff is the guard's ruling on recording a signoff: the subject
+// class must be on the whitelist (fail closed for anything else), and for
+// SoD-mandatory classes the approver must differ from the original
+// requester/executor. The policy is per-class, never per-call.
+func (g *Guard) DecideSignoff(subjectClass, approver, requestedBy string) Decision {
+	if !signoffSubjectClasses[subjectClass] {
+		return Decision{Reason: "the subject class is not on the signoff whitelist"}
+	}
+	if sodMandatoryClasses[subjectClass] && requestedBy != "" && requestedBy == approver {
+		return Decision{Reason: "separation of duties: the executor of the subject operation may not approve it"}
+	}
+	return Decision{Allow: true, Reason: "the signoff subject class is recognized"}
+}
