@@ -29,6 +29,8 @@
 - validateRegistry 调整＝§2.2 地址类-scheme 规则（仅 https 闸改条件闸）。
 - dashboard：连接类型"Self-hosted (OpenAI-compatible)"＝选 registry 条目＋输 key（复用 connection-save api_key 流，agentprofiles.js:847-856 形状）；profile 测试＝live 闸语义不变（--confirm-live-spend 域）。
 - wizard 行为：非 OAuth binding 不索要 `--acquire`（onboard_runtime_prod.go:96-98 现状即真）＝**向导零改动**。
+**218 真机佐证（轮六十三部署轮 r6）**：`harness=codex` 的 binding 即便配 `codex-api-key` 凭据，空 model 被 scaffold 校验拒（`allowUnselected` 例外只对未选中 binding 生效，config.go:1342-1344），且 codex 族名录钉死订阅形态模型名＝**"任意 OpenAI key 直通"在现有形状下无路可走**——本票 S1 的必要性由真机行为独立证实（非仅静态读码）。
+
 **S2（备择，不推荐）**＝OpenCode 族加操作者目录面——catalog 是发布钉版件（Parse 版本闸＋DisallowUnknownFields），开操作者注入＝动发布完整性面＋与"每模型带价格/上下文记录"的重契约较劲；除非用户面要求 OpenCode 增值（价格表/上下文/provenance），不值。
 
 ## §4 正清单（进码蓝本级；文件行位以届时代码为准，批准时逐行钉）

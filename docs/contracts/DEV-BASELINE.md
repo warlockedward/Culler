@@ -93,6 +93,7 @@
 | C09 | RR-3 关闭五项包（V-6+环境登记+config↔执行一致+反证+变更守卫） | C02,A14 | TM §8 RR-3 | RR-3：五项包+Authority 接受（治理） | 门:V-6 执行 |
 | C10 | chargeback 三列报表+价格快照版本表（unsettled-cost 态） | C05 | BL §5(c)/§6/§7；D-G7.2 | P5：对账报表测试+unsettled 态 | |
 | C11 | 自托管 OpenAI 兼容 provider 接入面（新 kind 受控引用 registry 条目；proxy 按登记目的地连接；连接策略豁免=仅操作者声明条目；scheme 按地址类划界（公网 https/私有段字面 IP 可 http）；OpenCode 发布目录不动） | C01,C02 | PS §1/§2.1-2.5 | P2：缺省拒向量族+策略命中/未命中向量+218 真机 stub e2e+既有通道零回归 | **轮六十三立票＝owner 裁「A 立案、产品化、边界按建议钉」（裁文=diff-plan §2）**；设计件=evidence/C11/diff-plan-001.md（S1 推荐/S2 备择）；DNS 再绑定残余=RR 候选候 Authority 具名，不随票关闭；**BACKLOG＝设计已交、代码授权待另发** |
+| C12 | 非订阅连接冷启动面（向导 runtime-auth 对 API-key/OpenCode 族仅指 dashboard，而 dashboard 在向导末段才激活＝零订阅部署存在无入口死锁；形状=向导交互粘贴（prompt 面同形 live-spend 提问，key 不落 argv/日志/文件）或激活前受控 token 子命令，归 Authority 裁） | C01,A02 | PS §2；AGENTS 操作者面规则；TM §7.2 记录制 | P2：冷启动 e2e＝净机无 dashboard 状态凭向导完成 API-key 录入→激活→连接可用；prompt 面负测（key 不出现于日志/ps/spine） | **轮六十三立票＝218 真机现形（r7 needs-input 无门可入）**；218 本轮以部署域内私有动词演示走通（owner 亲粘 key＝过渡路径非产品面，登记于 evidence/C12/bootstrap-record-001.md）；**BACKLOG＝设计缺口在册、代码授权待另发** |
 
 ### Track D · P4 身份与治理
 | ID | 标题 | depends | 契约锚 | 验收映射 | 备注/门 |
