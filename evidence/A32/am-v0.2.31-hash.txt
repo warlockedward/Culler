@@ -1,0 +1,10 @@
+AM v0.2.31 双面哈希登记（轮五十六收口窗：owner 纠正前轮"穷尽"失准声明⇒ledger 全扫六票 IN_PROGRESS 逐票门禁分析⇒A06 218 真 docker 臂系 Q4 授权域内唯一无新授权可续面⇒复测双臂 PASS＋0700 闸开火副证＋密钥环幂等真机证＋零残留逐字核验⇒A06 F1 判据 flip=EVIDENCED，具名残留三项候裁原样保持）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = d644294199a86d14e9dc6ad4978e64120bd4f468a563be7d15a4f19fb7bca6fb
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 442fb3bdb02a571412c98e51856bac9cea4a4f08501b9b775750ec2dd4af9e76，与 am-v0.2.30-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.30 = 442fb3bd…9e76（evidence/A32/am-v0.2.30-hash.txt 实读）；再前 v0.2.29 = 8b73f50e…c669（同件记载）
+- 同轮并入 dev 的提交: 949a5b1（A06 V-002 复测证据件＝verification-record-A06-V-002.md＋218-drill-43b6ccbf/record.json）；status.json A06=EVIDENCED 随本登记轮提交
+- 关键事实: 218 专用栈真 docker 双臂 PASS（run-1 空脊＋0700 闸生产开火/run-2 activity=22 真链抽样＋fingerprint 跨 run 稳定）；零残留＝专用栈复原＋主 daemon 62/173/185 前后逐字等；record＝TM §7.1 全 15 列＋z5 预留共 16 字段零缺列（票面"17"计数偏差登记语更正，历史字节不改）；identity 不变 4786047e…8be1（纯证据轮）
+- 诚实边界: 具名残留（§7.4 双事件轮换/resident 周期集成/Z5 通道）＝各自候裁不随 flip 消失；备份原件未导出（record＋双 sha256 在案，§7.7 无密文留档义务）；agent E1 自记非独立审查；PASS 作用域＝c41b3b2 码×F1104 专用栈×本 scenario 组合
+- 账: dev tip=949a5b1（本登记轮提交随后）/ worktrees=main+dev+a06（a06 收口后回收）/ origin/main=44b0f45（dev 领先含本轮共 5 commits，下轮 push 候令）/ 本地 main PRISTINE b22df40 / 无新外发 / **余 IN_PROGRESS＝A14/A24/A31/L01/L03（全候 owner 面）＋E 轨 BLOCKED×5**
