@@ -67,3 +67,10 @@
 - jobId＝scan-job-mwysrq61-61b348026b841cef，attempt 1 完成（无 enobufs）。**scanId＝scan-2026-11-27T09-47-39.033Z-4e249cae6f92；封印＝sha256:03117af7a9cced5bb1b5226be231da035129c1eeb3efa31e6bfd50532343470f**。
 - 对照轮五十三基线：**total 559／high 435／medium 120／low 4，逐域 dashboard 161／mc 157／runner 144／resident 61／evals 19／performance 10／release 7＝完全一致＝本窗全部变更（契约正文修订＋evidence/docs）零新增发现面**。
 - 本窗 enobufs 兼容放行欠账＝就此清偿（§9 逐笔封＋本笔终封双层覆盖）。诚实核心沿用 §1：partial／inconclusive／static-only／verdictEffect none——不构成安全背书。
+
+## 11. 轮六十二 grill 轮终封（批量裁执行窗）
+
+- 树＝dev tip 8f27cbe（Q1–Q5 批量裁执行全部增量：boot 臂工件/dnsmasq 单元/生产预案/AM v0.2.45/第六次 push 登记）。
+- jobId＝scan-job-mwyt71wo-61700bccf25bacd9（attempt 1 完成，无 enobufs）；**scanId＝scan-2026-11-27T09-59-31.590Z-4bcfb0e77ab7；封印＝sha256:81d37f28fbff0f5c5cb44d1cfb22a77c3408a25b7d469f094092283c980aa765**。
+- **findingCount=559／依赖面 572 包／advisory 4 包 40 条＝与轮五十三基线及 §9/§10 各封完全一致＝本窗批量裁执行（契约/evidence/部署预案，零生产码）零新增发现面**。
+- 本登记提交＝§11 自尾追加（登记文档性质，同 §9 声明）；诚实核心沿用 §1（partial/inconclusive/static-only/verdictEffect none），不构成安全背书。
