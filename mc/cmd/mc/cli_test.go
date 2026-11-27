@@ -2750,9 +2750,9 @@ func TestAttachmentTreePrepareStaysHostLocal(t *testing.T) {
 		path string
 		mode os.FileMode
 	}{
-		// The inbound read chain is execute-only traversal for the container
-		// (no group/other read or write); the outbound chain stays owner-only.
-		{filepath.Join(root, "in", "published", "sha256"), 0o711},
+		// The inbound read chain is execute-only traversal on Linux (owner-only
+		// on macOS, whose file share ignores the bits); outbound stays owner-only.
+		{filepath.Join(root, "in", "published", "sha256"), verbs.AttachmentInboundReadMode()},
 		{filepath.Join(root, "out", "published", "sha256"), 0o700},
 	} {
 		info, err := os.Stat(entry.path)

@@ -2,8 +2,10 @@ package boundary_test
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"mc/boundary"
@@ -138,6 +140,39 @@ func TestTrustHomeDir(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			if err := boundary.TrustHomeDir(make(t), uid); err == nil {
 				t.Fatalf("TrustHomeDir() = nil, want rejection")
+			}
+		})
+	}
+}
+
+func TestTrustHomeDirTraversalAllowsExecuteOnlyChain(t *testing.T) {
+	dir := t.TempDir()
+	uid := os.Getuid()
+	// Owner-only is always trusted. The execute-only inbound chain is accepted
+	// only on Linux: macOS's native home-ACL trust refuses any non-owner bit,
+	// and the Linux deployment is where container traversal is actually needed.
+	accepted := []os.FileMode{0o700}
+	if runtime.GOOS == "linux" {
+		accepted = append(accepted, 0o701, 0o711)
+	}
+	for _, mode := range accepted {
+		path := mkdir(t, filepath.Join(dir, fmt.Sprintf("ok%d", mode)), mode)
+		if err := boundary.TrustHomeDirTraversal(path, uid); err != nil {
+			t.Fatalf("TrustHomeDirTraversal(%04o) = %v, want accept", mode, err)
+		}
+	}
+	rejects := map[string]func(t *testing.T) string{
+		"group read":  func(t *testing.T) string { return mkdir(t, filepath.Join(dir, "gr"), 0o750) },
+		"other read":  func(t *testing.T) string { return mkdir(t, filepath.Join(dir, "orr"), 0o705) },
+		"other write": func(t *testing.T) string { return mkdir(t, filepath.Join(dir, "ow"), 0o702) },
+		"world rx":    func(t *testing.T) string { return mkdir(t, filepath.Join(dir, "wr"), 0o755) },
+		"regular":     func(t *testing.T) string { return writeFile(t, filepath.Join(dir, "rf"), 0o600) },
+		"missing":     func(t *testing.T) string { return filepath.Join(dir, "gone") },
+	}
+	for name, make := range rejects {
+		t.Run(name, func(t *testing.T) {
+			if err := boundary.TrustHomeDirTraversal(make(t), uid); err == nil {
+				t.Fatalf("TrustHomeDirTraversal(%s) = nil, want rejection", name)
 			}
 		})
 	}

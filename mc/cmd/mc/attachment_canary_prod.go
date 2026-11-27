@@ -360,7 +360,9 @@ func ensureAttachmentCanaryDir(path string) error {
 
 func trustAttachmentCanaryDirs(paths ...string) error {
 	for _, path := range paths {
-		if err := boundary.TrustHomeDir(path, os.Getuid()); err != nil {
+		// TrustHomeDirTraversal admits the execute-only inbound read chain but
+		// still refuses any group/other read or write and any granting macOS ACL.
+		if err := boundary.TrustHomeDirTraversal(path, os.Getuid()); err != nil {
 			return verbs.Domainf(
 				"attachment canary scratch ACL trust refused %q: %v",
 				path, err,
@@ -566,15 +568,17 @@ func publishHostAttachmentCanary(root, path string, body []byte) error {
 		return verbs.Domainf("attachment canary inbound path escaped its published root")
 	}
 	shard := filepath.Dir(path)
-	// 0711: the container binds the published root and must traverse this
-	// shard to read the sealed object; execute-only denies listing (verbs'
-	// attachmentInboundReadMode is unexported here).
-	if err := os.Mkdir(shard, 0o711); err != nil {
+	// The container binds the published root and must traverse this shard to
+	// read the sealed object. Use the same platform mode the publisher uses
+	// (Linux execute-only 0711, macOS owner-only 0700) so the shard matches the
+	// published directory it sits under.
+	inboundMode := verbs.AttachmentInboundReadMode()
+	if err := os.Mkdir(shard, inboundMode); err != nil {
 		return fmt.Errorf("create attachment canary inbound shard: %w", err)
 	}
 	// os.Mkdir is masked by umask (the deployment runs 077); set the mode so the
 	// container can traverse the shard regardless.
-	if err := os.Chmod(shard, 0o711); err != nil {
+	if err := os.Chmod(shard, inboundMode); err != nil {
 		return fmt.Errorf("set attachment canary inbound shard mode: %w", err)
 	}
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)

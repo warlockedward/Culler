@@ -81,6 +81,33 @@ func TrustHomeDir(path string, ownerUID int) error {
 	return trustedOwnerMode(path, info, ownerUID)
 }
 
+// TrustHomeDirTraversal is TrustHomeDir for a directory a non-owner process
+// must traverse by exact known path: the published inbound attachment read
+// chain. Group and other may hold the execute (search) bit but never read or
+// write, so the directory is not listable and its digest-named objects stay
+// unguessable; a granting native macOS ACL is still refused. Owner-only 0700
+// directories pass too, so a whole tree can be checked with one predicate.
+func TrustHomeDirTraversal(path string, ownerUID int) error {
+	info, err := trustedLstat(path)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return mountErrf(CodeAllowlistUntrusted, "MC_HOME %q is not a directory", path)
+	}
+	if perm := info.Mode().Perm(); perm&0o066 != 0 {
+		return mountErrf(CodeAllowlistUntrusted, "%q mode %04o grants group or other read or write", path, perm)
+	}
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return mountErrf(CodeAllowlistUntrusted, "cannot read ownership of %q", path)
+	}
+	if int(stat.Uid) != ownerUID {
+		return mountErrf(CodeAllowlistUntrusted, "%q is owned by uid %d, not the operator uid %d", path, stat.Uid, ownerUID)
+	}
+	return trustedNoGrantingACL(path, info, ownerUID)
+}
+
 // trustedLstat refuses to follow the final component: a symlink to an
 // otherwise-trusted object is not itself trusted.
 func trustedLstat(path string) (fs.FileInfo, error) {

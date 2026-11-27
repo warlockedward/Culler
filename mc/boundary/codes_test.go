@@ -192,6 +192,9 @@ func TestEveryPublicMountRejectionIsCoded(t *testing.T) {
 		{name: "TrustHomeDir", want: boundary.CodeAllowlistUntrusted, run: func() error {
 			return boundary.TrustHomeDir(missing, os.Getuid())
 		}},
+		{name: "TrustHomeDirTraversal", want: boundary.CodeAllowlistUntrusted, run: func() error {
+			return boundary.TrustHomeDirTraversal(missing, os.Getuid())
+		}},
 		{name: "ResolveSource", want: boundary.CodeSourceWrongKind, run: func() error {
 			_, err := boundary.ResolveSource("")
 			return err
@@ -222,6 +225,7 @@ func TestEveryPublicMountRejectionIsCoded(t *testing.T) {
 		"ResolveAccess":               true,
 		"TrustPolicyFile":             true,
 		"TrustHomeDir":                true,
+		"TrustHomeDirTraversal":       true,
 		"ResolveSource":               true,
 		"ResolveAllowlist":            true,
 		"ResolvedAllowlist.Authorize": true,

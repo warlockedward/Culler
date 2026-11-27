@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"unicode"
 	"unicode/utf8"
@@ -775,10 +776,29 @@ func safeAttachmentPathSegment(value string) bool {
 // reads a known digest path under it, so uid must be able to traverse these
 // directories; the execute-only "other" bits deny listing, so no attachment is
 // enumerable. Everything outside this chain stays owner-only 0700.
-const (
-	attachmentOwnerMode       uint32 = 0o700
-	attachmentInboundReadMode uint32 = 0o711
-)
+//
+// The execute bit is required only on Linux: Docker Desktop's virtiofs share on
+// macOS ignores unix permission bits (which is why the container-read failure
+// surfaces solely on Linux hosts), and macOS's stricter native home-ACL trust
+// refuses any non-owner bit. So macOS keeps the chain owner-only 0700 and the
+// Linux deployment widens it to execute-only 0711.
+const attachmentOwnerMode uint32 = 0o700
+
+var attachmentInboundReadMode uint32 = inboundAttachmentReadMode()
+
+func inboundAttachmentReadMode() uint32 {
+	if runtime.GOOS == "linux" {
+		return 0o711
+	}
+	return attachmentOwnerMode
+}
+
+// AttachmentInboundReadMode reports the mode a published inbound read directory
+// carries on this host, so the canary and tests build and assert the value the
+// publisher actually uses instead of hard-coding one platform's number.
+func AttachmentInboundReadMode() os.FileMode {
+	return os.FileMode(attachmentInboundReadMode)
+}
 
 func openOrCreateAttachmentDirectory(parent int, name string, mode uint32) (int, error) {
 	if name == "" || name == "." || name == ".." || filepath.Base(name) != name {

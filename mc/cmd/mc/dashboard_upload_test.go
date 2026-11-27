@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"mc/verbs"
 )
 
 func TestDashboardUploadResumesSessionPublishesFilesAndPreservesAnExactRetry(t *testing.T) {
@@ -47,12 +49,13 @@ func TestDashboardUploadResumesSessionPublishesFilesAndPreservesAnExactRetry(t *
 			if prepared.code != 0 {
 				t.Fatal(prepared.stderr)
 			}
-			// The inbound shard the publish flow adopts is created execute-only
-			// for container traversal; mirror that mode here.
-			if err := os.MkdirAll(filepath.Dir(corrupt), 0711); err != nil {
+			// The inbound shard the publish flow adopts carries the platform
+			// inbound read mode; mirror it (Linux execute-only, macOS owner-only).
+			inboundMode := verbs.AttachmentInboundReadMode()
+			if err := os.MkdirAll(filepath.Dir(corrupt), inboundMode); err != nil {
 				t.Fatal(err)
 			}
-			if err := os.Chmod(filepath.Dir(corrupt), 0o711); err != nil {
+			if err := os.Chmod(filepath.Dir(corrupt), inboundMode); err != nil {
 				t.Fatal(err)
 			}
 			if err := os.WriteFile(corrupt, []byte("external bytes"), 0600); err != nil {
