@@ -1,0 +1,10 @@
+AM v0.2.36 双面哈希登记（轮五十九收口窗：A36 设计面批准事件（owner「接受所有裁决，并且进行实施」＝进码授权生效，批准对象＝设计范围非验收）＋实施 CODED 落盘＋D4 断言族 11 用例绿＋最终树全道 29 包 EXIT=0）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 0639faa2de025704f5a04dcfe1da23ca9e3db5c8129bd5e9e18a2103c34291bc
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 3e3d0cc1e100fc8d110331fddc10e811077e412c795d85acabe12c3e7c4b57be，与 am-v0.2.35-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.35 = 3e3d0cc1…b57be（UIP 立法轮）；v0.2.34 = 69664251…badb（上游追踪机制轮）
+- 同轮并入 dev 的提交: 115331c（A36 设计面）＋4bc2161（实施 11 files +796/−4：deployment 纯决策形＋exec 字面量分离＋mc 动词对＋culler gateway 壳＋uninstall 命名＋config 注释修＋D4 族 11 用例＋壳 3 态）；status.json A36=CODED 随本登记轮提交
+- 关键事实: 最终干净 lane=mc/check.sh MC_CHECK_EXIT=0（29 包零红零 UNVERIFIED，零新包）；修正案文×3 入 diff-plan §8（端口=临时口实测/uninstall 改检测命名/dashboard 剥 UI 轮）；缺陷账×2（ufw [ 1] 格式想当然致三面失配—逐段微探针定案；gateway 抢在 --help 归一前校验—已旁路）；R-a 新规本轮零触碰（真机防火墙命令在 218 窗口验收臂才执行）；identity 不变 4786047e…8be1（零 schema）
+- 诚实边界: A36=CODED 不升 EVIDENCED——F1 验收臂（真容器往返+scoped-only+撤销零残留）挂 218 窗口 owner 点名，届时与 A31 F1③ 同轮合流；信任域论证批准＝批准设计范围非安全背书（AI 非 Acceptance Authority）；壳 v1 不暴露 --port flag（收窄参数留 Go 层候补）
+- 账: dev tip=4bc2161（登记轮提交随后）/ worktrees=main+dev+a36（本轮收口后回收，218 臂另开工单支）/ push 队列登记时点=8 候令（实算以 push 前为准）/ 本地 main PRISTINE b22df40 / 无新外发 / 余 IN_PROGRESS=A14/A24/A31/L01/L03＋A36=CODED 候臂＋E×5 BLOCKED / D09 缓行
