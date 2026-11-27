@@ -414,9 +414,11 @@ type Wiki struct {
 }
 
 // ProviderProxy is the listen address of the provider proxy. Empty binds the
-// proxy to loopback; an explicit IP literal lets agent containers reach it
-// through a host gateway address on Linux. Hostnames and port suffixes are
-// refused — the proxy port stays ephemeral.
+// proxy to loopback; an explicit IP literal on a bridge gateway address lets
+// agent containers reach it through the host gateway on Linux — reaching it
+// also requires the host's own INPUT policy to admit the bridge subnet,
+// which the operator grants explicitly with `culler gateway allow` (A36).
+// Hostnames and port suffixes are refused — the proxy port stays ephemeral.
 type ProviderProxy struct {
 	Bind string `toml:"bind"`
 }

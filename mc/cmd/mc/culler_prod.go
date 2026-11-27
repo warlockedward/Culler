@@ -256,6 +256,8 @@ func runCullerWith(args []string, stdin io.Reader, stdout, stderr io.Writer, dep
 			return 0
 		}
 		return 1
+	case "gateway":
+		return cullerGatewayAction(o.service, home, out, fail)
 	case "logs":
 		unit, stream := o.service, "stderr"
 		if unit == "" {

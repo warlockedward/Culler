@@ -47,4 +47,13 @@ mc/cmd/mc/agentprofiles.go（case 对）＋新 mc/deployment/provider_gateway.go
 
 ## 5. 登记与收尾
 
-设计面＝本件，提交于 shz/TA36 → ff dev 候 owner 批准（批准事件登记后方可进码，D06 同形）；实施轮＝少提交＋全道＋218 臂挂窗口点名；A36/A31 双票合流登记。
+设计面＝本件，提交于 shz/TA36 → ff dev 候 owner 批准（批准事件登记后方可进码，D06 同形）；实施轮＝少提交＋全道＋218 臂挂窗口点名；A36/A31 双票合流登记。批准事件＝轮五十九 owner「接受所有裁决，并且进行实施」（会话内批准，AM 登记）。
+
+## 8. 实施补记（设计面获准后的三处修正案文＋缺陷账）
+
+- **修正案文①（端口面）**：recon 后实测代理端口＝每启动临时口（provider-proxy 源码 `options.port ?? 0`，全仓无固定口配置）——"端口进规则"前提不成立。落形＝默认规则＝桥网→bind 地址 TCP（无端口约束：bind 地址本身即操作者显式选择的暴露面，部署设计上桥 IP 只有代理在听）；`port>0` 收窄参数保留在 Go 动词层，culler 壳 v1 不暴露该 flag（候补面登记）。
+- **修正案文②（uninstall 形）**：D3 原形"卸载时自动 revoke"改＝**检测＋命名**（present 态打印规则提醒＋revoke 一句命令指引），卸载过程零防火墙编辑——与 D2 精神一致（防火墙编辑只发生在显式人类动作里），且规则随部署消亡自然惰化。
+- **修正案文③（dashboard 提示行缓后）**：票面轻项"设置面提示"从本轮剥离——UI 面独立轮（需走 UI_MODULES＋smoke 全套纪律）；操作者面 `culler gateway status` 已是完整可见性。
+- **实施缺陷账（×2，均为我的代码错、测试抓的）**：① ufw 编号格式 `[ 1]`（方括号＋空格＋数字）被我按 `[1]` 想当然解析——首 token 成孤立括号、数字转换败、幂等/revoke/status 三面全失配；修复＝剥双括号后取首 token。诊断教训：中途出现"编译矛盾"假象（改名重编/清缓存皆无效），最终由**逐段微探针**在盘上代码一击定案——怀疑编译器之前先怀疑自己的格式假设。② culler 壳 gateway 分支抢在 `--help` 归一前做动作校验（`gateway --help` 被拒＝破坏 help 全家桶）；修复＝help 态旁路。
+- **Mimosa 兼容改形（零语义）**：泛型 runner（程序名变量）与 `exec.CommandContext`＋变量 argv 两形均被命令注入闸拦停×4 ⇒ 定形＝**纯逻辑/执行文件分离**：决策文件零 exec（解析/规范形/规则文本全纯函数＝全测试面），执行文件＝字面量 exec.Cmd 结构体、参数仅规范形再渲染文本与 strconv 数字；Bash 的 cp/sed/heredoc 形态亦被拦（文件名入命令即污点）⇒全程 Write/Edit。
+- **测试面**：D4 族 11 用例全绿（loopback 拒/无源拒/无 ufw 打印精确 iptables/规则形状逐字/幂等 no-op/编辑失败上抛/revoke 只删带标双条降序/无标零触碰/status 三态/损坏配置 fail-closed/非规范 bind 拒或规范形）＋壳测试 3 态（status 面板/未知动作 exit 2/loopback allow refused exit 1）＋culler/uninstall/agentprofile/scope 回归族 ok。config 注释承诺-现实差已修（指向 `culler gateway allow` 明示授予路径）。

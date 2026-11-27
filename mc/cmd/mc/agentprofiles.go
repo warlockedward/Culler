@@ -71,6 +71,32 @@ func commandAgentProfile(args []string, stdin io.Reader) (result any, err error)
 		}
 		return deployment.GetAgentProfileOperation(home, *id)
 	}
+	// The provider gateway family edits the host firewall on the operator's
+	// explicit call. It shares the host-only gate of the credential family
+	// (a firewall rule is the operator's host concern, not a helper's) and
+	// carries its own argument shape: an optional stable --port narrowing.
+	if strings.HasPrefix(args[0], "gateway-") {
+		if !deployment.HostCredentialCommandsAvailable() {
+			return nil, verbs.Domainf("The provider gateway needs the operator's host.")
+		}
+		flags := newFlags("agent profile " + args[0])
+		port := flags.Int("port", 0, "narrow the rule to one stable proxy port")
+		if err := parse(flags, args[1:]); err != nil {
+			return nil, err
+		}
+		if flags.NArg() != 0 {
+			return nil, verbs.Usagef("The gateway action takes only --port.")
+		}
+		switch args[0] {
+		case "gateway-allow":
+			return deployment.ProviderGatewayAllow(home, *port)
+		case "gateway-revoke":
+			return deployment.ProviderGatewayRevoke(home)
+		case "gateway-status":
+			return deployment.ProviderGatewayStatusOf(home, *port)
+		}
+		return nil, verbs.Usagef("The gateway action is unknown.")
+	}
 	if len(args) != 1 {
 		return nil, verbs.Usagef("The agent profile action has unexpected arguments.")
 	}

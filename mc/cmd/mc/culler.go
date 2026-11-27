@@ -32,6 +32,7 @@ var cullerCommands = []struct{ name, usage, description string }{
 	{"update", "update [--check | --restore]", "Install, recover, or check for an update."},
 	{"uninstall", "uninstall [options]", "Remove all S-Horizon installations."},
 	{"logs", "logs [service] [--tail N]", "Show recent service logs."},
+	{"gateway", "gateway [status|allow|revoke]", "Manage the Linux provider gateway host rule for an explicitly bound proxy."},
 	{"help", "help [command]", "Show command help."},
 }
 
@@ -141,6 +142,17 @@ func parseCuller(args []string) (cullerOptions, error) {
 		}
 	}
 	serviceCommand := o.command == "start" || o.command == "stop" || o.command == "restart" || o.command == "logs"
+	if o.command == "gateway" && !o.help {
+		// the gateway command carries its action in the same slot
+		if len(positional) != 2 {
+			return o, fmt.Errorf("The gateway command takes status, allow, or revoke.")
+		}
+		o.service = positional[1]
+		if o.service != "status" && o.service != "allow" && o.service != "revoke" {
+			return o, fmt.Errorf("Use status, allow, or revoke with gateway.")
+		}
+		return o, nil
+	}
 	if o.service != "" && !serviceCommand {
 		return o, fmt.Errorf("The %s command accepts no service.", o.command)
 	}

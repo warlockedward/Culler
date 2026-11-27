@@ -10,6 +10,7 @@ import (
 	"io"
 	"strings"
 
+	"mc/deployment"
 	"mc/onboarding"
 )
 
@@ -30,6 +31,19 @@ func cullerUninstall(ctx context.Context, o cullerOptions, stdin io.Reader, stdo
 		"Active agents stop. Removal can discard unfinished work.",
 		"Project repositories and shared host tools remain.",
 	})
+	// A granted provider gateway rule is an explicit host decision; the
+	// uninstaller names it instead of silently editing the firewall during
+	// teardown. The rule is inert once the deployment is gone, and revoke
+	// remains one explicit command away.
+	for _, gatewayHome := range o.homes {
+		if status, err := deployment.ProviderGatewayStatusOf(gatewayHome, 0); err == nil && status.State == "present" {
+			out.Panel("Provider gateway rule", []string{
+				"This host carries the scoped provider gateway rule from `culler gateway allow`.",
+				"It becomes inert with the deployment; remove it explicitly with `culler gateway revoke`.",
+			})
+			break
+		}
+	}
 	mode, confirmation := "--full-wipe", "wipe"
 	if o.keepData {
 		mode, confirmation = "--keep-data", "uninstall"
