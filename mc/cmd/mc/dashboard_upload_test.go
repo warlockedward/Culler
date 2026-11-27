@@ -47,7 +47,12 @@ func TestDashboardUploadResumesSessionPublishesFilesAndPreservesAnExactRetry(t *
 			if prepared.code != 0 {
 				t.Fatal(prepared.stderr)
 			}
-			if err := os.MkdirAll(filepath.Dir(corrupt), 0700); err != nil {
+			// The inbound shard the publish flow adopts is created execute-only
+			// for container traversal; mirror that mode here.
+			if err := os.MkdirAll(filepath.Dir(corrupt), 0711); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Chmod(filepath.Dir(corrupt), 0o711); err != nil {
 				t.Fatal(err)
 			}
 			if err := os.WriteFile(corrupt, []byte("external bytes"), 0600); err != nil {

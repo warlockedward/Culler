@@ -2746,16 +2746,25 @@ func TestAttachmentTreePrepareStaysHostLocal(t *testing.T) {
 		res.json["outbound"] != filepath.Join(root, "out") {
 		t.Fatalf("prepare receipt = %#v", res.json)
 	}
-	for _, path := range []string{
-		filepath.Join(root, "in", "published", "sha256"),
-		filepath.Join(root, "out", "published", "sha256"),
+	for _, entry := range []struct {
+		path string
+		mode os.FileMode
+	}{
+		// The inbound read chain is execute-only traversal for the container
+		// (no group/other read or write); the outbound chain stays owner-only.
+		{filepath.Join(root, "in", "published", "sha256"), 0o711},
+		{filepath.Join(root, "out", "published", "sha256"), 0o700},
 	} {
-		info, err := os.Stat(path)
+		info, err := os.Stat(entry.path)
 		if err != nil {
-			t.Fatalf("prepared path %q: %v", path, err)
+			t.Fatalf("prepared path %q: %v", entry.path, err)
 		}
-		if !info.IsDir() || info.Mode().Perm() != 0o700 {
-			t.Fatalf("prepared path %q = mode %v", path, info.Mode())
+		if !info.IsDir() || info.Mode().Perm() != entry.mode {
+			t.Fatalf("prepared path %q = mode %v, want %03o", entry.path, info.Mode(), entry.mode)
+		}
+		if info.Mode().Perm()&0o066 != 0 {
+			t.Fatalf("prepared path %q = mode %v grants group/other read or write",
+				entry.path, info.Mode())
 		}
 	}
 }

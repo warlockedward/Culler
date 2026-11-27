@@ -158,18 +158,24 @@ func verifyPublishedAttachment(home string, a AttachmentBytesArgs) (string, erro
 	if err != nil {
 		return "", Domainf("open attachment MC_HOME: %v", err)
 	}
-	if err := requireAttachmentDirectory(fd, "attachment MC_HOME"); err != nil {
+	if err := requireAttachmentDirectory(fd, "attachment MC_HOME", attachmentOwnerMode); err != nil {
 		_ = unix.Close(fd)
 		return "", classify(err)
 	}
-	for _, segment := range segments {
+	for index, segment := range segments {
 		next, err := unix.Openat(fd, segment,
 			unix.O_RDONLY|unix.O_DIRECTORY|unix.O_NOFOLLOW|unix.O_CLOEXEC, 0)
 		_ = unix.Close(fd)
 		if err != nil {
 			return "", Domainf("attachment bytes are not materialized in this deployment's attachment tree")
 		}
-		if err := requireAttachmentDirectory(next, "attachment tree directory"); err != nil {
+		// segments = attachments, session, direction, published, sha256, shard;
+		// the inbound read chain (last three) is execute-only for the container.
+		segmentMode := attachmentOwnerMode
+		if a.Direction == "in" && index >= 3 {
+			segmentMode = attachmentInboundReadMode
+		}
+		if err := requireAttachmentDirectory(next, "attachment tree directory", segmentMode); err != nil {
 			_ = unix.Close(next)
 			return "", classify(err)
 		}

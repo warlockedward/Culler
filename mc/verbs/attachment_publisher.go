@@ -567,7 +567,7 @@ func cleanupAttachmentCanonicalObject(
 	if state != "delete_pending" {
 		return nil
 	}
-	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2])
+	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode)
 	if err != nil {
 		return err
 	}
@@ -670,33 +670,40 @@ func openAttachmentTree(home, session string) (*attachmentTree, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open attachment MC_HOME: %w", err)
 	}
-	if err := requireAttachmentDirectory(tree.home, "attachment MC_HOME"); err != nil {
+	if err := requireAttachmentDirectory(tree.home, "attachment MC_HOME", attachmentOwnerMode); err != nil {
 		tree.close()
 		return nil, err
 	}
-	if tree.attachments, err = openOrCreateAttachmentDirectory(tree.home, "attachments"); err != nil {
+	if tree.attachments, err = openOrCreateAttachmentDirectory(tree.home, "attachments", attachmentOwnerMode); err != nil {
 		tree.close()
 		return nil, err
 	}
-	if tree.session, err = openOrCreateAttachmentDirectory(tree.attachments, session); err != nil {
+	if tree.session, err = openOrCreateAttachmentDirectory(tree.attachments, session, attachmentOwnerMode); err != nil {
 		tree.close()
 		return nil, err
 	}
 	for _, direction := range []string{"in", "out"} {
-		directionFD, err := openOrCreateAttachmentDirectory(tree.session, direction)
+		directionFD, err := openOrCreateAttachmentDirectory(tree.session, direction, attachmentOwnerMode)
 		if err != nil {
 			tree.close()
 			return nil, err
 		}
+		// The container binds in/published as its inbound root, so the inbound
+		// read chain gains execute-only traversal; the outbound chain, which the
+		// container reaches only through the setuid publisher, stays owner-only.
+		publishedMode := attachmentOwnerMode
+		if direction == "in" {
+			publishedMode = attachmentInboundReadMode
+		}
 		staging, journal, published, shaFD := -1, -1, -1, -1
-		if staging, err = openOrCreateAttachmentDirectory(directionFD, "staging"); err == nil {
-			journal, err = openOrCreateAttachmentDirectory(directionFD, "journal")
+		if staging, err = openOrCreateAttachmentDirectory(directionFD, "staging", attachmentOwnerMode); err == nil {
+			journal, err = openOrCreateAttachmentDirectory(directionFD, "journal", attachmentOwnerMode)
 		}
 		if err == nil {
-			published, err = openOrCreateAttachmentDirectory(directionFD, "published")
+			published, err = openOrCreateAttachmentDirectory(directionFD, "published", publishedMode)
 		}
 		if err == nil {
-			shaFD, err = openOrCreateAttachmentDirectory(published, "sha256")
+			shaFD, err = openOrCreateAttachmentDirectory(published, "sha256", publishedMode)
 		}
 		if direction == "in" && err == nil {
 			tree.inbound, tree.staging, tree.journal = directionFD, staging, journal
@@ -763,12 +770,22 @@ func safeAttachmentPathSegment(value string) bool {
 	return true
 }
 
-func openOrCreateAttachmentDirectory(parent int, name string) (int, error) {
+// attachmentInboundReadMode is the published inbound read chain (published,
+// sha256, and each shard). The container binds published as its own root and
+// reads a known digest path under it, so uid must be able to traverse these
+// directories; the execute-only "other" bits deny listing, so no attachment is
+// enumerable. Everything outside this chain stays owner-only 0700.
+const (
+	attachmentOwnerMode       uint32 = 0o700
+	attachmentInboundReadMode uint32 = 0o711
+)
+
+func openOrCreateAttachmentDirectory(parent int, name string, mode uint32) (int, error) {
 	if name == "" || name == "." || name == ".." || filepath.Base(name) != name {
 		return -1, fmt.Errorf("refuse unsafe attachment directory name %q", name)
 	}
 	created := false
-	if err := unix.Mkdirat(parent, name, 0o700); err == nil {
+	if err := unix.Mkdirat(parent, name, mode); err == nil {
 		created = true
 	} else if !errors.Is(err, unix.EEXIST) {
 		return -1, fmt.Errorf("create attachment directory %q: %w", name, err)
@@ -778,7 +795,16 @@ func openOrCreateAttachmentDirectory(parent int, name string) (int, error) {
 	if err != nil {
 		return -1, fmt.Errorf("open attachment directory %q: %w", name, err)
 	}
-	if err := requireAttachmentDirectory(fd, name); err != nil {
+	if created {
+		// Set the mode explicitly: mkdir is masked by umask, and the operator
+		// deployment runs under a 077 umask that would strip the execute bits
+		// the inbound read chain requires.
+		if err := unix.Fchmod(fd, mode); err != nil {
+			_ = unix.Close(fd)
+			return -1, fmt.Errorf("set attachment directory %q mode: %w", name, err)
+		}
+	}
+	if err := requireAttachmentDirectory(fd, name, mode); err != nil {
 		_ = unix.Close(fd)
 		return -1, err
 	}
@@ -791,14 +817,14 @@ func openOrCreateAttachmentDirectory(parent int, name string) (int, error) {
 	return fd, nil
 }
 
-func requireAttachmentDirectory(fd int, label string) error {
+func requireAttachmentDirectory(fd int, label string, mode uint32) error {
 	var stat unix.Stat_t
 	if err := unix.Fstat(fd, &stat); err != nil {
 		return fmt.Errorf("inspect %s: %w", label, err)
 	}
-	if stat.Mode&unix.S_IFMT != unix.S_IFDIR || stat.Mode&0o777 != 0o700 ||
+	if stat.Mode&unix.S_IFMT != unix.S_IFDIR || uint32(stat.Mode&0o777) != mode ||
 		int(stat.Uid) != os.Getuid() {
-		return fmt.Errorf("%s must be an operator-owned mode-0700 directory", label)
+		return fmt.Errorf("%s must be an operator-owned mode-%03o directory", label, mode)
 	}
 	return nil
 }
@@ -1242,7 +1268,7 @@ func materializeAttachmentObject(
 	plan attachmentPublicationPlan,
 	reused bool,
 ) error {
-	shard, err := openOrCreateAttachmentDirectory(tree.sha256, plan.digest[:2])
+	shard, err := openOrCreateAttachmentDirectory(tree.sha256, plan.digest[:2], attachmentInboundReadMode)
 	if err != nil {
 		return err
 	}
@@ -1395,7 +1421,7 @@ func verifyAttachmentCanonical(
 	if !safeAttachmentHex(digest, 64) {
 		return attachmentFileEvidence{}, Domainf("invalid canonical attachment digest")
 	}
-	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2])
+	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode)
 	if err != nil {
 		return attachmentFileEvidence{}, err
 	}
@@ -1406,7 +1432,7 @@ func verifyAttachmentCanonical(
 func verifyAttachmentCanonicalIdentity(
 	tree *attachmentTree, digest string, size int64, device, inode string,
 ) error {
-	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2])
+	shard, err := openOrCreateAttachmentDirectory(tree.sha256, digest[:2], attachmentInboundReadMode)
 	if err != nil {
 		return err
 	}

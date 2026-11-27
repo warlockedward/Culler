@@ -155,27 +155,30 @@ func TestPrepareAttachmentTreeCreatesAndRevalidatesStableSessionRoots(t *testing
 		first.Outbound != filepath.Join(home, "attachments", "h-tree", "out") {
 		t.Fatalf("tree receipt = %#v", first)
 	}
-	for _, relative := range []string{
-		"attachments",
-		"attachments/h-tree",
-		"attachments/h-tree/in",
-		"attachments/h-tree/in/staging",
-		"attachments/h-tree/in/journal",
-		"attachments/h-tree/in/published",
-		"attachments/h-tree/in/published/sha256",
-		"attachments/h-tree/out",
-		"attachments/h-tree/out/staging",
-		"attachments/h-tree/out/journal",
-		"attachments/h-tree/out/published",
-		"attachments/h-tree/out/published/sha256",
+	for _, entry := range []struct {
+		relative string
+		mode     os.FileMode
+	}{
+		{"attachments", 0o700},
+		{"attachments/h-tree", 0o700},
+		{"attachments/h-tree/in", 0o700},
+		{"attachments/h-tree/in/staging", 0o700},
+		{"attachments/h-tree/in/journal", 0o700},
+		{"attachments/h-tree/in/published", 0o711},
+		{"attachments/h-tree/in/published/sha256", 0o711},
+		{"attachments/h-tree/out", 0o700},
+		{"attachments/h-tree/out/staging", 0o700},
+		{"attachments/h-tree/out/journal", 0o700},
+		{"attachments/h-tree/out/published", 0o700},
+		{"attachments/h-tree/out/published/sha256", 0o700},
 	} {
-		info, err := os.Lstat(filepath.Join(home, relative))
+		info, err := os.Lstat(filepath.Join(home, entry.relative))
 		if err != nil {
-			t.Fatalf("%s missing: %v", relative, err)
+			t.Fatalf("%s missing: %v", entry.relative, err)
 		}
-		if !info.IsDir() || info.Mode().Perm() != 0o700 {
-			t.Fatalf("%s = mode %v, want operator-owned 0700 directory",
-				relative, info.Mode())
+		if !info.IsDir() || info.Mode().Perm() != entry.mode {
+			t.Fatalf("%s = mode %v, want operator-owned %03o directory",
+				entry.relative, info.Mode(), entry.mode)
 		}
 	}
 	sentinel := filepath.Join(first.Outbound, "published", "retained")
@@ -222,6 +225,17 @@ func TestPrepareAttachmentTreeRefusesUnsafeOrWidenedRoots(t *testing.T) {
 	}
 	if _, err := PrepareAttachmentTree(nil, home, "h-wide"); err == nil {
 		t.Fatal("widened attachment direction was repaired or adopted")
+	}
+	// The inbound read chain may be 0711 but no wider: a listing-permitted
+	// published directory must be refused, not adopted.
+	if _, err := PrepareAttachmentTree(nil, home, "h-inwide"); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(filepath.Join(home, "attachments", "h-inwide", "in", "published"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := PrepareAttachmentTree(nil, home, "h-inwide"); err == nil {
+		t.Fatal("listing-permitted inbound published directory was adopted")
 	}
 }
 
@@ -529,7 +543,7 @@ func TestAttachmentPublicationCreatorRecoveryRehashesExactLocation(t *testing.T)
 			tamperPath := filepath.Join(
 				home, "attachments", session, "in", "staging", plan.stagingName)
 			if location == "canonical" {
-				shard, err := openOrCreateAttachmentDirectory(tree.sha256, plan.digest[:2])
+				shard, err := openOrCreateAttachmentDirectory(tree.sha256, plan.digest[:2], attachmentInboundReadMode)
 				if err != nil {
 					t.Fatal(err)
 				}
