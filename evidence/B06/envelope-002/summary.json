@@ -1,0 +1,73 @@
+{
+  "env": {
+    "date_utc": "2026-11-27T02:47:53Z",
+    "image": "alpine:3.22",
+    "image_id": "sha256:49340b346798875b5592e5d420241f2f9cfba5f47e62ebb1446a1b34734e898f",
+    "kernel": "Linux 5.15.0-94-generic x86_64",
+    "cpu": "128",
+    "mem_gib": "503",
+    "disk_free": "21G",
+    "disk_used_pct": "96%",
+    "build_head": "2f07dec",
+    "sha256_mc": "5ca5dcae6326d501448381c0b688ec37258ba95c9eed31363d181b6c50899c7e",
+    "sha256_driver": "37bebce93ff66cea10ed3b6061b8b6e40e6e5316be7b2c17d214dc16df7cf910",
+    "levels": "1,8,32,64 trials=100 proc_arm=1"
+  },
+  "levels": [
+    {
+      "level": 1,
+      "writer_processes": 1,
+      "writes": 200,
+      "recorded": 200,
+      "busy_timeout_suspects": 0,
+      "throughput_per_s": 115.5,
+      "mean_ms": 2.59,
+      "p50_ms": 2.32,
+      "p95_ms": 4.28,
+      "p99_ms": 9.86,
+      "max_ms": 13.23
+    },
+    {
+      "level": 8,
+      "writer_processes": 1,
+      "writes": 1600,
+      "recorded": 1600,
+      "busy_timeout_suspects": 0,
+      "throughput_per_s": 221.9,
+      "mean_ms": 10.81,
+      "p50_ms": 1.98,
+      "p95_ms": 20.16,
+      "p99_ms": 184.44,
+      "max_ms": 1135.04
+    },
+    {
+      "level": 32,
+      "writer_processes": 1,
+      "writes": 6400,
+      "recorded": 6400,
+      "busy_timeout_suspects": 0,
+      "throughput_per_s": 262.8,
+      "mean_ms": 54.09,
+      "p50_ms": 2.4,
+      "p95_ms": 193.66,
+      "p99_ms": 1435.15,
+      "max_ms": 4336.57
+    },
+    {
+      "level": 64,
+      "writer_processes": 1,
+      "writes": 12800,
+      "recorded": 12798,
+      "busy_timeout_suspects": 3,
+      "throughput_per_s": 242.8,
+      "mean_ms": 120.35,
+      "p50_ms": 3.26,
+      "p95_ms": 819.02,
+      "p99_ms": 2063.75,
+      "max_ms": 5338.7
+    }
+  ],
+  "contention_sanity": "OK",
+  "chain_verify_status": "ok",
+  "total_writes": 21000
+}

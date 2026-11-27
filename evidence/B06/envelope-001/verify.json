@@ -1,0 +1,15 @@
+{
+  "aggregates": [
+    {
+      "aggregate_id": "activity",
+      "chain_digest": "d3e61d8e69318fb75058fc8a0f8ddac7aa845bfdfd1ebeb4a86a50b2cb82fb09",
+      "seq_max": 21000,
+      "status": "ok"
+    }
+  ],
+  "algorithm_id": "shz-merkle-v1",
+  "errors": [],
+  "leaf_count": 1,
+  "root_hex": "19e85ba1ac7dee5d6fdd508003d923c245e6edeaf8ec09cc71507758d3c5fa8e",
+  "status": "ok"
+}

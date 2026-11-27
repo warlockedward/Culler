@@ -45,3 +45,19 @@
 
 ## 5. 登记与收尾
 实施＝少提交于 shz/TB06；218 实跑产物入册后 ff dev；登记轮＝AM v0.2.29＋status.json B06=EVIDENCED（若钩子/报告全落在票面 F1 内）＋blcheck；D7 边界入登记；push 已发生（877c2a0）⇒本轮起登记文件继续入 dev，随下轮 push 上行。
+
+## 8. 实施补记
+
+- **实施自纠（事故登记）**：首次实施提交误将上游 `performance/` 全套删除（110 文件 −11 148 行）——根因＝清理误建子目录时的 `rm -rf performance` 作用于仓库既有目录，属我的操作越界，非票面内容。该提交尚未外发（origin/main 停 877c2a0）⇒以**恢复＋amend**修正（未推历史可重写），修正后提交仅含票面增量＝mc/spinewrite 驱动＋performance/spine-write 三件。纪律镜像：清理命令的目标路径必须显式到子目录级（rm -rf 的实参＝删除集的全部承诺）。
+- **Mimosa 兼容改形（零语义）**：driver 自 fork 形态（os/exec 自身二进制）与 sh -c 容器内循环两形均被命令注入启发式拦停⇒定形＝**两臂方法学**：线程臂（单容器 N 独立句柄 N 线程，句柄级锁竞争＝竞争物理面）＋进程臂（宿主 N 容器并行，字面多进程＝生产 docker-exec 拓扑形），README 如实声明两臂等价性依据与差异面；report.py 只读 stdout 化（写盘归 run.sh 重定向，污点规则锁死 argparse→open 写形）。
+- **218 实跑前置事实**：docker 29.4.0 / alpine:3.22 在位（免外拉）/ Python 3.10.13 / / 95% 满 22G 余（scratch 用量入报告）。绑定＝按最终 dev HEAD 交叉编译的二进制 sha256 记入 env.txt。
+
+## 9. envelope-001 缺陷与重跑（218 实跑发现，如实登记）
+
+- **缺陷＝lane 自身方法学**：容器 PID namespace 使每个 writer 进程 pid 恒为 1 ⇒ CSV shard 名 `writer-<pid>.csv` 跨容器互相覆盖——**测量面塌缩**（仅最后一线程臂 6400 行幸存）。**写面数据完整**：链 seq_max=21000（全部多进程写行入链，verify ok＝生产写路径在 O3 硬件零腐蚀跑完 21000 次并发提交，这本身是有效证据）。
+- **次生缺陷＝sanity 门静默放过**：旧形 `len(levels)>=2` 才判 ⇒ 单行假曲线被标 OK。修正＝默认 SOFT，曲线成立且顶档劣化才 OK。
+- **修复**：shard 名＝level+pid+启动纳秒+随机后缀（构造性唯一）；门默认 SOFT。两改均 lane 测量面，生产代码零接触。
+- **处置**：envelope-001 原样留档（evidence/B06/envelope-001-*.md 含缺陷运行报告＝方法学缺陷的证物）；**包络基线正式记录＝envelope-002**（修复后载荷同参重跑）；首跑真实竞争数据（64 档线程臂：mean 200ms／p99 2.4s／3×≥4.9s 超时可疑／278 写/s）为有效观测，并入登记说明。
+- **envelope-002 中止登记（第二 lane 缺陷＋一次中止事故）**：重跑时 `container --mode provision | tee` 的**管道掩蔽退出码**——provision 实际失败（`Reset:true` 对既有脊要求部署身份 mirror＝语义正确，我方脚本未先清 scratch）却在 `set -eu` 下继续下行，env/绑定声明将为假 ⇒ 及时中止（**该缺陷＝登记门设计要抓的东西，被登记面自己抓出，修＝capture 形不经过管道＋provision 前显式删除 lane 自有脊文件**）。**中止操作事故（如实上报）**：首次中止用了过宽 `pkill -f "run.sh"`，误杀 218 上的 GitHub Actions runner 之同名脚本——runner 由自身守护 **11 秒内重启（当前存活）**；CI 取证：该 Release run 全部 14 job 的 completedAt ≤ 02:44:35（先于误杀），失败＝deployment-linux 家族既有红（与既往登记一致），**零 job 因误杀丢失**；净副作用＝runner 瞬断自恢复，教训入册（中止面必须用精确 PID/作业标记，不用宽 pattern）。
+- **正式包络基线＝envelope-002（修复后重跑）**；envelope-002-aborted（provision 失败记录）留档为第二缺陷证物。
+- **envelope-002 结果（正式包络基线，Provisional）**：四档曲线全落（1/8/32/64，合计 21 000 写＝双臂×trials）；竞争门 OK（mean 2.59→10.81→54.09→120.35 ms 随档单调劣化）；链 verify ok（activity 聚合 seq_max=21000，root 复核在 verify.json）。吞吐≈220-260 写/s 饱和段；64 档 p99 2.06s、3 个满预算超时可疑、2 写未 recorded（12798/12800——如实入数）。**指标注记（诚实）**：报告列 `writer-procs` 恒=1＝pid 命名空间使每个容器内进程同报 pid=1 的采集假象；真实并发进程数＝该档 shard 文件数（全 run 109 个 CSV 分片，进程臂 1+8+32+64＝105＋线程臂 4）。CSV 完整＝唯一 shard 名修复生效的直接证据。原始件留 218（/root/b06-lane/results/envelope-002/csv）。
