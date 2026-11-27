@@ -61,3 +61,18 @@
 - 主 daemon nat DOCKER 链＝**28 条规则完整重建**（DNAT 映射在位，nat MASQUERADE 15 条）——v0.2.41 登记的「链空＝他租户转发预期不通」快照已过期：租户容器（fastgpt/milvus/nexusflow 族）窗口内重启驱动主 dockerd 自愈重建。**owner 无需再专门重启主 docker.service**（该处置项自动消解）。
 - 本核查为纯只读（iptables -S / docker ps / systemctl is-active），零变更，符合共享宿主零伤害约束 (b)。
 - CI 栈终态复核＝shz-ci-docker/shz-ci-containerd/shz-ci-netns 三 active＋容器 egress 回归 0% 丢包。
+
+## 附录 B · 全链停起臂（Q3 (b) 案，R-a 点名批准＝owner 2026-11-27 批量裁，A31-V-002 外第二例）
+
+`systemctl stop shz-ci-docker shz-ci-containerd shz-ci-dnsmasq shz-ci-netns` → 三 inactive＋netns/veth/规则/路由宿主侧全归零（shz 规则计数=0，route-gone，netns 目录空）＋主 daemon 64 容器持续服务＝**teardown 即宿主零 CI 网络残留实证**。`systemctl start` 链反向起回＝四 active，footprint 精确恢复（DU 2＋nat 1＋route 1），egress/DNS/run 回归全绿。**金标准＝宿主三表归一化 diff 在整轮（停→起→重启→DNS 修复→停→起）后与 pre-dnsfix 基线逐字相等（HOST-UNCHANGED）**。boot 链等价性＝单元依赖边/脚本/传播旗全验；剩余未测面收窄为 PID1 开机时序一项（reboot 维护窗口补）。dnsmasq 单元 Requires netns＝netns 停⇒转发器随停，无僵尸重试。
+
+## 附录 C · 缺陷 #6＝netns 内 DNS 失联（真机抓错，根因＋三案对比）
+
+根因：dockerd/containerd 经 NetworkNamespacePath 只换 netns，读到的仍是宿主 /etc/resolv.conf=systemd-resolved stub 127.0.0.53——该地址在 netns 回环上无监听 ⇒ 一切 registry 解析失败（09:48 `fetch failed: dial tcp lookup ... 127.0.0.53:53 read: connection refused`；netns 内 getent rc=2 判别实证）。三案实测对比（全部真机）：
+- **(a) unit BindPaths/BindReadOnlyPaths 挂 resolv.conf**：DNS 通（pull OK）但**给 dockerd/containerd 制造私有 mount ns＝打断 overlay 挂载传播**→容器 rootfs 空（`exec /hello: stat no such file`/`cat not found`），fresh pull 亦复现；`:rshared` 传播旗亦不能补救（两轮实测）⇒ 弃（docker 不能进单元私有 mount ns）。
+- **(b) RESOLV_HOST_CONF glibc 环境变量**：netns 内判别＝rc=2 无效（glibc 2.35 不支持）⇒ 弃（负结果在册）。
+- **(c) netns 内 dnsmasq 转发器（采纳）**：dnsmasq-base 已在场（零新装软件）；shz-ci-dnsmasq 单元在 netns lo 的 127.0.0.53:53 转发 223.5.5.5/114.114.114.114——**不碰任何 mount ns、不碰宿主配置、不碰宿主防火墙**；netns 默认解析路径原样复活。验证：registry 解析 OK、pull busybox/hello OK、ROOTFS/EGRESS/CONTAINER-DNS 全绿、宿主三表逐字不变。边界：upstream 硬编码两枚公共 DNS 于 unit（配置面性质，改=单元文件一笔）；宿主 resolv.conf 属租户共享面全程未触（零伤害 (b) 保持）。
+
+## 附录 D · 终态单元账（5 shz 单元全 enabled）
+
+shz-ci-netns（oneshot，Wants network-online）← shz-ci-dnsmasq（Requires netns；Before containerd/docker）← shz-ci-containerd ← shz-ci-docker。工件＝本目录 5 文件＋netns.conf×2＋本记录。
