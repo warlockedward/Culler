@@ -43,6 +43,10 @@ const (
 	CredentialKindOpenCodeAPIKey = "opencode-api-key"
 )
 
+// OpenAICompatible is a connection whose endpoint the operator declared in
+// the provider registry; the transport follows the codex harness family.
+const CredentialKindOpenAICompatible = "openai-compatible"
+
 //go:embed config.example.toml
 var exampleBody []byte
 
@@ -85,16 +89,31 @@ type RegistryEntry struct {
 // The host credential store holds its grant under the credential source identifier.
 type CredentialSource struct {
 	CatalogEntry string `toml:"catalog_entry,omitempty"`
-	InferenceURL string `toml:"inference_url,omitempty"`
-	Name         string `toml:"name,omitempty"`
-	BaseURL      string `toml:"base_url,omitempty"`
-	Kind         string `toml:"kind"`
-	TokenURL     string `toml:"token_url,omitempty"`
-	ClientID     string `toml:"client_id,omitempty"`
+	// RegistryEntry names the operator-declared endpoint of an OpenAICompatible connection.
+	RegistryEntry string `toml:"registry_entry,omitempty"`
+	InferenceURL  string `toml:"inference_url,omitempty"`
+	Name          string `toml:"name,omitempty"`
+	BaseURL       string `toml:"base_url,omitempty"`
+	Kind          string `toml:"kind"`
+	TokenURL      string `toml:"token_url,omitempty"`
+	ClientID      string `toml:"client_id,omitempty"`
+}
+
+// CredentialAddress resolves where a connection sends: the release-pinned
+// inference address, or for a self-hosted connection its registry entry.
+func (c Config) CredentialAddress(source CredentialSource) (string, bool) {
+	if source.Kind == CredentialKindOpenAICompatible {
+		entry, ok := c.Runtimes.Registry[source.RegistryEntry]
+		return entry.BaseURL, ok
+	}
+	return source.InferenceURL, source.InferenceURL != ""
 }
 
 // Delivery selects the host proxy for a supported connection.
 func (s CredentialSource) Delivery() string {
+	if s.Kind == CredentialKindOpenAICompatible {
+		return "proxy"
+	}
 	switch s.Kind {
 	case CredentialKindCodexOAuth, CredentialKindClaudeOAuth, CredentialKindCodexAPIKey, CredentialKindClaudeAPIKey, CredentialKindOpenCodeAPIKey:
 		return "proxy"
@@ -104,6 +123,9 @@ func (s CredentialSource) Delivery() string {
 
 // Channel is the credential channel the resident and the adapters read.
 func (s CredentialSource) Channel() string {
+	if s.Kind == CredentialKindOpenAICompatible {
+		return "codex"
+	}
 	switch s.Kind {
 	case CredentialKindOpenCodeAPIKey:
 		return "opencode"
@@ -117,6 +139,9 @@ func (s CredentialSource) Channel() string {
 
 // Harness is the one harness family a binding on this kind can use.
 func (s CredentialSource) Harness() string {
+	if s.Kind == CredentialKindOpenAICompatible {
+		return "codex"
+	}
 	switch s.Kind {
 	case CredentialKindOpenCodeAPIKey:
 		return "opencode"
@@ -736,6 +761,11 @@ func (c Config) Validate() error {
 		if err := validateCredentialSource(id, source); err != nil {
 			return err
 		}
+		if source.Kind == CredentialKindOpenAICompatible {
+			if _, ok := c.Runtimes.Registry[source.RegistryEntry]; !ok {
+				return fmt.Errorf("runtimes.credentials.%s references undefined registry entry %q", id, source.RegistryEntry)
+			}
+		}
 	}
 	if len(c.Runtimes.Bindings) == 0 {
 		return fmt.Errorf("runtimes.bindings must define at least one binding")
@@ -1244,6 +1274,15 @@ func validateCredentialSource(id string, source CredentialSource) error {
 	if source.BaseURL != "" {
 		return fmt.Errorf("runtimes.credentials.%s carries a forbidden base_url", id)
 	}
+	if source.Kind == CredentialKindOpenAICompatible {
+		if !safeRuntimeID(source.RegistryEntry) {
+			return fmt.Errorf("The self-hosted connection requires a provider registry entry.")
+		}
+		if source.InferenceURL != "" || source.TokenURL != "" || source.ClientID != "" || source.CatalogEntry != "" {
+			return fmt.Errorf("The self-hosted connection takes its address from the registry entry alone.")
+		}
+		return nil
+	}
 	if source.Kind == CredentialKindOpenCodeAPIKey {
 		if !safeRuntimeID(source.CatalogEntry) || source.InferenceURL != "" || source.TokenURL != "" || source.ClientID != "" {
 			return fmt.Errorf("The OpenCode connection requires one catalog entry and no address.")
@@ -1294,8 +1333,8 @@ func validateRegistry(registry map[string]RegistryEntry) error {
 		if err != nil {
 			return fmt.Errorf("runtimes.registry.%s base_url is not a valid URL", id)
 		}
-		if parsed.Scheme != "https" {
-			return fmt.Errorf("runtimes.registry.%s base_url must use https", id)
+		if parsed.Scheme != "https" && parsed.Scheme != "http" {
+			return fmt.Errorf("runtimes.registry.%s base_url must use https or http", id)
 		}
 		if parsed.User != nil {
 			return fmt.Errorf("runtimes.registry.%s base_url must not carry userinfo", id)
@@ -1304,12 +1343,20 @@ func validateRegistry(registry map[string]RegistryEntry) error {
 		if host == "" {
 			return fmt.Errorf("runtimes.registry.%s base_url must carry a host", id)
 		}
-		if ip := net.ParseIP(host); ip != nil {
-			if ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified() {
-				return fmt.Errorf("runtimes.registry.%s base_url may not point at a loopback, private, or reserved address", id)
+		ip := net.ParseIP(host)
+		if parsed.Scheme == "https" {
+			if ip != nil && (ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsUnspecified()) {
+				return fmt.Errorf("runtimes.registry.%s https base_url may not point at a loopback, private, or reserved address", id)
 			}
+		} else if ip == nil || ip.IsUnspecified() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || !(ip.IsLoopback() || ip.IsPrivate()) {
+			// Cleartext reaches only a declared literal loopback or private
+			// endpoint: the self-hosted inference server on this machine.
+			return fmt.Errorf("runtimes.registry.%s http base_url must be a literal loopback or private address", id)
 		}
 		port := 443
+		if parsed.Scheme == "http" {
+			port = 80
+		}
 		if raw := parsed.Port(); raw != "" {
 			n, err := strconv.Atoi(raw)
 			if err != nil || n < 1 || n > 65535 {
@@ -1320,6 +1367,9 @@ func validateRegistry(registry map[string]RegistryEntry) error {
 		allowed := entry.PortAllowlist
 		if len(allowed) == 0 {
 			allowed = []int{443}
+			if parsed.Scheme == "http" {
+				allowed = []int{80}
+			}
 		}
 		if !slices.Contains(allowed, port) {
 			return fmt.Errorf("runtimes.registry.%s port %d is not in its allowlist", id, port)

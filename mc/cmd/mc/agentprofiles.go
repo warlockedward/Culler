@@ -210,6 +210,12 @@ func commandAgentProfile(args []string, stdin io.Reader) (result any, err error)
 		}
 		for id, row := range catalog {
 			source := cfg.Runtimes.Credentials[row.Credential]
+			if source.Kind == config.CredentialKindOpenAICompatible {
+				if address, ok := cfg.CredentialAddress(source); ok {
+					row.InferenceURL = address
+					catalog[id] = row
+				}
+			}
 			if source.Kind == config.CredentialKindOpenCodeAPIKey {
 				if provider, ok := deployment.OpenCodeProvider(home, source.CatalogEntry); ok {
 					row.OpenCode = &provider
@@ -221,6 +227,13 @@ func commandAgentProfile(args []string, stdin io.Reader) (result any, err error)
 
 		for id, source := range cfg.Runtimes.Credentials {
 			connections[id] = deployment.ResidentRuntimeBinding{Harness: source.Harness(), Credential: id, Channel: source.Channel(), Kind: source.Kind, InferenceURL: source.InferenceURL, TokenURL: source.TokenURL, ClientID: source.ClientID}
+			if source.Kind == config.CredentialKindOpenAICompatible {
+				if address, ok := cfg.CredentialAddress(source); ok {
+					row := connections[id]
+					row.InferenceURL = address
+					connections[id] = row
+				}
+			}
 			if source.Kind == config.CredentialKindOpenCodeAPIKey {
 				row := connections[id]
 				if provider, ok := deployment.OpenCodeProvider(home, source.CatalogEntry); ok {
