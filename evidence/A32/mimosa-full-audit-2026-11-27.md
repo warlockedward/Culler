@@ -92,3 +92,9 @@
   3. 明文仅可达**字面环回/私有 IP 且端口∈显式 allowlist 且在该 credential 声明的 endpoint 集合内**——公网主机名/公网 IP/link-local/0.0.0.0 四类各配向量必拒（transport.test.ts 新增 9 向量＋§2.1 旧向量转写后仍守）。
 - **残余（如实、不吞并）**：本地环回/私有段明文链路＝本机 root 或同宿主租户可旁观推理流量（无 TLS）＝owner §2.2 裁文明确接受的取舍（"私有段可 http"）；跨网络明文被裁文禁（http 仅字面本地）。此残余属威胁模型变更候 Authority 于 TM/PS 记一笔，本 agent 不自授接受。
 - 诚实核心沿用 §1：static-only／verdictEffect none／runStatus inconclusive；本节的"已缓解"是**代码路径级 E1 论证**，非扫描器给出的通过判定，亦非独立审查结论。
+
+## 14. 轮六十三收口文档树扫描（AM v0.2.46 后）
+
+- 树＝dev tip fbab35e（AM v0.2.46＋A35 注记＋部署证据件）；jobId scan-job-mwz2u6xo-fc5b101380c1b48e；**scanId=scan-2026-11-27T14-29-27.850Z-2eb07012519d；封印=sha256:46da12c6ae3aa493ad7d8485848bc6ae22484fdf9e78d5557ef95380e44ea85c**。
+- **560＝与 D-2 码树（§13）逐级逐域全等＝本轮纯文档/证据提交零新增发现面**；+1 相对 559 基线仍是 §13 那条 C11 http SSRF 面（非本轮引入，已定性）。
+- 诚实核心沿用 §1（static-only／verdictEffect none／inconclusive），不构成安全背书。
