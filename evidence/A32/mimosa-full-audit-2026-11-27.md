@@ -60,3 +60,10 @@
 - 过程如实：job mwys5d1f（首试 85407fd 树）audit 阶段状态回写停滞且未落盘＝取消重发 mwys67bh 成功；hook 在各笔 commit/push 时点的 scanner_enobufs 兼容放行记录在册。
 - §9 本笔登记提交自身＝纯封印号追加（零新语义内容），不覆盖自身扫描（自尾结构=登记文档性质，如 AM 惯例）。
 - 诚实核心沿用 §1：coverage partial／runStatus inconclusive／static-only／verdictEffect none——不构成安全背书。
+
+## 10. 轮六十二续窗终封（final-tip 清账，2026-11-27 09:47:39 UTC）
+
+- 树＝dev tip 31c904f（本窗全部 7 笔增量在内：push 登记/DT v0.2 修订/AM v0.2.43/现状核查附录/§9 册/双臂登记/AM v0.2.44）。
+- jobId＝scan-job-mwysrq61-61b348026b841cef，attempt 1 完成（无 enobufs）。**scanId＝scan-2026-11-27T09-47-39.033Z-4e249cae6f92；封印＝sha256:03117af7a9cced5bb1b5226be231da035129c1eeb3efa31e6bfd50532343470f**。
+- 对照轮五十三基线：**total 559／high 435／medium 120／low 4，逐域 dashboard 161／mc 157／runner 144／resident 61／evals 19／performance 10／release 7＝完全一致＝本窗全部变更（契约正文修订＋evidence/docs）零新增发现面**。
+- 本窗 enobufs 兼容放行欠账＝就此清偿（§9 逐笔封＋本笔终封双层覆盖）。诚实核心沿用 §1：partial／inconclusive／static-only／verdictEffect none——不构成安全背书。
