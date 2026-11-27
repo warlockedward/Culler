@@ -1,0 +1,35 @@
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 10022/tcp                  ALLOW IN    Anywhere                  
+[ 2] 22/tcp                     DENY IN     Anywhere                  
+[ 3] 38888                      ALLOW IN    Anywhere                  
+[ 4] Anywhere on docker0        ALLOW IN    Anywhere                  
+[ 5] 38019/udp                  ALLOW IN    Anywhere                  
+[ 6] 7434/tcp                   ALLOW IN    Anywhere                  
+[ 7] 8080                       ALLOW IN    Anywhere                  
+[ 8] 8000                       ALLOW IN    Anywhere                  
+[ 9] 43001                      ALLOW IN    Anywhere                  
+[10] 8001                       ALLOW IN    Anywhere                  
+[11] 38000:38040/tcp            ALLOW IN    Anywhere                  
+[12] 7000                       ALLOW IN    Anywhere                  
+[13] 5001                       ALLOW IN    Anywhere                  
+[14] 49624                      ALLOW IN    Anywhere                  
+[15] 38023                      ALLOW IN    Anywhere                  
+[16] 10022/tcp (v6)             ALLOW IN    Anywhere (v6)             
+[17] 22/tcp (v6)                DENY IN     Anywhere (v6)             
+[18] 38888 (v6)                 ALLOW IN    Anywhere (v6)             
+[19] Anywhere (v6) on docker0   ALLOW IN    Anywhere (v6)             
+[20] 38019/udp (v6)             ALLOW IN    Anywhere (v6)             
+[21] 7434/tcp (v6)              ALLOW IN    Anywhere (v6)             
+[22] 8080 (v6)                  ALLOW IN    Anywhere (v6)             
+[23] 8000 (v6)                  ALLOW IN    Anywhere (v6)             
+[24] 43001 (v6)                 ALLOW IN    Anywhere (v6)             
+[25] 8001 (v6)                  ALLOW IN    Anywhere (v6)             
+[26] 38000:38040/tcp (v6)       ALLOW IN    Anywhere (v6)             
+[27] 7000 (v6)                  ALLOW IN    Anywhere (v6)             
+[28] 5001 (v6)                  ALLOW IN    Anywhere (v6)             
+[29] 49624 (v6)                 ALLOW IN    Anywhere (v6)             
+[30] 38023 (v6)                 ALLOW IN    Anywhere (v6)             
+

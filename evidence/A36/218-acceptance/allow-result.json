@@ -1,0 +1,1 @@
+{"state":"present","bind":"10.199.0.1","network":"10.199.0.0/16","interface":"shz-br0","detail":"the scoped rule was added; revoke deletes only rules carrying this tool's comment tag"}

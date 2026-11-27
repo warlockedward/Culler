@@ -1,0 +1,1 @@
+20:[16] 10.199.0.1/tcp             ALLOW IN    10.199.0.0/16/tcp          # shz-provider-gateway
