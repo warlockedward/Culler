@@ -1,0 +1,10 @@
+AM v0.2.37 双面哈希登记（轮五十九续收口窗：blcheck 机器拦停 A36 立票时的乐观画边＝验收循环 A31→A36→A31，边反转修正 A36 dep=A04／A31 dep=A36，两行行注在册；纪律读法＝EXEC-1 检查器再拦执行侧手感画边，第 N+1 案）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 68a19f8c83891ab5afefdbfac7347d5c8cad54e74698e35c22c340790fe1947e
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 0639faa2de025704f5a04dcfe1da23ca9e3db5c8129bd5e9e18a2103c34291bc，与 am-v0.2.36-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.36 = 0639faa2…91bc（A36 批准+CODED 轮）；v0.2.35 = 3e3d0cc1…b57be（UIP 立法轮）
+- 同轮并入 dev 的提交: DEV-BASELINE 两行修正（A36 行 dep=A04＋CODED 注＋循环诊断全文；A31 行 dep=A36＋合流半程注）＋本登记件；status.json 无变化（A36=CODED 合规于新边）
+- 关键事实: blcheck 首次复验 EXIT=1 ready-unmet(A36)＝正确拦截；边反转后复验 EXIT=0 violations=0（见捕获件）；代码零改动（纯登记面）；identity 不变 4786047e…8be1
+- 诚实边界: 画边错误由我造成（轮五十七立票时），机器发现、机器验证修正——登记不修饰；A31 剩余半程=A36 的 218 往返臂（同轮合流语义）
+- 账: dev tip=<本提交+捕获> / worktrees=main+dev+a36（收口后回收）/ push 队列=10 候令（实算以 push 前为准）/ 本地 main PRISTINE b22df40 / 无新外发
