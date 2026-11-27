@@ -7,4 +7,4 @@ AM v0.2.34 双面哈希登记（轮五十七续收口窗：上游 Culler＝fork 
 - 同轮并入 dev 的提交: 5d44da8（LoopForge 许可二校修正）＋本登记提交（docs/facts/culler-upstream-tracking-ledger-001.md＋AM v0.2.34＋本件）＋blcheck 捕获
 - 关键事实: blcheck 74/0 不变（机制登记零新票）；上游镜像=blobless 204KB 独立 clone（与工作仓零 git 关联）；git remote -v 实证工作仓 origin 单一（warlockedward）；b22df40 仍为上游 HEAD 祖先（谱系无重写）
 - 诚实边界: 分叉点清单当前唯一=版本/converter 语义（我方无转换器教义在先是有意决定）；借鉴仅两形态=研究记录/逐票 ADR；永不 bulk-merge
-- 账: dev tip=<捕获提交> / 领先 origin/main(1053fe4) 共 5 commits 随下轮 push 候令 / identity 不变 4786047e…8be1 / 本地 main PRISTINE b22df40 / 无新外发（本轮未推，队列候令）
+- 账: dev tip=<捕获提交> / 领先 origin/main(1053fe4) 共 3 commits（cf0f81a/5d44da8/本两枚合一提交 133ae7b 计 2… 实算=git rev-list，本行以实算 3 为准） 随下轮 push 候令 / identity 不变 4786047e…8be1 / 本地 main PRISTINE b22df40 / 无新外发（本轮未推，队列候令）
