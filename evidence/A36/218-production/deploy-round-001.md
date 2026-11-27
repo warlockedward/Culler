@@ -44,3 +44,9 @@
 - **A36＝CODED 不升、A31＝IN_PROGRESS 不变**：F1/F1③ 验收臂未跑（代理未在场、未碰 ufw）＝维持原状，不假 PASS。
 - **D-1/D-2＝已修在册**（defects-001.md），D-2 端到端待 A35 激活后于 Linux 全链复验。
 - 建议下一步＝**owner 新令激活 A35**（我出 diff-plan：入站已修复用＋出站 publisher 宿主 out 目录 owner 归 10001（不放宽 access、符合镜像本意）＋wiki export Chmod＋amd64 harness；Linux boundary/e2e 硬门）→ 双臂随之。
+
+## §6 r13 逐层真机账（② 通过后暴露 C11-TS 遗漏，随即补）
+
+- **② 出站修复真机生效**＝r13（HEAD 4e641fd）resident.stderr 报错从 `attachment confinement canary refused` 变为 `The runtime catalog connection is invalid.`＝canary（入站+出站）已过、监督推进到下一层。ufw 仍 ALLOW 28＝防火墙全程未碰（r13 刻意不含 gateway-allow）。
+- **新边界＝C11 切片3 的 TS 侧遗漏**：`resident/src/credential-projector.ts:48` 的 runtime-catalog kind 白名单只放行 `<channel>-oauth`/`<channel>-api-key`，未含 `openai-compatible`；`:55` 对非 opencode 目的地强制 https（self-host 是环回 http）。⇒ 真机第一次把 self-host 连接喂进 resident 消费路径才现形——**此前 resident 789 全绿是因测试 row 全是 codex-api-key，未覆盖 C11 新 kind 走 parseRuntimeCatalog**（"未验证继承面"又一例，与 D-1/D-2 同族＝macOS/CI 面掩盖 Linux/新路径）。
+- 修复＝:48 白名单加 openai-compatible；新增 `kind=openai-compatible ⟹ channel=codex` 路由锁；scheme 对 self-host 放行 http（目的地 host 类=环回/私有字面 IP 由 Go validateRegistry + C02 连接期双重把守，此处不重复）；其余 kind 保持 https-only 不变。补 credential-projector.test 四向量（http 环回落／https 落／claude 路由拒／userinfo 拒）。resident 790/0（+1）。

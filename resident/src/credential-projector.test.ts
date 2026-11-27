@@ -140,6 +140,16 @@ test("the catalog rejects provider secrets and untrusted destinations", () => {
 });
 
 
+test("the catalog accepts a self-hosted cleartext endpoint on the codex route only", () => {
+  const selfHosted: RuntimeBindingSpec = { harness: "codex", credential: "self-host", channel: "codex", kind: "openai-compatible", inference_url: "http://127.0.0.1:38011/v1" };
+  expect(parseRuntimeCatalog({ "self-host": selfHosted })["self-host"]).toMatchObject({ kind: "openai-compatible", inference_url: "http://127.0.0.1:38011/v1" });
+  expect(parseRuntimeCatalog({ "self-host": { ...selfHosted, inference_url: "https://inference.example/v1" } })["self-host"]).toMatchObject({ inference_url: "https://inference.example/v1" });
+  // A self-hosted credential never rides the claude route, and userinfo is still refused.
+  expect(() => parseRuntimeCatalog({ "self-host": { ...selfHosted, channel: "claude", harness: "claude-sdk" } })).toThrow();
+  expect(() => parseRuntimeCatalog({ "self-host": { ...selfHosted, inference_url: "http://name:secret@127.0.0.1" } })).toThrow();
+});
+
+
 test("connection revocation removes only that connection's launch authority", async () => {
   const other = { ...row, credential: "other-connection" };
   const f = fixture({ "test-profile": row, "other-profile": other });

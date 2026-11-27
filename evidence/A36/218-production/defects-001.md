@@ -39,3 +39,4 @@
 ## 环境性测试脆弱（登记非本轮引入，A35 全道唯一红）
 
 `TestReleaseSkillWorksForExternalAgentWithoutSourceOrDevelopmentTools` 在全道并发下于 `agent_skill_external_test.go:54` 的 `mise exec -- bun -p process.execPath` 子进程返回 exit 1（耗时 120s）；隔离重跑同树（含 A35 改动）`ok`（但该步本身耗时 173s）。判定＝该测试对宿主机 mise/bun 外部工具的固有脆弱＋并发放大，**不触 attachment/canary/broker 任何代码路径**，非 A35 回归。归 A32 上游既有面候命清单式处理（不借 A35 域顺手改他人断言）；如后续要根治＝把该 fixture 的 bun 解析改为预取常量或加超时余量，属独立测试卫生票。
+**复验**：同树重跑全道 → `MC_CHECK_EXIT=0`、29 包 ok＝该 bun 步并发脆弱自愈，坐实"非 A35 回归"判定（提交 4e641fd）。

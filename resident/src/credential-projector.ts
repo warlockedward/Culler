@@ -45,14 +45,21 @@ export function parseRuntimeCatalog(value: unknown): Record<string, RuntimeBindi
     const row = raw as RuntimeBindingSpec;
     if (!/^(?:connection:)?[a-z0-9][a-z0-9_.-]{0,63}$/.test(id) || !/^[a-z0-9][a-z0-9_.-]{0,63}$/.test(row.credential) ||
         !["codex", "claude", "opencode"].includes(row.channel) || row.harness !== (row.channel === "claude" ? "claude-sdk" : row.channel) ||
-        ![`${row.channel}-oauth`, `${row.channel}-api-key`].includes(row.kind)) throw new Error("The runtime catalog connection is invalid.");
+        ![`${row.channel}-oauth`, `${row.channel}-api-key`, "openai-compatible"].includes(row.kind)) throw new Error("The runtime catalog connection is invalid.");
+    if (row.kind === "openai-compatible" && row.channel !== "codex") throw new Error("The self-hosted connection route is invalid.");
     if (row.channel === "opencode") {
       if (row.kind !== "opencode-api-key" || row.inference_url !== "") throw new Error("The OpenCode connection is invalid.");
       out[id] = structuredClone(row);
       continue;
     }
+    // A self-hosted connection reaches an operator-declared registry endpoint
+    // (validated as a literal loopback/private address at config time, and by
+    // the DestinationPolicy transport at connect time), so it may use cleartext
+    // http; every subscription and release-key connection stays https-only.
+    const selfHosted = row.kind === "openai-compatible";
     const target = new URL(row.inference_url);
-    if (target.protocol !== "https:" || target.username || target.password || target.search || target.hash) throw new Error("The runtime catalog destination is invalid.");
+    const schemeOK = selfHosted ? target.protocol === "http:" || target.protocol === "https:" : target.protocol === "https:";
+    if (!schemeOK || target.username || target.password || target.search || target.hash) throw new Error("The runtime catalog destination is invalid.");
     out[id] = { ...row };
   }
   return out;
