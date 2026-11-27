@@ -1,6 +1,6 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { networkErrorFromFetch, type NetworkErrorClass } from "../../runner/shared/network-error";
-import { providerTransport } from "./provider-transport";
+import { providerTransport, type DestinationPolicy } from "./provider-transport";
 import { UsageStream, usageFamilyForOperation, type UsageEvents } from "./usage-observation";
 
 export interface ProviderOperation {
@@ -15,6 +15,8 @@ export interface ProviderOperation {
 
 export interface ProviderRoute {
   baseURL: string;
+  // Cleartext is reserved for operator-declared self-hosted endpoints.
+  allowCleartext?: boolean;
   openCode?: { keyPlacement: "bearer" | "x-api-key" | "x-goog-api-key"; modelLocation: "body" | "path" };
   operations: ProviderOperation[];
   requestHeaders?: string[];
@@ -158,12 +160,29 @@ function canonicalPath(value: string): boolean {
   return /^\/(?:[A-Za-z0-9_-]+\/?)*$/.test(value) && !value.includes("//");
 }
 
+// The transport policy widens exactly as far as the validated routes: https
+// stays on 443, and only a declared cleartext route adds its own endpoint.
+function cleartextAwarePolicy(routes: Record<string, ProviderRoute>): DestinationPolicy {
+  const ports = new Set<number>([443]);
+  const cleartextEndpoints: string[] = [];
+  for (const route of Object.values(routes)) {
+    const url = new URL(route.baseURL);
+    if (url.protocol === "http:") {
+      const port = url.port === "" ? 80 : Number(url.port);
+      ports.add(port);
+      cleartextEndpoints.push(`${url.hostname}:${port}`);
+    }
+  }
+  return { portAllowlist: [...ports], cleartextEndpoints };
+}
+
 function validateRoutes(input: Record<string, ProviderRoute>): Record<string, ProviderRoute> {
   const routes: Record<string, ProviderRoute> = Object.create(null);
   for (const [id, candidate] of Object.entries(input)) {
     const route = structuredClone(candidate);
     const url = new URL(route.baseURL);
-    if (!identifier(id) || url.protocol !== "https:" || url.username || url.password || url.search || url.hash ||
+    const schemeOK = url.protocol === "https:" || (route.allowCleartext === true && url.protocol === "http:");
+    if (!identifier(id) || !schemeOK || url.username || url.password || url.search || url.hash ||
         (!route.openCode && !canonicalPath(url.pathname)) || !route.operations.length) {
       throw new Error("The provider route is invalid.");
     }
@@ -477,7 +496,7 @@ export function startProviderProxy(options: ProviderProxyOptions, dependencies: 
   // 2.5): canonical-destination checks, resolve-time validation per attempt,
   // hostname-pinned TLS, no pooling, and by construction no inheritance of
   // process or environment HTTP(S)/SOCKS proxies (§2.7①'s Proxy=nil analogue).
-  const requestProvider = dependencies.fetch ?? providerTransport({ portAllowlist: [443] });
+  const requestProvider = dependencies.fetch ?? providerTransport(cleartextAwarePolicy(routes));
   const byDigest = new Map<string, Authorization>();
   const byID = new Map<string, Authorization>();
   const byLaunch = new Map<string, string>();

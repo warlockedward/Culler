@@ -23,7 +23,7 @@ func AgentConnectionSave(home string, req AgentConnectionRequest) (AgentProfileC
 	if req.Kind != "" || req.BaseURL != "" || req.Token != "" {
 		return AgentProfileCatalog{}, fmt.Errorf("The connection accepts a supported provider integration only.")
 	}
-	source, ok := agentSubscriptionIntegration(req.TemplateID)
+	source, ok := agentSubscriptionIntegration(home, req.TemplateID)
 	if !ok {
 		return AgentProfileCatalog{}, fmt.Errorf("Select a supported connection.")
 	}

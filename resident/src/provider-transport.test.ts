@@ -36,7 +36,7 @@ describe("canonicalDestination", () => {
       ["https://2130706433/", "ipv4_form"],
       ["https://10.0.0.01/", "ipv4_form"],
       ["https://1.2.3.4.5/", "unparseable"],
-      ["http://api.example.com/", "scheme"],
+      ["http://api.example.com/", "cleartext_host_form"], // §2.2: public cleartext never reaches the dial
       ["https://user@api.example.com/", "userinfo"],
       ["https://api.example.com:abc/", "unparseable"],
       ["https://EXAMPLE.com/", "accepted"], // single-parser case folding is the canonical form
@@ -53,6 +53,18 @@ describe("canonicalDestination", () => {
   test("trailing dot normalizes like the single parser does", () => {
     expect(code(() => canonicalDestination("https://example.com./", policy))).toBe("accepted");
     expect(canonicalDestination("https://example.com./", policy).host).toBe("example.com");
+  });
+  test("cleartext reaches only the declared local endpoint (§2.2 ruling)", () => {
+    const local = { portAllowlist: [443, 80, 38011, 8000], cleartextEndpoints: ["127.0.0.1:38011", "[::1]:80"] };
+    expect(canonicalDestination("http://127.0.0.1:38011/v1", local).port).toBe(38011);
+    expect(canonicalDestination("http://[::1]/v1", local).port).toBe(80);
+    expect(code(() => canonicalDestination("http://127.0.0.1:8000/v1", local))).toBe("cleartext_denied");
+    expect(code(() => canonicalDestination("http://10.0.0.5:80/v1", local))).toBe("cleartext_denied");
+    expect(code(() => canonicalDestination("http://8.8.8.8/", local))).toBe("cleartext_address_class");
+    expect(code(() => canonicalDestination("http://169.254.1.1/", local))).toBe("cleartext_address_class");
+    expect(code(() => canonicalDestination("http://0x7f.0.0.1:38011/", local))).toBe("ipv4_form");
+    expect(code(() => canonicalDestination("http://api.example.com/", local))).toBe("cleartext_host_form");
+    expect(code(() => canonicalDestination("http://127.0.0.1:38011/", { portAllowlist: [443] }))).toBe("cleartext_denied");
   });
 });
 
@@ -75,7 +87,9 @@ describe("transport coverage (PS §2.7 static half)", () => {
       expect(text).not.toMatch(/https?\.request\(|https?\.get\(|net\.connect|net\.createConnection|tls\.connect|dgram|await fetch\(|globalThis\.fetch/);
     }
     const proxy = sources.find(entry => entry.name === "provider-proxy.ts");
-    expect(proxy?.text).toContain("providerTransport({ portAllowlist: [443] })");
+    expect(proxy?.text).toContain("providerTransport(cleartextAwarePolicy(routes))");
+    // Cleartext widening derives from validated route addresses only.
+    expect(proxy?.text).toContain("cleartextEndpoints.push(`${url.hostname}:${port}`)");
   });
 });
 

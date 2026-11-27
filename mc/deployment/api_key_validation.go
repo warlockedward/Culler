@@ -69,20 +69,24 @@ func validateAPIKeyReplacement(home string, req AgentConnectionRequest, source o
 	if err != nil {
 		return "", err
 	}
+	address, ok := cfg.CredentialAddress(source)
+	if !ok {
+		return "", fmt.Errorf("The self-hosted connection endpoint is unavailable.")
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := authenticateReplacementKey(ctx, client, source, req.APIKey); err != nil {
+	if err := authenticateReplacementKey(ctx, client, source, address, req.APIKey); err != nil {
 		return "", err
 	}
 	return revision, nil
 }
 
-func authenticateReplacementKey(ctx context.Context, client *http.Client, source operatorconfig.CredentialSource, key string) error {
-	base := strings.TrimRight(source.InferenceURL, "/")
+func authenticateReplacementKey(ctx context.Context, client *http.Client, source operatorconfig.CredentialSource, address, key string) error {
+	base := strings.TrimRight(address, "/")
 	target := base + "/models"
 	headers := http.Header{"Accept": {"application/json"}}
 	switch source.Kind {
-	case operatorconfig.CredentialKindCodexAPIKey:
+	case operatorconfig.CredentialKindCodexAPIKey, operatorconfig.CredentialKindOpenAICompatible:
 		headers.Set("Authorization", "Bearer "+key)
 	case operatorconfig.CredentialKindClaudeAPIKey:
 		target = base + "/v1/models?limit=1"

@@ -92,6 +92,7 @@ function routes(catalog: Record<string, RuntimeBindingSpec>): Record<string, Pro
     }
     const route: ProviderRoute = {
       baseURL: row.inference_url,
+      allowCleartext: row.kind === "openai-compatible" || undefined,
       operations: structuredClone(protocols[row.channel].operations) as ProviderRoute["operations"],
       requestHeaders: protocols[row.channel].requestHeaders,
       responseHeaders: protocols[row.channel].responseHeaders,

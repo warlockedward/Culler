@@ -167,8 +167,8 @@ func TestAPIKeyReplacementRejectsRedirectsAndInvalidCatalogsWithoutSecretErrors(
 				}
 				return response, err
 			})
-			source, _ := agentSubscriptionIntegration("codex-api-key")
-			err := authenticateReplacementKey(context.Background(), apiKeyValidationClient, source, "synthetic-replacement-key")
+			source, _ := agentSubscriptionIntegration(t.TempDir(), "codex-api-key")
+			err := authenticateReplacementKey(context.Background(), apiKeyValidationClient, source, source.InferenceURL, "synthetic-replacement-key")
 			if err == nil || strings.Contains(err.Error(), "synthetic-replacement-key") || calls != 1 {
 				t.Fatal("The key check accepted an invalid response, followed a redirect, or exposed its key.")
 			}
@@ -191,8 +191,8 @@ func TestAPIKeyReplacementBoundsSlowResponseBodies(t *testing.T) {
 	})
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
 	defer cancel()
-	source, _ := agentSubscriptionIntegration("codex-api-key")
-	if err := authenticateReplacementKey(ctx, apiKeyValidationClient, source, "synthetic-replacement-key"); err == nil || ctx.Err() == nil {
+	source, _ := agentSubscriptionIntegration(t.TempDir(), "codex-api-key")
+	if err := authenticateReplacementKey(ctx, apiKeyValidationClient, source, source.InferenceURL, "synthetic-replacement-key"); err == nil || ctx.Err() == nil {
 		t.Fatal("The slow catalog response escaped its deadline.")
 	}
 }

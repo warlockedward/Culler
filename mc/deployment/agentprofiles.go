@@ -234,7 +234,7 @@ func agentProfileList(home string, includeEvidence bool) (AgentProfileCatalog, e
 		views[id] = view
 		out.Connections = append(out.Connections, view)
 	}
-	out.Integrations = agentSubscriptionIntegrations()
+	out.Integrations = agentSubscriptionIntegrations(home)
 	out.Providers = AgentProviderCatalog()
 	out.OpenCode = OpenCodeDownloadStatus(home)
 	ids := []string{}
@@ -260,13 +260,23 @@ func agentProfileList(home string, includeEvidence bool) (AgentProfileCatalog, e
 	return out, nil
 }
 
-func agentSubscriptionIntegration(id string) (operatorconfig.CredentialSource, bool) {
+func agentSubscriptionIntegration(home, id string) (operatorconfig.CredentialSource, bool) {
 	if strings.HasPrefix(id, "opencode:") {
 		provider, ok := opencodecatalog.Find(strings.TrimPrefix(id, "opencode:"))
 		return operatorconfig.CredentialSource{Kind: operatorconfig.CredentialKindOpenCodeAPIKey, CatalogEntry: provider.ID, Name: provider.Name}, ok
 	}
 	source, ok := operatorconfig.Default().Runtimes.Credentials[id]
-	return source, ok && agentConnectionKind(source.Kind)
+	if ok && agentConnectionKind(source.Kind) {
+		return source, true
+	}
+	// A self-hosted connection is a credential the operator declared in this
+	// deployment's configuration, never a release-pinned integration.
+	cfg, err := operatorconfig.Load(filepath.Join(home, "config.toml"))
+	if err != nil {
+		return operatorconfig.CredentialSource{}, false
+	}
+	declared, ok := cfg.Runtimes.Credentials[id]
+	return declared, ok && declared.Kind == operatorconfig.CredentialKindOpenAICompatible
 }
 
 func agentSubscriptionKind(kind string) bool {
@@ -274,7 +284,7 @@ func agentSubscriptionKind(kind string) bool {
 }
 
 func agentAPIKeyKind(kind string) bool {
-	return kind == operatorconfig.CredentialKindCodexAPIKey || kind == operatorconfig.CredentialKindClaudeAPIKey || kind == operatorconfig.CredentialKindOpenCodeAPIKey
+	return kind == operatorconfig.CredentialKindCodexAPIKey || kind == operatorconfig.CredentialKindClaudeAPIKey || kind == operatorconfig.CredentialKindOpenCodeAPIKey || kind == operatorconfig.CredentialKindOpenAICompatible
 }
 
 func agentConnectionKind(kind string) bool {
@@ -282,8 +292,9 @@ func agentConnectionKind(kind string) bool {
 }
 
 // The configuration template supplies the subscription integrations. Each
-// deployment offers them without regard to its own connections.
-func agentSubscriptionIntegrations() []AgentConnectionView {
+// deployment offers them without regard to its own connections. Self-hosted
+// connections join the list from the deployment's own configuration.
+func agentSubscriptionIntegrations(home string) []AgentConnectionView {
 	reference := operatorconfig.Default().Runtimes.Credentials
 	ids := []string{}
 	for id, source := range reference {
@@ -298,6 +309,21 @@ func agentSubscriptionIntegrations() []AgentConnectionView {
 		view := AgentConnectionView{ID: id, Name: agentDisplayName(id, source.Name), Kind: source.Kind, Harness: source.Harness(), Models: []string{}}
 		view.AuthorizationAvailable, view.AuthorizationMessage = AgentProfileAuthorizationCapability(source.Kind)
 		out = append(out, view)
+	}
+	if cfg, err := operatorconfig.Load(filepath.Join(home, "config.toml")); err == nil {
+		declared := []string{}
+		for id, source := range cfg.Runtimes.Credentials {
+			if source.Kind == operatorconfig.CredentialKindOpenAICompatible {
+				declared = append(declared, id)
+			}
+		}
+		sort.Strings(declared)
+		for _, id := range declared {
+			source := cfg.Runtimes.Credentials[id]
+			view := AgentConnectionView{ID: id, Name: agentDisplayName(id, source.Name), Kind: source.Kind, Harness: source.Harness(), Models: []string{}}
+			view.AuthorizationAvailable, view.AuthorizationMessage = AgentProfileAuthorizationCapability(source.Kind)
+			out = append(out, view)
+		}
 	}
 	return out
 }
@@ -408,7 +434,7 @@ func saveAgentConnection(home string, req AgentConnectionRequest, validatedRevis
 		if validatedRevision != "" && agentProfileRevision(*cfg) != validatedRevision {
 			return fmt.Errorf("The configuration changed during the key check. Refresh the connection, then retry.")
 		}
-		source, ok := agentSubscriptionIntegration(req.TemplateID)
+		source, ok := agentSubscriptionIntegration(home, req.TemplateID)
 		if !ok {
 			return fmt.Errorf("Select a supported connection.")
 		}

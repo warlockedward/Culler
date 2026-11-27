@@ -5,6 +5,7 @@
 // followed, and no process-level HTTP(S)/SOCKS proxy is inherited — the
 // node:https client path ignores environment proxies by construction.
 import * as https from "node:https";
+import * as http from "node:http";
 import * as net from "node:net";
 import * as dns from "node:dns";
 import type { IncomingMessage } from "node:http";
@@ -15,6 +16,9 @@ export interface DestinationPolicy {
   // Optional in-entry relaxation (§2.2): a hit widens within the entry only;
   // a malformed or non-canonical entry is refused at transport build time.
   readonly allowCidrs?: readonly string[];
+  // Declared cleartext inference endpoints "host:port" (§2.2 ruling: only the
+  // operator-declared literal loopback or private address may run http).
+  readonly cleartextEndpoints?: readonly string[];
 }
 
 export class DestinationError extends Error {
@@ -31,6 +35,24 @@ const strictIPv4 = /^(?:0|[1-9][0-9]{0,2})(?:\.(?:0|[1-9][0-9]{0,2})){3}$/;
 function isCanonicalIPv4(value: string): boolean {
   if (!strictIPv4.test(value)) return false;
   return value.split(".").every(part => Number(part) <= 255);
+}
+
+// isLocalAddress is the §2.2 cleartext address class: loopback and private
+// literals only. Publicly routed addresses never run cleartext here.
+function isLocalAddress(address: string): boolean {
+  const octets = address.split(".");
+  if (net.isIPv4(address) && octets.length === 4) {
+    const first = Number(octets[0]);
+    const second = Number(octets[1]);
+    return first === 127 || first === 10 || (first === 172 && second >= 16 && second <= 31) || (first === 192 && second === 168);
+  }
+  const lower = address.toLowerCase();
+  return lower === "::1" || lower.startsWith("fc") || lower.startsWith("fd");
+}
+
+function canonicalEndpoint(host: string, port: number): string {
+  const literal = host.replace(/^\[|\]$/g, "");
+  return net.isIPv6(literal) ? `[${literal}]:${port}` : `${literal}:${port}`;
 }
 
 // Unmaps an IPv4-mapped IPv6 address (the dotted form or the WHATWG hex form)
@@ -75,7 +97,7 @@ export function canonicalDestination(raw: string, policy: DestinationPolicy): { 
   } catch {
     throw new DestinationError("unparseable");
   }
-  if (url.protocol !== "https:") throw new DestinationError("scheme");
+  if (url.protocol !== "https:" && url.protocol !== "http:") throw new DestinationError("scheme");
   if (url.username !== "" || url.password !== "") throw new DestinationError("userinfo");
   const host = url.hostname; // bracketed for IPv6
   const original = authorityHost(raw);
@@ -117,7 +139,18 @@ function normalizeIPv6(value: string): string {
 }
 
 function finish(url: URL, host: string, policy: DestinationPolicy): { url: URL; host: string; port: number } {
-  const port = url.port === "" ? 443 : Number(url.port);
+  const cleartext = url.protocol === "http:";
+  const port = url.port === "" ? (cleartext ? 80 : 443) : Number(url.port);
+  if (cleartext) {
+    const literal = host.replace(/^\[|\]$/g, "");
+    if (net.isIP(literal) === 0 || (net.isIPv4(literal) && !isCanonicalIPv4(literal))) throw new DestinationError("cleartext_host_form");
+    if (!isLocalAddress(literal)) throw new DestinationError("cleartext_address_class");
+    const endpoint = canonicalEndpoint(literal, port);
+    if (!(policy.cleartextEndpoints ?? []).some(entry => {
+      const split = entry.lastIndexOf(":");
+      return split > 0 && canonicalEndpoint(entry.slice(0, split), Number(entry.slice(split + 1))) === endpoint;
+    })) throw new DestinationError("cleartext_denied");
+  }
   if (!Number.isInteger(port) || !policy.portAllowlist.includes(port)) throw new DestinationError("port_denied");
   return { url, host, port };
 }
@@ -266,22 +299,27 @@ export function providerTransport(policy: DestinationPolicy, overrides: Transpor
       headers[name] = value;
     });
     return await new Promise<Response>((resolve, reject) => {
-      const request = https.request({
-        ...overrides,
+      const cleartext = url.protocol === "http:";
+      const dial = {
         method,
         path: `${url.pathname}${url.search}`,
         // The dial target is the canonical host from this very request, and
         // the lookup hook is the last word before the socket connects.
         hostname: host,
         port,
-        servername: net.isIP(host) === 0 ? host : undefined,
         lookup: policyLookup(built) as never,
         agent: false,
-        rejectUnauthorized: true,
         headers,
-      }, (message: IncomingMessage) => {
-        resolve(webResponse(message, request));
-      });
+      };
+      const onMessage = (message: IncomingMessage): void => { resolve(webResponse(message, request)); };
+      const request = cleartext
+        ? http.request(dial, onMessage)
+        : https.request({
+            ...overrides,
+            ...dial,
+            servername: net.isIP(host) === 0 ? host : undefined,
+            rejectUnauthorized: true,
+          }, onMessage);
       request.on("error", reject);
       const signal = init.signal;
       if (signal) {
