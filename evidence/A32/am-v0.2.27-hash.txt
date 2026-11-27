@@ -1,0 +1,10 @@
+AM v0.2.27 双面哈希登记（轮五十二收口窗：D08 签署平面落地⇒EVIDENCED＝D-track 第八票＝最后一张非门票收口；D18 结构红线「批准永不创建需求」以 verb 零需求表代码路径＋G1 计数不变断言承载；SoD 强制集冻结 {breakglass.ratification}＝IG §3 硬规则；审批防伪造＝会话派生 approver＋append-only lattice 双面孔）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 59a9bf52d45c432a85eb1fc099b4ca45fbc2522a14ff2969f62591b70c894359
+- sha256(主工作树未跟踪副本) = 同上（cmp DUAL-EQUAL，2026-11-27 +0800 实测）
+- 链自检: 登记前 AM 文件 sha256 = 5a8535ce3a7353dc9aa487df3ba4798e0945c4f9ecfb2b753a86d189a9d8db6d，与 am-v0.2.26-hash.txt 登记值逐字相等（零漂移后方可登记）
+- 前轮: v0.2.26 = 5a8535ce3a7353dc9aa487df3ba4798e0945c4f9ecfb2b753a86d189a9d8db6d（evidence/A32/am-v0.2.26-hash.txt 实读）；再前 v0.2.25 = 6729276b27c1738b9384f4caf587297d40e40d597023f8ff341540a06be7ac13（同件记载）
+- 同轮并入 dev 的提交: ef8f117（D08 设计面：diff-plan 先列后改，D0-D5＋STOP 条件 S1-S4）＋ced2660（D08 实施：schema.sql S12 signoffs[类白名单 CHECK+guarded_insert attribution+no_update/no_delete lattice+signoffs_subject 索引]；migrate.go d07AnchorIdentity 钉定+S11.to 改钉+S12 add-signoffs；identity.Guard.DecideSignoff[白名单 fail-closed+SoD 强制集冻结]；verbs SignoffRecord[会话派生 approver+breakglass subject 验审计行+executor 绑定 requested_by+写面仅 signoffs+activity]；mc signoff record CLI+signoff-record 路由；G1-G5+SO1-SO2 测试族；registry 12 步全族更新）；status.json D08=EVIDENCED 随本登记轮提交
+- 关键事实: 最终干净 lane＝mc/check.sh MC_CHECK_EXIT=0（29 包 ok[零新包]，零 FAIL 零 UNVERIFIED；首跑 Bun fixture mise 解析闪断＝D07 同源环境事件，单测重验 ok 后重跑全绿）；新基线 identity＝4786047e098a0c6b830c1cde532cbbd3289b735d1aa047fd7f9b6d32ae7b8be1（shell 三文件拼接＝Go 探针逐字节相等）；Mimosa P5 兑现＝verb 路径零 exec（signNodeServe 进程内 seam）
+- 诚实边界: 超时升级未建（候后续票）；签署权委派＝D01/D02 grant 面既有承载不新增；degraded.grant 双人级签发接线候后续票；审批展示面（dashboard）不在票面；generic 类 subject_ref 不做存在性验证（自由定位符）
+- 账: dev tip＝ced2660（本登记轮提交随后）/ worktrees＝main+dev+d08（d08 收口后回收）/ 无新外发（不 push；main 保持 PRISTINE b22df40；ci/routing-base 探针支停 3444103）/ Mimosa 完整审计重跑候 push 门（Q7 裁定）/ **D-chain 状态：D01-D08 全 EVIDENCED＝D-track 非门票全部收口⇒D09 缓行（Q2）⇒下一票＝B10（activity 稳态链化，入图可立）；B06 候 218**
