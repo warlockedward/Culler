@@ -57,3 +57,13 @@ mc/cmd/mc/agentprofiles.go（case 对）＋新 mc/deployment/provider_gateway.go
 - **实施缺陷账（×2，均为我的代码错、测试抓的）**：① ufw 编号格式 `[ 1]`（方括号＋空格＋数字）被我按 `[1]` 想当然解析——首 token 成孤立括号、数字转换败、幂等/revoke/status 三面全失配；修复＝剥双括号后取首 token。诊断教训：中途出现"编译矛盾"假象（改名重编/清缓存皆无效），最终由**逐段微探针**在盘上代码一击定案——怀疑编译器之前先怀疑自己的格式假设。② culler 壳 gateway 分支抢在 `--help` 归一前做动作校验（`gateway --help` 被拒＝破坏 help 全家桶）；修复＝help 态旁路。
 - **Mimosa 兼容改形（零语义）**：泛型 runner（程序名变量）与 `exec.CommandContext`＋变量 argv 两形均被命令注入闸拦停×4 ⇒ 定形＝**纯逻辑/执行文件分离**：决策文件零 exec（解析/规范形/规则文本全纯函数＝全测试面），执行文件＝字面量 exec.Cmd 结构体、参数仅规范形再渲染文本与 strconv 数字；Bash 的 cp/sed/heredoc 形态亦被拦（文件名入命令即污点）⇒全程 Write/Edit。
 - **测试面**：D4 族 11 用例全绿（loopback 拒/无源拒/无 ufw 打印精确 iptables/规则形状逐字/幂等 no-op/编辑失败上抛/revoke 只删带标双条降序/无标零触碰/status 三态/损坏配置 fail-closed/非规范 bind 拒或规范形）＋壳测试 3 态（status 面板/未知动作 exit 2/loopback allow refused exit 1）＋culler/uninstall/agentprofile/scope 回归族 ok。config 注释承诺-现实差已修（指向 `culler gateway allow` 明示授予路径）。
+
+## 9. 218 窗口准备轮（轮六十）：真机抓到两枚本地不可见缺陷（CODED 阶段的活体价值证明）
+
+- **缺陷①＝PATH 依赖**：静态链接的 mc 在监督/裸环境跑 `exec.Command("ip"…)` LookPath 败（`fork/exec ip: no such file or directory`，root 交互 shell 却有——本机 macOS/单测缝注入两形态都结构性测不到）。修复＝FHS 绝对路径 `/usr/sbin/{ip,ufw}`（执行文件内注记成文）。
+- **缺陷②＝网桥名启发式过窄**：以 `br*`/`docker0` 前缀认桥 ⇒ 拒绝本部署自家 `shz-br0`（docker 自定义网桥名＝任意字符串惯例，前缀不是法律）。**根因修复＝放弃命名判断，读内核接口型别**（`ip -o link show type bridge`）＋要求 `proto kernel` 且 `scope link`（on-link 源＝L2 邻接面，安全性由内核型别＋链路范围保证而非命名巧合）。附赠回归钉＝物理网卡路由拒（LAN 子网入许可＝暴露面越界，`TestGatewayRefusesPhysicalInterfaceRoute`）。
+- 两缺陷均＝**真机才现形**——A36 验收臂挂在 218 的票面理由拿到反面实证（本地全绿≠真机可用）。
+- 窗口基线（改前态，事后零残留对照用）＝`/root/a36-window/{ufw-before.txt,input-before.txt}`（ufw active、无 10.199 桥规则、main daemon 53 容器/173 卷＝他租户波动如实记）；载荷 mc＝`b6b12515d56b36dc…`（dev tip 树交叉编译，双端 sha 对读）。
+- **纯读面真机复验**：`gateway-status` ⇒ `absent + network=10.199.0.0/16 + interface=shz-br0 + suggested_command=ufw allow from 10.199.0.0/16 to 10.199.0.1 proto tcp comment shz-provider-gateway`＝推导链/闸/建议形全对，零主机变更。
+- 配置面 owner-only 闸开火一次（config.toml 644 被拒＝A02 边界生产路径又拦人，副证在册）。
+- **R-a 适用**：下一步 allow/revoke 是真防火墙变更＝事前请示包已呈 owner，批准前窗口冻结在只读态。

@@ -10,20 +10,29 @@ import (
 // scripted values, recording every call. The real programs never run here:
 // these tests are the pure decision face of the provider gateway surface.
 type gatewayFixture struct {
-	bind      string
-	bindErr   error
-	routes    string
-	ufwState  string
-	numbered  string
-	allowRecs [][]string
-	delRecs   []int
-	failAllow bool
+	bind        string
+	bindErr     error
+	routes      string
+	bridgeLinks string
+	ufwState    string
+	numbered    string
+	allowRecs   [][]string
+	delRecs     []int
+	failAllow   bool
 }
+
+// defaultBridgeLinks mirrors `ip -o link show type bridge` output for the
+// networks bridgeRoutes declares, including the real-host shape that broke
+// the first name-heuristic implementation: a bridge named shz-br0.
+const defaultBridgeLinks = `2: docker0: <BROADCAST,MULTICAST> mtu 1500 mode DEFAULT group default
+33: br-9f2c11: <BROADCAST,MULTICAST> mtu 1500 mode DEFAULT group default
+45: shz-br0: <NO-CARRIER,BROADCAST,MULTICAST> mtu 1500 mode DEFAULT group default`
 
 func (f *gatewayFixture) install(t *testing.T) {
 	t.Helper()
 	bindSave := providerGatewayBindHost
 	routeSave := ipRouteOutput
+	bridgeSave := ipBridgeLinks
 	stateSave := ufwStateOutput
 	numSave := ufwNumberedOutput
 	allowSave := ufwAllowEdit
@@ -31,6 +40,7 @@ func (f *gatewayFixture) install(t *testing.T) {
 	t.Cleanup(func() {
 		providerGatewayBindHost = bindSave
 		ipRouteOutput = routeSave
+		ipBridgeLinks = bridgeSave
 		ufwStateOutput = stateSave
 		ufwNumberedOutput = numSave
 		ufwAllowEdit = allowSave
@@ -38,6 +48,11 @@ func (f *gatewayFixture) install(t *testing.T) {
 	})
 	providerGatewayBindHost = func(string) (string, error) { return f.bind, f.bindErr }
 	ipRouteOutput = func() (string, error) { return f.routes, nil }
+	bridgeLinks := f.bridgeLinks
+	if bridgeLinks == "" {
+		bridgeLinks = defaultBridgeLinks
+	}
+	ipBridgeLinks = func() (string, error) { return bridgeLinks, nil }
 	ufwStateOutput = func() (string, error) {
 		if f.ufwState == "" {
 			return "", fmt.Errorf("ufw: command not found")
@@ -63,6 +78,38 @@ const bridgeRoutes = `default via 10.0.0.1 dev enp0s3 proto dhcp
 172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown
 10.199.0.0/24 dev br-9f2c11 proto kernel scope link src 10.199.0.1 linkdown
 `
+
+// TestGatewayKernelClassifiesBridges is the real-host regression: the
+// deployment bridge is named shz-br0 — no name prefix rule covers every
+// honest shape, so membership is read from the kernel's interface type.
+func TestGatewayKernelClassifiesBridges(t *testing.T) {
+	f := &gatewayFixture{bind: "10.199.0.1", routes: `10.199.0.0/16 dev shz-br0 proto kernel scope link src 10.199.0.1 linkdown`, ufwState: "Status: active"}
+	f.install(t)
+	got, err := ProviderGatewayAllow("/unused", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.State != "present" || got.Network != "10.199.0.0/16" || got.Interface != "shz-br0" {
+		t.Fatalf("shz-br0 not accepted: %+v", got)
+	}
+}
+
+// TestGatewayRefusesPhysicalInterfaceRoute guards the sharper edge: a bind
+// on the host's LAN interface has a perfectly good proto-kernel scope-link
+// route — but a physical NIC is not a bridge, and admitting its subnet
+// would widen exposure past the container network.
+func TestGatewayRefusesPhysicalInterfaceRoute(t *testing.T) {
+	f := &gatewayFixture{bind: "10.0.0.7", routes: bridgeRoutes,
+		bridgeLinks: `2: docker0: <BROADCAST> mtu 1500`, ufwState: "Status: active"}
+	f.install(t)
+	got, err := ProviderGatewayAllow("/unused", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.State != "refused" || len(f.allowRecs) != 0 {
+		t.Fatalf("physical NIC accepted: %+v edits=%v", got, f.allowRecs)
+	}
+}
 
 func TestGatewayAllowRefusesLoopbackBind(t *testing.T) {
 	f := &gatewayFixture{bind: "127.0.0.1", ufwState: "Status: active"}

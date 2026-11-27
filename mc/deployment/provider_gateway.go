@@ -33,6 +33,7 @@ const providerGatewayTag = "shz-provider-gateway"
 // the variables wholesale).
 var (
 	ipRouteOutput     = gatewayIPRoute
+	ipBridgeLinks     = gatewayIPLinkBridges
 	ufwStateOutput    = gatewayUfwState
 	ufwNumberedOutput = gatewayUfwNumbered
 	ufwAllowEdit      = gatewayUfwAllow
@@ -115,16 +116,35 @@ func bindOf(home string) (string, bool, error) {
 }
 
 // bridgeNetwork finds the subnet the rule may name: a directly-connected
-// kernel route on a locally-attached bridge interface whose network contains
-// the bind. No match, no rule — the source is never guessed.
-func bridgeNetwork(routeOutput, bind string) (canonicalPair, error) {
+// kernel route (proto kernel, scope link) on an interface the KERNEL reports
+// as type bridge, whose network contains the bind. Bridge class comes from
+// `ip link show type bridge`, never from a name guess — the first real-host
+// run proved names defeat prefixes (the deployment's own bridge is
+// `shz-br0`, and `br-*` naming is docker's convention, not a law). The
+// kernel type plus on-link scope is what makes the source safe: only
+// L2-adjacent residents of that bridge can match it. No such route, no
+// rule — the source is never guessed.
+func bridgeNetwork(routeOutput, bridgeLinksOutput, bind string) (canonicalPair, error) {
 	ip := net.ParseIP(bind)
 	if ip == nil {
 		return canonicalPair{}, fmt.Errorf("the provider proxy bind %q is not an IP literal", bind)
 	}
-	for _, line := range strings.Split(routeOutput, "\n") {
+	bridges := map[string]bool{}
+	for _, line := range strings.Split(bridgeLinksOutput, "\n") {
+		// `ip -o link show type bridge` lines lead with "N: name: <...>"
 		fields := strings.Fields(line)
-		if len(fields) < 4 || !strings.Contains(line, "proto kernel") {
+		if len(fields) < 2 {
+			continue
+		}
+		name := strings.TrimSuffix(strings.TrimSuffix(fields[1], ":"), "@if0")
+		bridges[name] = true
+	}
+	for _, line := range strings.Split(routeOutput, "\n") {
+		if !strings.Contains(line, "proto kernel") || !strings.Contains(line, "scope link") {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) < 4 {
 			continue
 		}
 		_, block, err := net.ParseCIDR(fields[0])
@@ -137,14 +157,14 @@ func bridgeNetwork(routeOutput, bind string) (canonicalPair, error) {
 				iface = fields[i+1]
 			}
 		}
-		if !strings.HasPrefix(iface, "br") && iface != "docker0" {
+		if !bridges[iface] {
 			continue
 		}
 		if block.Contains(ip) {
 			return canonicalize(bind, block.String(), iface)
 		}
 	}
-	return canonicalPair{}, fmt.Errorf("the bind %s is not inside any locally-attached bridge network; refusing to guess a source", bind)
+	return canonicalPair{}, fmt.Errorf("the bind %s is not inside a directly-attached kernel-classified bridge network; refusing to guess a source", bind)
 }
 
 // matchedTaggedRules extracts rule indices whose lines carry this tool's
@@ -196,7 +216,11 @@ func resolveGatewayPair(home string) (bind string, loopback bool, pair canonical
 	if err != nil {
 		return bind, false, canonicalPair{}, false, fmt.Errorf("read host routes: %w", err)
 	}
-	pair, perr := bridgeNetwork(routes, bind)
+	bridges, err := ipBridgeLinks()
+	if err != nil {
+		return bind, false, canonicalPair{}, false, fmt.Errorf("read bridge interfaces: %w", err)
+	}
+	pair, perr := bridgeNetwork(routes, bridges, bind)
 	if perr != nil {
 		return bind, false, canonicalPair{}, false, nil
 	}
