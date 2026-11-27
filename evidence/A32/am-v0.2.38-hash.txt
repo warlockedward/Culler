@@ -1,0 +1,9 @@
+AM v0.2.38 双面哈希登记（轮五十九终＝图边定案：A31/A36 之间是验收合流语义非开工前置，任何方向画 edge 皆死锁（blcheck 两拦实证），定案双向无 edge＋行注散文承载合流；v0.2.37 的单反转折射亦被本轮修正——三步演进全文在 AM 行内，不修饰）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = 0b64ebc51db71006be4a50c915a7a4fff2582e5b14ca3d2150d7296f80244525
+- 链自检: 登记前 AM 文件 sha256（git HEAD 态）= 68a19f8c83891ab5afefdbfac7347d5c8cad54e74698e35c22c340790fe1947e，与 am-v0.2.37-hash.txt 登记值逐字相等（零漂移）；纪律自纠一笔＝本轮首测链自检时先改标题后校验（读到的是工作态非 HEAD 态），以 git show HEAD 重校验定案——校验必须对提交态做，登记件如实注
+- 前轮: v0.2.37 = 68a19f8c…1947e（反转修正轮，本轮被再修正）；v0.2.36 = 0639faa2…91bc
+- 同轮并入 dev 的提交: 基线两行定案文（A36 行两拦定案全文＋A31 行回归 dep=—＋合流句权威化）＋AM v0.2.38＋本件；blcheck 复验=EXIT 0 violations=0（捕获件）
+- 关键事实: 代码/status.json/identity 零变化（纯图面）；A36=CODED、A31=IN_PROGRESS 各合规于无边形态；A31 剩余半程=218 窗口经 A36 gateway allow 臂（行注权威表述）
+- 诚实边界: 登记链自身出现"修正的修正"（v0.2.37→v0.2.38），两版都保留不删——演进史即审计面
+- 账: dev tip=<本提交+捕获提交> / worktrees=main+dev（a36 回收后）/ push 队列=11 候令（实算以 push 前为准）/ 本地 main PRISTINE b22df40 / 无新外发
