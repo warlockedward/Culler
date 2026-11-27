@@ -46,3 +46,17 @@
 - **scanId＝scan-2026-11-27T09-11-52.345Z-c650fb7b257f；封印＝sha256:695759603cd5ee4fbc626f3c6dcbed56cc0eea86a6ec48b479ee669fb25d78ad**；历史目录＝/Users/raistlin/.mimosa/security-scans/project-05846d035334cfe0b42fb29c/<scanId>（仓外）。
 - 对照轮五十三基线（§1/§2，scanId 2e2724cedeb1）：**total 559／high 435／medium 120／low 4；逐域 dashboard 161／mc 157／runner 144／resident 61／evals 19／performance 10／release 7——两份 findings.json 逐域逐级完全一致＝本两笔提交（纯 evidence/docs 面，零代码）零新增发现面**。依赖面同为 572 包、advisory 4 包 40 条。
 - 诚实核心沿用 §1：coverage partial／runStatus inconclusive／static-only／verdictEffect none——UNKNOWN≠PASS，本节同样不构成安全背书。
+
+## 9. 轮六十二续窗扫描链（第五次 push 后，commit 级逐笔封印）
+
+本窗 5 笔提交（d4ab94c push 登记／0435302 DT v0.2 修订／f2f1159 AM v0.2.43／85407fd 现状附录）的完成扫描对照轮五十三基线（§1/§2）＝**全部 559／high 435／medium 120／low 4，逐域 dashboard 161／mc 157／runner 144／resident 61／evals 19／performance 10／release 7 完全一致＝零新增发现面**（本窗变更=evidence/docs/契约正文，blcheck 另证零锚漂移）：
+
+| 树 | scanId | 封印（job seal） |
+|---|---|---|
+| d4ab94c | scan-2026-11-27T09-24-31.976Z-c2830867f39c | sha256:20643432204a31a788d6a435b06cb89594ffe23a4f8166d9bafc90fb15aef3ab |
+| f2f1159 | scan-2026-11-27T09-28-52.218Z-d268f905c59a | sha256:c7969203c856a885c39a82db552099220ba2a2bb92e8e65f538634464c1045a5 |
+| 85407fd（tip） | scan-2026-11-27T09-30-53.205Z-2b41731fea9b | sha256:ab84199ef9aad82d149d62cf176df317e76e2034c487bab62ac45b07b6a7b251 |
+
+- 过程如实：job mwys5d1f（首试 85407fd 树）audit 阶段状态回写停滞且未落盘＝取消重发 mwys67bh 成功；hook 在各笔 commit/push 时点的 scanner_enobufs 兼容放行记录在册。
+- §9 本笔登记提交自身＝纯封印号追加（零新语义内容），不覆盖自身扫描（自尾结构=登记文档性质，如 AM 惯例）。
+- 诚实核心沿用 §1：coverage partial／runStatus inconclusive／static-only／verdictEffect none——不构成安全背书。
