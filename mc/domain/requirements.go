@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"database/sql"
+	"mc/substrate"
 	"strings"
 	"unicode/utf8"
 )
@@ -252,7 +253,9 @@ func ApplyTaskRequirementsRevision(ctx context.Context, q Q, revision int64) err
 	if _, err := q.ExecContext(ctx, `UPDATE requirements_revisions SET state='applied',applied_at=datetime('now') WHERE id=?`, revision); err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('mc','requirements.applied',?,?)`, task, reason)
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "mc", Kind: "requirements.applied", Subject: task, Detail: reason,
+	})
 	return err
 }
 

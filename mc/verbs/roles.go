@@ -13,6 +13,7 @@ import (
 	"mc/dispatch"
 	"mc/domain"
 	"mc/repository"
+	"mc/substrate"
 )
 
 // ArbiterVerdicts is the payload for mc arbiter decide.
@@ -200,7 +201,9 @@ func ArbiterDecide(db *sql.DB, id *RunIdentity, run string, batch io.Reader) (an
 				if err != nil {
 					return err
 				}
-				if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('arbiter','proposal.superseded',?,?)`, v.Task, string(body)); err != nil {
+				if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+					Actor: "arbiter", Kind: "proposal.superseded", Subject: v.Task, Detail: string(body),
+				}); err != nil {
 					return err
 				}
 				continue

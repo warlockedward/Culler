@@ -65,3 +65,12 @@
 ## 6. 登记与收尾
 
 实施＝少提交于 shz/TB10；全道绿后 ff dev；登记轮＝AM v0.2.28＋status.json B10=EVIDENCED＋blcheck；identity 不变（无迁移步骤）；B08 具名残余（稳态半）闭合随登记说明；D7 边界入册。
+
+## 8. 实施补记
+
+- **设计修正 ①（`any` 透传）**：`ActivityEvent` 可选列字段由 `*string` 改为 `any`。recon 后发现 18 处位点的 subject/detail 为 int64 等非串类型（task id、run id、connection），今日经列 TEXT affinity 落形；`*string` 会迫使 Go 侧格式化（扩大变更面且违零改写），`any` 把调用原值直接重绑定到同一 placeholder＝**构造性零改写**（nil 仍 NULL，"" 仍空串，二者在 payload 在场性上分明——S2 断言）。
+- **设计修正 ②（pre-chain 回退臂）**：第六步之前的迁移步骤（applyMigrationStep 对每步都写步骤 activity 行）运行时无 `activity_chain_map`/`audit_events` 可附。AppendActivity 以 sqlite_master 探针判定：机制缺席⇒只落行（这些行由 S6 回填按行 id 序**恰好投影一次**，杜绝双写）；机制在位⇒三元组全附。运行时脊恒有机制，回退臂只属迁移史。S3＋回填族全表覆盖断言（N1/N4 升级为 表==链==映射 强不变量）共同闸住。
+- **设计修正 ③（事务面严格性维持）**：`TestProposalBriefHistoryReflectsCancellationAndPreservesReason` 红暴露该测试把 `*sql.DB` 裸传给 `domain.Cancel`（生产恒 `inTx`⇒q 事务面）；测试形态改为 inTx，**不放宽 AppendActivity 的 Tx/Conn 闸**（R-03 原子审计承载：三元组必须与致因状态变更同事务）。
+- **schema 三文件零改动**⇒identity 不变（仍 4786047e098a0c6b…32ae7b8be1），B10 无迁移步骤（票面＝稳态代码面）。
+- 覆盖门实扫＝模块唯一 activity 行 INSERT 在 substrate/activity_chain.go（CG1 旁路必红＋CG2 幻影单点＋CG3 枚举器负控 fixture：旁路检出/mapping 不误检/词尾 activity2、activity_x 不误检/测试文件不扫）。
+- 改接 36 点全落：substrate 1＋verbs 27（含 identity recordActivity 委托）＋domain 8（4 文件新增 mc/substrate import；allowances 两 json_object 位点走同事务预读渲染器，T7 字节保真含混合 unicode 样本；wikiupdate SELECT 派生位点走 0/1 行预读，缺席不落行＝原语义）。

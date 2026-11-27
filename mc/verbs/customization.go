@@ -9,6 +9,7 @@ import (
 
 	"mc/dispatch"
 	"mc/domain"
+	"mc/substrate"
 )
 
 type RoleCustomization struct {
@@ -218,7 +219,9 @@ func RunCustomizationConflict(db *sql.DB, id *RunIdentity, a CustomizationConfli
 			}
 			result["task_id"] = *subject
 		}
-		if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail,project) VALUES(?,'customization.conflict',?,?,?)`, string(c.Role), a.Run, report, c.Project); err != nil {
+		if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: string(c.Role), Kind: "customization.conflict", Subject: a.Run, Detail: report, Project: c.Project,
+		}); err != nil {
 			return err
 		}
 		if fence.WikiUpdate {

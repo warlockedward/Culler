@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"database/sql"
+	"mc/substrate"
 	"strings"
 	"unicode/utf8"
 )
@@ -31,7 +32,10 @@ func Promote(ctx context.Context, q Q, taskID int64) error {
 	if pending, err := RequirementsRevisionPending(ctx, q, taskID); err != nil {
 		return err
 	} else if pending {
-		_, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('arbiter','proposal.superseded',?,'The Arbiter accepted the previous requirements.')`, taskID)
+		err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "arbiter", Kind: "proposal.superseded", Subject: taskID,
+			Detail: "The Arbiter accepted the previous requirements.",
+		})
 		return err
 	}
 	r, err := getTask(ctx, q, taskID)
@@ -60,7 +64,9 @@ func RejectProposal(ctx context.Context, q Q, taskID int64, reason string) error
 	if pending, err := RequirementsRevisionPending(ctx, q, taskID); err != nil {
 		return err
 	} else if pending {
-		_, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('arbiter','proposal.superseded',?,?)`, taskID, reason)
+		err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "arbiter", Kind: "proposal.superseded", Subject: taskID, Detail: reason,
+		})
 		return err
 	}
 	if reason == "" {
@@ -86,9 +92,9 @@ func RejectProposal(ctx context.Context, q Q, taskID int64, reason string) error
 		WHERE id = ?`, taskID); err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx, `
-		INSERT INTO activity (actor, kind, subject, detail)
-		VALUES ('arbiter', 'task.rejected', ?, ?)`, taskID, reason)
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "arbiter", Kind: "task.rejected", Subject: taskID, Detail: reason,
+	})
 	return err
 }
 
@@ -230,9 +236,9 @@ func Cancel(ctx context.Context, q Q, taskID int64, reason string, actor string)
 		WHERE id = ?`, taskID); err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx, `
-		INSERT INTO activity (actor, kind, subject, detail)
-		VALUES (?, 'task.cancelled', ?, ?)`, actor, taskID, reason)
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: actor, Kind: "task.cancelled", Subject: taskID, Detail: reason,
+	})
 	return err
 }
 

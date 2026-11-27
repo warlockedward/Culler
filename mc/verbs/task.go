@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"mc/domain"
+	"mc/substrate"
 )
 
 // TaskAdd creates explicit operator work with its repository assignments.
@@ -122,7 +123,9 @@ func TaskBlock(db *sql.DB, id *RunIdentity, task int64, reason string) (any, err
 			}
 			if pending {
 				superseded = true
-				if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES(?,'task.superseded_block',?,?)`, id.Role, task, reason); err != nil {
+				if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+					Actor: id.Role, Kind: "task.superseded_block", Subject: task, Detail: reason,
+				}); err != nil {
 					return err
 				}
 				return endRun(ctx, q, id.RunID, "blocked")

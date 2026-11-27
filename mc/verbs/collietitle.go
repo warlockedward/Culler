@@ -3,6 +3,7 @@ package verbs
 import (
 	"context"
 	"database/sql"
+	"mc/substrate"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -54,7 +55,9 @@ func CollieTitle(db *sql.DB, id *RunIdentity, session, title string) (any, error
 		if id != nil {
 			actor = "collie"
 		}
-		if _, err := q.ExecContext(ctx, `INSERT INTO activity (actor,kind,subject,detail) VALUES (?, 'collie.title', ?, ?)`, actor, session, title); err != nil {
+		if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: actor, Kind: "collie.title", Subject: session, Detail: title,
+		}); err != nil {
 			return err
 		}
 		changed = true

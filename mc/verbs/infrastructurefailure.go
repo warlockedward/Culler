@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"mc/domain"
+	"mc/substrate"
 )
 
 func RunProcessStarted(db *sql.DB, id *RunIdentity, run string) (any, error) {
@@ -44,7 +45,9 @@ func resumeTaskTx(ctx context.Context, q Q, task int64, reason, actor string) er
 	if err := domain.ClearInfra(ctx, q, task); err != nil {
 		return err
 	}
-	_, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES(?,'task.resumed',?,?)`, actor, task, reason)
+	err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: actor, Kind: "task.resumed", Subject: task, Detail: reason,
+	})
 	return err
 }
 

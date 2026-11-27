@@ -148,11 +148,16 @@ func TestActivityBackfillProjectsStockRowsInOrder(t *testing.T) {
 	if !report.Migrated || len(report.Applied) != 7 || report.Applied[0] != "migrate-activity-to-chain" || report.Applied[1] != "add-identity-foundation" || report.Applied[2] != "add-legacy-actor-sealing" || report.Applied[3] != "add-degraded-grants" || report.Applied[4] != "add-sign-requests" || report.Applied[5] != "add-anchor-checkpoints" || report.Applied[6] != "add-signoffs" {
 		t.Fatalf("report = %+v; want the sixth through twelfth steps applied", report)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'activity'`); n != 2 {
-		t.Fatalf("activity chain rows = %d; want 2 (one per stock row)", n)
+	// Post-B10 the whole table is chained: the stock rows through the
+	// backfill, the migration steps' own rows through the central append.
+	// Full coverage (table == chain == mapping) is the spine's invariant, and
+	// the stock pair still owns the first two chain positions (below).
+	stockAndSteps := countRows(t, db, `SELECT COUNT(*) FROM activity`)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'activity'`); n != stockAndSteps {
+		t.Fatalf("activity chain rows = %d; want %d (every row chained: stock through the backfill, steps through the append)", n, stockAndSteps)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM activity_chain_map`); n != 2 {
-		t.Fatalf("mapping rows = %d; want 2", n)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM activity_chain_map`); n != stockAndSteps {
+		t.Fatalf("mapping rows = %d; want %d (one per chained row)", n, stockAndSteps)
 	}
 	var firstPrev string
 	if err := db.QueryRow(`SELECT prev_hash FROM audit_events WHERE aggregate_id = 'activity' AND seq = 1`).Scan(&firstPrev); err != nil {
@@ -294,7 +299,22 @@ func TestActivityMigrationIsIdempotentOnReRun(t *testing.T) {
 	if again.Migrated || len(again.Applied) != 0 {
 		t.Fatalf("re-run report = %+v; want a no-op (the sixth step is recorded)", again)
 	}
-	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'activity'`); n != 1 {
-		t.Fatalf("activity chain rows after re-run = %d; want 1 (not re-backfilled)", n)
+	// Post-B10 coverage with the no-op re-run: the stock row is projected
+	// exactly once through the backfill, and the full coverage invariant —
+	// table == chain == mapping — is untouched by the second call.
+	var stockID int64
+	if err := db.QueryRow(`SELECT id FROM activity WHERE kind = 'probe.kind.a'`).Scan(&stockID); err != nil {
+		t.Fatal(err)
+	}
+	stockEvent := activityChainEventID(stockID)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'activity' AND event_id = ?`, stockEvent); n != 1 {
+		t.Fatalf("stock row chain events after re-run = %d; want exactly 1 (the projection is never rebuilt)", n)
+	}
+	total := countRows(t, db, `SELECT COUNT(*) FROM activity`)
+	if n := countRows(t, db, `SELECT COUNT(*) FROM audit_events WHERE aggregate_id = 'activity'`); n != total {
+		t.Fatalf("activity chain rows after re-run = %d; want %d (every row, once)", n, total)
+	}
+	if n := countRows(t, db, `SELECT COUNT(*) FROM activity_chain_map`); n != total {
+		t.Fatalf("mapping rows after re-run = %d; want %d", n, total)
 	}
 }

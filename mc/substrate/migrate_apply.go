@@ -1,6 +1,7 @@
 package substrate
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -136,9 +137,9 @@ func applyMigrationStep(db *sql.DB, step MigrationStep) (bool, error) {
 		return false, fmt.Errorf("record migration step %s: %w", step.Name, err)
 	}
 	detail := fmt.Sprintf("from %s to %s", step.FromSchemaID, step.ToSchemaID)
-	if _, err := tx.Exec(
-		`INSERT INTO activity (actor, kind, subject, detail) VALUES (?, ?, ?, ?)`,
-		"mc", "schema.migration.step", step.Name, detail); err != nil {
+	if err := AppendActivity(context.Background(), tx, ActivityEvent{
+		Actor: "mc", Kind: "schema.migration.step", Subject: step.Name, Detail: detail,
+	}); err != nil {
 		return false, fmt.Errorf("record migration event for step %s: %w", step.Name, err)
 	}
 	if err := appendMigrationAuditRow(tx, step); err != nil {

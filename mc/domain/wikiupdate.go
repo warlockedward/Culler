@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"mc/dispatch"
+	"mc/substrate"
 )
 
 // The wiki update aggregate: one wiki_updates row for each wiki update, and
@@ -334,8 +335,18 @@ func endWikiUpdate(ctx context.Context, q Q, run string, end WikiEnd) (bool, err
 	default:
 		detail = "The wiki update succeeded. The Project wiki needed no change."
 	}
-	_, err = q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail,project)
-		SELECT 'mc','wiki.update_ended',run_id,?,project FROM wiki_updates WHERE run_id=?`, detail, run)
+	// The replaced statement was an INSERT..SELECT: no wiki_updates row
+	// means no activity row and no error. The pre-read carries that exactly.
+	subjectVal, projectVal, found, err := wikiUpdateOrigin(ctx, q, run)
+	if err != nil {
+		return false, err
+	}
+	if !found {
+		return true, nil
+	}
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "mc", Kind: "wiki.update_ended", Subject: subjectVal, Detail: detail, Project: projectVal,
+	})
 	return err == nil, err
 }
 
@@ -493,4 +504,25 @@ func (r *WikiUpdateRow) Record() *dispatch.WikiUpdate {
 		record.HeartbeatUptime = &heartbeat
 	}
 	return record
+}
+
+// wikiUpdateOrigin reads the run_id and project of one wiki_updates row for
+// the ending event. run_id is unique, so the read is 0 or 1 row.
+func wikiUpdateOrigin(ctx context.Context, q Q, run string) (string, string, bool, error) {
+	rows, err := q.QueryContext(ctx, `SELECT run_id, project FROM wiki_updates WHERE run_id = ?`, run)
+	if err != nil {
+		return "", "", false, err
+	}
+	defer rows.Close()
+	var subjectVal, projectVal string
+	if !rows.Next() {
+		return "", "", false, nil
+	}
+	if err := rows.Scan(&subjectVal, &projectVal); err != nil {
+		return "", "", false, err
+	}
+	if err := rows.Err(); err != nil {
+		return "", "", false, err
+	}
+	return subjectVal, projectVal, true, nil
 }

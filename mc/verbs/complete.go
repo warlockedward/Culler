@@ -11,6 +11,7 @@ import (
 	"unicode/utf8"
 
 	"mc/domain"
+	"mc/substrate"
 )
 
 // CompleteArgs carries the flags of mc complete. One call selects one arm:
@@ -313,7 +314,9 @@ func Complete(db *sql.DB, id *RunIdentity, a CompleteArgs) (any, error) {
 			return err
 		}
 		if pending {
-			if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES(?,'task.superseded_block',?,?)`, id.Role, a.Task, a.Reason); err != nil {
+			if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+				Actor: id.Role, Kind: "task.superseded_block", Subject: a.Task, Detail: a.Reason,
+			}); err != nil {
 				return err
 			}
 			result["superseded"] = true

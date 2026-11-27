@@ -233,3 +233,180 @@ func VerifyActivityBackfill(tx *sql.Tx) error {
 	}
 	return nil
 }
+
+// ErrActivitySurface identifies an AppendActivity call that is not running
+// on an open transaction surface. The row, its chain event, and the mapping
+// commit or vanish as one unit (DC R-03), so the append is refused on a bare
+// database handle rather than split across implicit transactions.
+var ErrActivitySurface = errors.New("activity append needs an open transaction")
+
+// ActivityEvent is one steady-state activity row against the central append.
+// An optional column carries the same Go value the replaced SQL bound: nil
+// stores NULL, a string stores the string, an int64 lands under the column's
+// TEXT affinity exactly as the old placeholder did. The field is deliberately
+// `any` — the central API re-binds the call's value without re-formatting it,
+// which is what makes the 35-site rewiring a zero-rewrite at the byte level.
+type ActivityEvent struct {
+	Actor             string
+	Kind              string
+	Subject           any
+	Detail            any
+	Project           any
+	DispatchKey       any
+	DispatchRequestID any
+	DispatchResult    any
+}
+
+// AppendActivity is the single writer of activity rows for the spine: it
+// lands the row, its 'activity' aggregate chain event, and the row-to-event
+// mapping on the caller's open transaction, in that order. The chain event
+// is rendered by the same authority the sixth step's backfill used
+// (activityPayload, activityChainEventID), so a steady-state row is
+// indistinguishable from a backfilled one — same event identity, same
+// payload bytes, same chain linkage. The central API is the coverage gate's
+// only exempted writer: a new activity-row INSERT anywhere else in the
+// module turns the gate red.
+func AppendActivity(ctx context.Context, q auditor, ev ActivityEvent) error {
+	switch q.(type) {
+	case *sql.Tx, *sql.Conn:
+	default:
+		return fmt.Errorf("%w: got %T", ErrActivitySurface, q)
+	}
+	res, err := q.ExecContext(ctx, `INSERT INTO activity
+		(actor, kind, subject, detail, project, dispatch_key, dispatch_request_id, dispatch_result)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		ev.Actor, ev.Kind, ev.Subject, ev.Detail, ev.Project,
+		ev.DispatchKey, ev.DispatchRequestID, ev.DispatchResult)
+	if err != nil {
+		return fmt.Errorf("append activity row %s: %w", ev.Kind, err)
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return fmt.Errorf("read the new activity id: %w", err)
+	}
+	// The pre-chain world: a step recorded before the sixth step lands has no
+	// mapping table to map into, and the sixth step's backfill projects every
+	// row that exists at its time — so these rows reach the chain exactly
+	// once, through the backfill, never twice. A runtime spine always carries
+	// the mechanism; the row-only arm belongs to migration history alone.
+	{
+		var maps int
+		probe, err := q.QueryContext(ctx, `SELECT COUNT(*) FROM sqlite_master
+			WHERE type = 'table' AND name = 'activity_chain_map'`)
+		if err != nil {
+			return fmt.Errorf("probe the activity chain mechanism: %w", err)
+		}
+		if probe.Next() {
+			if err := probe.Scan(&maps); err != nil {
+				probe.Close()
+				return fmt.Errorf("scan the activity chain probe: %w", err)
+			}
+		}
+		if err := probe.Err(); err != nil {
+			probe.Close()
+			return fmt.Errorf("iterate the activity chain probe: %w", err)
+		}
+		probe.Close()
+		if maps == 0 {
+			return nil
+		}
+	}
+	// The row is read back, never trusted from the call: the payload renders
+	// the stored bytes, so the chain records what the spine holds — the same
+	// rule the backfill follows.
+	var (
+		actor, kind, createdAt         string
+		subject, detail, project       sql.NullString
+		dispatchKey, dispatchRequestID sql.NullString
+		dispatchResult                 sql.NullString
+	)
+	rows, err := q.QueryContext(ctx, `SELECT actor, kind, created_at, subject, detail,
+		project, dispatch_key, dispatch_request_id, dispatch_result
+		FROM activity WHERE id = ?`, id)
+	if err != nil {
+		return fmt.Errorf("read back activity row %d: %w", id, err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return fmt.Errorf("the new activity row %d is not readable", id)
+	}
+	if err := rows.Scan(&actor, &kind, &createdAt, &subject, &detail,
+		&project, &dispatchKey, &dispatchRequestID, &dispatchResult); err != nil {
+		return fmt.Errorf("scan activity row %d: %w", id, err)
+	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate activity row %d: %w", id, err)
+	}
+	payload, err := activityPayload(id, actor, kind, createdAt,
+		nullStringPtr(subject), nullStringPtr(detail), nullStringPtr(dispatchKey),
+		nullStringPtr(dispatchRequestID), nullStringPtr(dispatchResult), nullStringPtr(project))
+	if err != nil {
+		return fmt.Errorf("render activity payload for row %d: %w", id, err)
+	}
+	prev, err := activityChainPrev(ctx, q)
+	if err != nil {
+		return err
+	}
+	eventID := activityChainEventID(id)
+	if err := AppendAuditEvent(q, map[string]any{
+		"serializer_id":  canonicalSerializerID,
+		"event_id":       eventID,
+		"aggregate_id":   activityAggregateID,
+		"aggregate_type": activityAggregateID,
+		"event_type":     kind,
+		"occurred_at":    payload["created_at"],
+		"recorded_at":    canonNow(),
+		"prev_hash":      prev,
+		"payload_family": "activity",
+		"payload":        payload,
+	}); err != nil {
+		return fmt.Errorf("append activity chain event for row %d: %w", id, err)
+	}
+	if _, err := q.ExecContext(ctx, `INSERT INTO activity_chain_map (activity_id, event_id) VALUES (?, ?)`,
+		id, eventID); err != nil {
+		return fmt.Errorf("map activity row %d to its chain event: %w", id, err)
+	}
+	return nil
+}
+
+// activityChainPrev resolves the predecessor the next 'activity' aggregate
+// event must carry: the stored chain_digest of the current head, or the
+// aggregate's genesis before the first row.
+func activityChainPrev(ctx context.Context, q auditor) (string, error) {
+	var headSeq int
+	rows, err := q.QueryContext(ctx,
+		`SELECT COALESCE(MAX(seq), 0) FROM audit_events WHERE aggregate_id = ?`, activityAggregateID)
+	if err != nil {
+		return "", fmt.Errorf("read the activity chain head: %w", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return "", fmt.Errorf("read the activity chain head: no result row")
+	}
+	if err := rows.Scan(&headSeq); err != nil {
+		return "", fmt.Errorf("scan the activity chain head: %w", err)
+	}
+	if err := rows.Err(); err != nil {
+		return "", err
+	}
+	if headSeq == 0 {
+		return GenesisHash(activityAggregateID), nil
+	}
+	rows, err = q.QueryContext(ctx,
+		`SELECT chain_digest FROM audit_events WHERE aggregate_id = ? AND seq = ?`, activityAggregateID, headSeq)
+	if err != nil {
+		return "", fmt.Errorf("read the activity chain head digest: %w", err)
+	}
+	defer rows.Close()
+	var digest string
+	if !rows.Next() {
+		return "", fmt.Errorf("the activity chain has no head at seq %d", headSeq)
+	}
+	if err := rows.Scan(&digest); err != nil {
+		return "", fmt.Errorf("scan the activity chain head digest: %w", err)
+	}
+	if err := rows.Err(); err != nil {
+		return "", err
+	}
+	return digest, nil
+}

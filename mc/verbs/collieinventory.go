@@ -2,6 +2,7 @@ package verbs
 
 import (
 	"context"
+	"mc/substrate"
 	"sort"
 	"time"
 )
@@ -505,9 +506,9 @@ func collieRecoverForPendingInputTx(ctx context.Context, q Q, sessionID string, 
 		resumeOwed, resumeMode, sessionID); err != nil {
 		return err
 	}
-	_, err := q.ExecContext(ctx, `
-		INSERT INTO activity (actor, kind, subject, detail)
-		VALUES ('dispatch', 'collie.resumed', ?, ?)`, sessionID, detail)
+	err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "dispatch", Kind: "collie.resumed", Subject: sessionID, Detail: detail,
+	})
 	return err
 }
 

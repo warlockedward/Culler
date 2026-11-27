@@ -551,11 +551,10 @@ func writeWikiStartRecord(ctx context.Context, q Q, runID, project, key, request
 	if err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx, `
-		INSERT INTO activity
-			(actor, kind, subject, detail, project, dispatch_key, dispatch_request_id, dispatch_result)
-		VALUES ('dispatch', 'wiki.update_started', ?, 'The wiki update started.', ?, ?, ?, ?)`,
-		runID, project, key, requestID, body)
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "dispatch", Kind: "wiki.update_started", Subject: runID, Detail: "The wiki update started.",
+		Project: project, DispatchKey: key, DispatchRequestID: requestID, DispatchResult: body,
+	})
 	return err
 }
 

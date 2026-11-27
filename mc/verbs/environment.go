@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"mc/domain"
+	"mc/substrate"
 	"mc/trace"
 )
 
@@ -200,7 +201,9 @@ func ProjectEnvironment(db *sql.DB, id *RunIdentity, action string, req Environm
 			if err != nil {
 				return err
 			}
-			_, err = q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES(?,'environment.proposed',?,?)`, id.Role, *subject, r.Explanation)
+			err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+				Actor: id.Role, Kind: "environment.proposed", Subject: *subject, Detail: r.Explanation,
+			})
 		case "storage-report":
 			if !imageDigest.MatchString(req.ImageDigest) {
 				return Usagef("The storage report requires an image digest.")

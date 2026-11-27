@@ -9,6 +9,7 @@ import (
 
 	"mc/domain"
 	"mc/refusal"
+	"mc/substrate"
 )
 
 type RefusalCandidateKind string
@@ -223,20 +224,19 @@ func recordDispatchHealth(ctx context.Context, q Q, cand RefusalCandidate, d ref
 		key = dispatchKey
 	}
 	if requestID == "" {
-		_, err = q.ExecContext(ctx, `
-			INSERT INTO activity (actor, kind, subject, detail, dispatch_key)
-			VALUES ('dispatch', 'dispatch.health', ?, ?, ?)`, subject, string(payload), key)
+		err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "dispatch", Kind: "dispatch.health", Subject: subject, Detail: string(payload), DispatchKey: key,
+		})
 		return err
 	}
 	result, err := json.Marshal(effect)
 	if err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx, `
-		INSERT INTO activity
-			(actor, kind, subject, detail, dispatch_key, dispatch_request_id, dispatch_result)
-		VALUES ('dispatch', 'dispatch.health', ?, ?, ?, ?, ?)`,
-		subject, string(payload), key, requestID, string(result))
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "dispatch", Kind: "dispatch.health", Subject: subject, Detail: string(payload),
+		DispatchKey: key, DispatchRequestID: requestID, DispatchResult: string(result),
+	})
 	return err
 }
 

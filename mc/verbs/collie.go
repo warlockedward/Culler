@@ -12,6 +12,7 @@ import (
 
 	"mc/domain"
 	"mc/operatorcmd"
+	"mc/substrate"
 	"mc/trace"
 )
 
@@ -675,10 +676,9 @@ func CollieResume(db *sql.DB, id *RunIdentity, sessionID, rawFrom string) (any, 
 			WHERE id = ?`, sessionID); err != nil {
 			return err
 		}
-		if _, err := q.ExecContext(ctx, `
-			INSERT INTO activity (actor, kind, subject, detail)
-			VALUES ('owner', 'collie.resumed', ?, ?)`,
-			sessionID, from.Surface+":"+from.ChannelRef); err != nil {
+		if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "owner", Kind: "collie.resumed", Subject: sessionID, Detail: from.Surface + ":" + from.ChannelRef,
+		}); err != nil {
 			return err
 		}
 		if _, err := ensureActiveBinding(ctx, q, sessionID, from); err != nil {
@@ -746,10 +746,9 @@ func resumeBoundSessionForSend(ctx context.Context, q Q, sessionID string, from 
 		WHERE id = ?`, resumeOwed, resumeMode, sessionID); err != nil {
 		return err
 	}
-	_, err := q.ExecContext(ctx, `
-		INSERT INTO activity (actor, kind, subject, detail)
-		VALUES ('owner', 'collie.resumed', ?, ?)`,
-		sessionID, from.Surface+":"+from.ChannelRef)
+	err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "owner", Kind: "collie.resumed", Subject: sessionID, Detail: from.Surface + ":" + from.ChannelRef,
+	})
 	return err
 }
 
@@ -1922,7 +1921,9 @@ func CollieDelete(db *sql.DB, id *RunIdentity, sessionID string) (any, error) {
 		if _, err := q.ExecContext(ctx, `UPDATE collie_sessions SET deleted_at=datetime('now') WHERE id=?`, sessionID); err != nil {
 			return err
 		}
-		_, err = q.ExecContext(ctx, `INSERT INTO activity (actor,kind,subject,detail) VALUES ('owner','collie.deleted',?,'The operator deleted the conversation.')`, sessionID)
+		err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "owner", Kind: "collie.deleted", Subject: sessionID, Detail: "The operator deleted the conversation.",
+		})
 		return err
 	})
 	if err != nil {
@@ -2018,9 +2019,9 @@ func collieEndTx(ctx context.Context, q Q, actor, sessionID, reason string) (boo
 	if err := faultPoint("collie_end_activity"); err != nil {
 		return false, "", err
 	}
-	if _, err := q.ExecContext(ctx, `
-		INSERT INTO activity (actor, kind, subject, detail)
-		VALUES (?, 'collie.ended', ?, ?)`, actor, sessionID, reason); err != nil {
+	if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: actor, Kind: "collie.ended", Subject: sessionID, Detail: reason,
+	}); err != nil {
 		return false, "", err
 	}
 	return true, "ended", nil
@@ -2256,9 +2257,9 @@ func CollieExit(db *sql.DB, id *RunIdentity, sessionID, launchID, containerID, r
 			sessionID, launchID, containerID); err != nil {
 			return err
 		}
-		if _, err := q.ExecContext(ctx, `
-			INSERT INTO activity (actor, kind, subject, detail)
-			VALUES ('resident', 'collie.launch_cleared', ?, ?)`, sessionID, reason); err != nil {
+		if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "resident", Kind: "collie.launch_cleared", Subject: sessionID, Detail: reason,
+		}); err != nil {
 			return err
 		}
 		result["fenced"] = true

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"mc/substrate"
 	"os"
 	"path/filepath"
 	"sort"
@@ -121,7 +122,10 @@ func ArtifactExpiryComplete(db *sql.DB, id *RunIdentity, task int64, token strin
 		if _, err := q.ExecContext(ctx, `UPDATE artifact_retention SET token=NULL,expired_at=? WHERE task_id=?`, at, task); err != nil {
 			return err
 		}
-		_, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('system','artifacts.expired',?,'Task artifacts expired after the retention period.')`, task)
+		err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "system", Kind: "artifacts.expired", Subject: task,
+			Detail: "Task artifacts expired after the retention period.",
+		})
 		return err
 	})
 	return map[string]any{"task_id": task, "expired": err == nil}, err

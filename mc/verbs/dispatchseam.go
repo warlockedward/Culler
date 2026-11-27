@@ -1262,9 +1262,10 @@ func writeDispatchReceipt(ctx context.Context, q Q, requestID string, effect map
 	if err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx, `
-		INSERT INTO activity (actor, kind, subject, detail, dispatch_request_id, dispatch_result)
-		VALUES ('dispatch', 'dispatch.result', NULL, NULL, ?, ?)`, requestID, body)
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "dispatch", Kind: "dispatch.result", Subject: nil, Detail: nil,
+		DispatchRequestID: requestID, DispatchResult: body,
+	})
 	return err
 }
 
@@ -1278,10 +1279,14 @@ func writeAttestedReceipt(ctx context.Context, q Q, requestID, key string, effec
 	if err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx, `
-		INSERT INTO activity
-			(actor, kind, subject, detail, dispatch_key, dispatch_request_id, dispatch_result)
-		VALUES ('dispatch', ?, ?, NULLIF(?, ''), ?, ?, ?)`, fallbackKind, subject, detail, key, requestID, body)
+	var receiptDetail any
+	if detail != "" {
+		receiptDetail = detail
+	}
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "dispatch", Kind: fallbackKind, Subject: subject, Detail: receiptDetail,
+		DispatchKey: key, DispatchRequestID: requestID, DispatchResult: body,
+	})
 	return err
 }
 

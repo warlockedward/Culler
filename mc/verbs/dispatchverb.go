@@ -15,6 +15,7 @@ import (
 	"mc/dispatch"
 	"mc/domain"
 	"mc/routing"
+	"mc/substrate"
 )
 
 // Dispatch is the one caller of dispatch.Decide.
@@ -807,8 +808,9 @@ func connectionWait(ctx context.Context, q Q, sp *dispatch.Spawn, connection str
 			return nil, err
 		}
 		detail := "The " + spawnName(sp) + " waits for this connection. " + cause.Error()
-		if _, err := q.ExecContext(ctx, `INSERT INTO activity (actor, kind, subject, detail, project)
-			VALUES ('dispatch', 'dispatch.wait_started', ?, ?, ?)`, connection, detail, sp.Project); err != nil {
+		if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "dispatch", Kind: "dispatch.wait_started", Subject: connection, Detail: detail, Project: sp.Project,
+		}); err != nil {
 			return nil, err
 		}
 	}
@@ -836,8 +838,10 @@ func endConnectionWait(ctx context.Context, q Q, project string) error {
 	if _, err := q.ExecContext(ctx, `UPDATE projects SET connection_wait = NULL, connection_wait_task = NULL WHERE id = ?`, project); err != nil {
 		return err
 	}
-	_, err := q.ExecContext(ctx, `INSERT INTO activity (actor, kind, subject, detail, project)
-		VALUES ('dispatch', 'dispatch.wait_ended', ?, 'The wait for this connection ended.', ?)`, connection.String, project)
+	err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "dispatch", Kind: "dispatch.wait_ended", Subject: connection.String,
+		Detail: "The wait for this connection ended.", Project: project,
+	})
 	return err
 }
 

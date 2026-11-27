@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
+	"mc/substrate"
 	"strings"
 	"time"
 )
@@ -370,10 +371,9 @@ func collieWakeRoundWithConfirmedAbsence(
 			// Already launched under this tick's own CAS window — nothing to emit.
 			return nil, false, nil
 		}
-		if _, err := q.ExecContext(ctx, `
-			INSERT INTO activity (actor, kind, subject, detail)
-			VALUES ('dispatch', 'collie.launched', ?, ?)`,
-			d.SessionID, launchID); err != nil {
+		if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+			Actor: "dispatch", Kind: "collie.launched", Subject: d.SessionID, Detail: launchID,
+		}); err != nil {
 			return nil, false, err
 		}
 		effect, err := collieWakeEffect(

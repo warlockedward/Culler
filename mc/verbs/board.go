@@ -11,6 +11,7 @@ import (
 	"unicode/utf8"
 
 	"mc/domain"
+	"mc/substrate"
 )
 
 type BoardWriteRequest struct {
@@ -322,7 +323,9 @@ func blockTaskTx(ctx context.Context, q Q, task int64, kind, reason, actor strin
 	if err := domain.Block(ctx, q, task, kind, reason); err != nil {
 		return err
 	}
-	_, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES(?,'task.block_reason',?,?)`, actor, task, reason)
+	err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: actor, Kind: "task.block_reason", Subject: task, Detail: reason,
+	})
 	return err
 }
 
@@ -352,7 +355,9 @@ func unblockTaskTx(ctx context.Context, q Q, task int64, reason, actor string) (
  WHERE cleared_at IS NULL AND run_id IN (SELECT id FROM runs WHERE subject=?)`, actor, reason, task); err != nil {
 		return 0, err
 	}
-	if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES(?,'task.unblock_reason',?,?)`, actor, task, reason); err != nil {
+	if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: actor, Kind: "task.unblock_reason", Subject: task, Detail: reason,
+	}); err != nil {
 		return 0, err
 	}
 	return 0, nil

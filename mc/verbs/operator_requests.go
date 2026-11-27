@@ -13,6 +13,7 @@ import (
 
 	"mc/domain"
 	"mc/operatorcmd"
+	"mc/substrate"
 )
 
 const OperatorRequestLimit = 4 << 20
@@ -529,6 +530,9 @@ func authorizeOperatorTransaction(ctx context.Context, q Q) error {
 	if err := authorizeOperatorRequest(ctx, q, r); err != nil {
 		return err
 	}
-	_, err = q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES(?,'operator.request',?,?)`, r.Origin, r.ID, fmt.Sprintf("%s: %s", r.SessionID, strings.Join(r.Command[:min(2, len(r.Command))], " ")))
+	err = substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: r.Origin, Kind: "operator.request", Subject: r.ID,
+		Detail: fmt.Sprintf("%s: %s", r.SessionID, strings.Join(r.Command[:min(2, len(r.Command))], " ")),
+	})
 	return err
 }

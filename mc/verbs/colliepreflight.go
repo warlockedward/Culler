@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
+	"mc/substrate"
 )
 
 // ---------------------------------------------------------------------------
@@ -158,10 +159,9 @@ func recordColliePreflightHealth(ctx context.Context, q Q, sessionID string) (st
 	if err != nil {
 		return "", err
 	}
-	if _, err := q.ExecContext(ctx, `
-		INSERT INTO activity (actor, kind, subject, detail)
-		VALUES ('dispatch', 'collie.preflight_health', ?, ?)`,
-		sessionID, string(detail)); err != nil {
+	if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "dispatch", Kind: "collie.preflight_health", Subject: sessionID, Detail: string(detail),
+	}); err != nil {
 		return "", err
 	}
 	return key, nil

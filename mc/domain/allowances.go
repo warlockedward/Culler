@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"fmt"
+	"mc/substrate"
 	"strings"
 )
 
@@ -66,7 +67,13 @@ func GrantCorrectionAllowance(ctx context.Context, q Q, task int64, reason strin
 	if _, err := q.ExecContext(ctx, `UPDATE tasks SET correction_count=0,verifier_correction_open=1,correction_operator_reason=? WHERE id=?`, reason, task); err != nil {
 		return err
 	}
-	if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('owner','task.correction_allowance',?,json_object('reason',?,'attempts',3))`, task, reason); err != nil {
+	detail, err := renderActivityJSON(ctx, q, `SELECT json_object('reason',?,'attempts',3)`, reason)
+	if err != nil {
+		return err
+	}
+	if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "owner", Kind: "task.correction_allowance", Subject: task, Detail: detail,
+	}); err != nil {
 		return err
 	}
 	return returnToSeeded(ctx, q, task, "verifier", report)
@@ -83,7 +90,13 @@ func RequestMergeRepair(ctx context.Context, q Q, task, candidate int64) error {
 	if _, err := q.ExecContext(ctx, `UPDATE tasks SET correction_reason=?,correction_operator_reason=NULL WHERE id=?`, body, task); err != nil {
 		return err
 	}
-	if _, err := q.ExecContext(ctx, `INSERT INTO activity(actor,kind,subject,detail) VALUES('mc','task.merge_repair',?,json_object('candidate',?))`, task, candidate); err != nil {
+	detail, err := renderActivityJSON(ctx, q, `SELECT json_object('candidate',?)`, candidate)
+	if err != nil {
+		return err
+	}
+	if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: "mc", Kind: "task.merge_repair", Subject: task, Detail: detail,
+	}); err != nil {
 		return err
 	}
 	return returnToSeeded(ctx, q, task, "merge", body)
@@ -93,4 +106,26 @@ func RequestMergeRepair(ctx context.Context, q Q, task, candidate int64) error {
 func CloseCorrection(ctx context.Context, q Q, task int64) error {
 	_, err := q.ExecContext(ctx, `UPDATE tasks SET correction_open=0 WHERE id=?`, task)
 	return err
+}
+
+// renderActivityJSON runs a SQLite JSON expression to its stored bytes in
+// the caller's transaction: the central append receives exactly what the
+// replaced inline json_object() call would have written.
+func renderActivityJSON(ctx context.Context, q Q, query string, args ...any) (string, error) {
+	rows, err := q.QueryContext(ctx, query, args...)
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+	var out string
+	if !rows.Next() {
+		return "", fmt.Errorf("the JSON renderer returned no row")
+	}
+	if err := rows.Scan(&out); err != nil {
+		return "", err
+	}
+	if err := rows.Err(); err != nil {
+		return "", err
+	}
+	return out, nil
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"mc/identity"
+	"mc/substrate"
 )
 
 // Session TTL defaults (IG §2: absolute + idle; the spine clock computes
@@ -596,8 +597,9 @@ func recordActivity(ctx context.Context, q Q, actor, kind, subject, detail strin
 	if actor == "operator" {
 		return Domainf("The legacy operator actor is sealed; the event must be attributed to a current actor.")
 	}
-	if _, err := q.ExecContext(ctx, `INSERT INTO activity (actor, kind, subject, detail) VALUES (?, ?, ?, ?)`,
-		actor, kind, subject, detail); err != nil {
+	if err := substrate.AppendActivity(ctx, q, substrate.ActivityEvent{
+		Actor: actor, Kind: kind, Subject: subject, Detail: detail,
+	}); err != nil {
 		return fmt.Errorf("record identity %s event: %w", kind, err)
 	}
 	return nil
