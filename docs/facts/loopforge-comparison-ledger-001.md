@@ -21,6 +21,7 @@
 |---|---|---|---|
 | `451d38c` | 2026-11-19 | 首研 | `ANALYSIS-2026-11-19-LoopForge-vs-Culler.md`（仓根，未跟踪——注：属操作者工作面文件，未入 campaign 账）＋PS §2 gitegress 传输模式（已进 PROVIDER-SECURITY 正文）＋借用/反模式清单（会话记忆） |
 | `be6918d`（v0.4.3 预备，2026-11-26） | 2026-11-27 | **+101 commits** | 本台账＋下表动向摘要（未逐文件深研——深研按域触发） |
+| `be6918d`（复钉，零增量） | 2026-11-27 | 0 | **按域深研·provider/credential 路线**＝`docs/facts/loopforge-provider-model-001.md`（9 家托管 CLI 架构 vs Culler 自研内核；forbidden_env 默认面窄＝唯一候选借鉴，登记不立票） |
 
 ## 4. 451d38c→be6918d 动向摘要（主题级，E1=log 实扫）
 
