@@ -1,0 +1,10 @@
+AM v0.2.48 双面哈希登记（轮六十四续＝218 全面下线：部署轮 13 项＋CI 栈 14 项清点全 0、宿主防火墙经授权回到迁移前形态、根盘回升 43G；含本人一次真实误操作（误删租户账号 shzci 的 linger）的完整自纠与零损害证明；立 A40 归属证明门）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = a4ee2ff5b74529e6436e991eae9ed69f113359ea830608cd6394279aa7070e2c
+- sha256(主工作树未跟踪副本) = a4ee2ff5b74529e6436e991eae9ed69f113359ea830608cd6394279aa7070e2c（DUAL-EQUAL，2026-11-28 实测）
+- 链自检: 登记前 AM sha256 = a004e48437846db68c78c65520a874142b0ad4d3c7d63f66cc977d24cb40daa4，与 am-v0.2.47-hash.txt 逐字相等（零漂移）
+- 前轮: v0.2.47 = a004e484…daa4；v0.2.46 = 862223c0…e7e0；v0.2.45 = c0ba2182…c8b09
+- 同轮并入 dev 的提交: deploy-round-001 §8（部署回退）＋ci-stack-decommission-001（CI 栈下线＋误操作自纠）＋A40 票行＋本登记；E01–E05 维持 BLOCKED
+- 关键事实: 租户 53 容器/new-api/actions-runner 全程无损；ufw ALLOW 恒 28 未变；主 daemon nat DOCKER 窗内差异已归因（milvusStandalone 崩溃循环）并以 teardown 仅删带标签规则的结构证明排除我方
+- 诚实边界: 本人误删 linger 为事实（虽零损害已恢复），已立 A40 而非仅作说明；依赖 218 CI 栈的 e2e 道自此无宿主＝回归 CI 未覆盖状态；new-api 侧 key 属租户资产未动、仍建议轮换
+- 账: dev tip=本登记笔 / push 第 19 次随本笔 / 本地 main PRISTINE b22df40 / identity 不变 / 218 运行态足迹=0
