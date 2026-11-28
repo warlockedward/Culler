@@ -50,3 +50,19 @@
 - **② 出站修复真机生效**＝r13（HEAD 4e641fd）resident.stderr 报错从 `attachment confinement canary refused` 变为 `The runtime catalog connection is invalid.`＝canary（入站+出站）已过、监督推进到下一层。ufw 仍 ALLOW 28＝防火墙全程未碰（r13 刻意不含 gateway-allow）。
 - **新边界＝C11 切片3 的 TS 侧遗漏**：`resident/src/credential-projector.ts:48` 的 runtime-catalog kind 白名单只放行 `<channel>-oauth`/`<channel>-api-key`，未含 `openai-compatible`；`:55` 对非 opencode 目的地强制 https（self-host 是环回 http）。⇒ 真机第一次把 self-host 连接喂进 resident 消费路径才现形——**此前 resident 789 全绿是因测试 row 全是 codex-api-key，未覆盖 C11 新 kind 走 parseRuntimeCatalog**（"未验证继承面"又一例，与 D-1/D-2 同族＝macOS/CI 面掩盖 Linux/新路径）。
 - 修复＝:48 白名单加 openai-compatible；新增 `kind=openai-compatible ⟹ channel=codex` 路由锁；scheme 对 self-host 放行 http（目的地 host 类=环回/私有字面 IP 由 Go validateRegistry + C02 连接期双重把守，此处不重复）；其余 kind 保持 https-only 不变。补 credential-projector.test 四向量（http 环回落／https 落／claude 路由拒／userinfo 拒）。resident 790/0（+1）。
+
+## §7 干净重装验证（轮六十四·dev-reset 全清→向导 r17，决定性）
+
+owner 选「干净重装验证」。前置核实（不猜破坏性工具）：本轮窗口 `3e5d6a3..4d499c9` 内 schema 三文件**零改动**（git diff 空）→ `mc __reset` 不因 schema 拒绝；mc/mc-prod/HEAD 全=4d499c9→免 --rebuild；dry-run PLAN 作用域确认仅 `/data-shunhong/shorizon-prod`。
+
+**dev-reset --confirm --project 执行**：spine 销毁＋**全新大脑**（新 deployment `a087f5534fe…`，schema 仍 4786047e 三度确证不变），home/container/tunables 重建成；project 段被 dev-reset 自身 `mc onboard project` 未带 `--accept-generated-sandbox` 挡住（工具局限）。
+
+**发现＝dev-reset 真实缝隙（登记，不在 A35 域内顺手改）**：dev-reset 有意**保留 `onboard-intents/`**（注释：清它会丢失重登记路径），**却又销毁 `deployment.uuid` 换全新大脑**→保留的 posture receipt（`project-<sha>.json` 记 `deployment_uuid:7b75278f…`＝已销毁旧脊）与新脊 `a087f5534fe…` 不符→向导 project 段按设计"跨 deployment 引用一律拒隐式改写"→卡死。**＝恢复工具两处设计（保留 intents + 换 uuid）自相矛盾**，净重装后首次 project 重登记必卡。手工清除该孤儿 receipt（我 MC_HOME 内、指向已死 deployment）后放行。
+
+**干净脊向导 r17 全段（决定性）**：preflight/home/runtime-auth/routing/container/**project/tunables/surfaces/supervision/verify 全 ok/done**；`supervision=done`→resident+dashboard+agentsview active、**tick 回执落（release 4d499c9）**、127.0.0.1:7333 在听。⇒ **A35 核心目标达成：Linux 运行时不再残疾——装配/凭据/网关许可/监督/心跳/代理在场全通**（① ② C11 载体三项真机证实）。
+
+**唯一未闭＝acceptance 真实回合**：`--confirm-live-spend` 下 codex harness 启动并拨 new-api（status=running＝进程确实起了、① 生效旁证），但该回合未干净收尾→残留 running→后续报 `ambiguous after a prior start`。new-api 后端存活（`/v1/models`→401 正确鉴权拒绝）。清理 running 记录后，acceptance 失败使 `enabled_bindings=[]` 而 routing.md 仍引 newapi→tick 刷 `unresolved binding`（产品 DisableOnboardRuntimeBinding 未同步 routing.md＝**疑似第二个产品缺陷：acceptance 失败禁用 binding 不清理 routing.md 引用→部署自锁死循环**，待干净复现定性）。已 `disable --now` 停我的 user 单元→干净静默（loaded 0）。
+
+**零干扰全程终证**：CI 栈 4 单元 active、宿主 shz-ci-gw 3、ufw ALLOW 恒 28（双臂未跑＝从未碰防火墙）、租户容器 56 在跑、new-api 存活。本部署仅余自有 MC_HOME（大盘）＋三命名卷＋镜像，无残留运行体、无与租户撞名。
+
+**净结论**：Linux"不残疾"已由干净重装证实到"监督激活+心跳+代理在场"这一层；差最后"一次真实 agent 回合成功返回"，其卡点是 **codex CLI ↔ new-api 协议兼容**（外部工具面）或上述**疑似产品自锁缺陷**，均属需单独定性的新边界，非 A35 移植本体——A35 三缺陷（① amd64 路径 ② bind owner 双向 ＝真机已修已证）。
