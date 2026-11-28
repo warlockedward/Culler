@@ -104,3 +104,8 @@
 - credential-projector 放行树＝scan 20ffbfa31d9b/f10d8610（§14 续）560；dispatch 载体自包含扩展树 e0e7d41＝jobId scan-job-mwzlkqed-cd6e05debd5ee358，**scanId=scan-2026-11-27T23-13-58.247Z-6de91ee57dcb；封印=sha256:f986e9dbb74c3fa16ba72178a22f5da11f14fc1068f86ac449d7e5b196f96abd**。
 - **560＝基线全等（逐域逐级不变＝mc 157 含新码＝自包含载体与 registry 重建零新发现面）**。
 - wire 兼容性代码路径级论证已入 A35 diff-plan（历史 effect 零值退化＝与改动前逐字同行为；live/replayed 走同一 struct→JSON→map 归一化；drift digest 哈希 config.Runtimes 与载体无关）。诚实核心沿用 §1（static-only/verdictEffect none）。
+
+## 16. gateway --port 文法修复扫描（轮六十四）
+
+- 树 tip 8833e78；jobId scan-job-mwzt9wfm；**scanId=scan-2026-11-28T02-49-30.825Z-bade081a3efa；封印=sha256:1a6611de142b3947cbdc7643ebe97f1ec104969c356f4fe196346765dee9a66f**。
+- **560＝基线全等**（+1 仍是 §13 那条 C11 http SSRF 面，非本轮引入）＝gateway ruleSpec/port 感知幂等改动（纯 ufw 参数文法，无新执行面）零新增发现。诚实核心沿用 §1。
