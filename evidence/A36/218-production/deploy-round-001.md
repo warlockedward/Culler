@@ -66,3 +66,11 @@ owner 选「干净重装验证」。前置核实（不猜破坏性工具）：�
 **零干扰全程终证**：CI 栈 4 单元 active、宿主 shz-ci-gw 3、ufw ALLOW 恒 28（双臂未跑＝从未碰防火墙）、租户容器 56 在跑、new-api 存活。本部署仅余自有 MC_HOME（大盘）＋三命名卷＋镜像，无残留运行体、无与租户撞名。
 
 **净结论**：Linux"不残疾"已由干净重装证实到"监督激活+心跳+代理在场"这一层；差最后"一次真实 agent 回合成功返回"，其卡点是 **codex CLI ↔ new-api 协议兼容**（外部工具面）或上述**疑似产品自锁缺陷**，均属需单独定性的新边界，非 A35 移植本体——A35 三缺陷（① amd64 路径 ② bind owner 双向 ＝真机已修已证）。
+
+## §8 全量回退·零残留（2026-11-28，owner 令「回退所有配置，不留任何残留」）
+
+执行序（先产品卸载路径后手工，全程不碰 CI 栈/租户）：① `shz uninstall --keep-data --yes`（拆启动单元/helper 容器，镜像步被孤儿探针容器卡住如实报）；② 定性孤儿 `festive_northcutt`＝我 Flash 探针的超时泄漏容器（cmdline 逐字核实）→ `docker rm -f`；③ 手工收口：4 镜像 rmi＋2 后发现的 CI 窗 e2e-project 镜像（先证零容器引用）rmi＋3 命名卷 rm＋按记录标记精确删 .zshrc/.zprofile 各 1 个 PATH 块＋rm CLI 二进制＋`daemon-reload/reset-failed` 清 failed 残影；④ 删数据目录全集（shorizon-prod 256M 含 spine/凭据副本、shorizon-src、shorizon-deploy-r63、shorizon-workspace、smoke-workspaces）；⑤ key 卫生：/tmp/k.f 曾泄漏一次（探针超时 shred 未达，发现于清点）→ 再 shred，终清点 0。
+
+**终证＝13 项自动清点全 0**：user/system 单元×3、磁盘 unit 文件、CLI 二进制×2、shell 块、数据目录、容器、镜像、卷、网络、gateway 防火墙规则、我的 /tmp 文件、~/.codex 类家目录。
+**旁证无损**：CI 栈四单元 active、shz-ci-gw 3、ufw ALLOW 恒 28（全程未增未删）、租户 53 容器、new-api 401 存活。
+**登记**：CI 栈（shz-ci-\* 单元/netns/迁移工件/`/root/shz-ci-migration`）按既有工作授权**保留未动**；其清理需另行指示。new-api 侧那把 key 属租户服务本体未动（仍建议轮换）。**状态回写**：218 部署轮关闭；C11 端到端/A36-F1/A31-F1③ 双臂＝待命（恢复成本＝一次向导重装，全程有案）；A37 的 provisioning 观察证据（B1 REACHABLE/端口漂移 35045/文法缺陷修复验证）已在案不回改。
