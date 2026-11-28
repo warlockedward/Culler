@@ -109,3 +109,9 @@
 
 - 树 tip 8833e78；jobId scan-job-mwzt9wfm；**scanId=scan-2026-11-28T02-49-30.825Z-bade081a3efa；封印=sha256:1a6611de142b3947cbdc7643ebe97f1ec104969c356f4fe196346765dee9a66f**。
 - **560＝基线全等**（+1 仍是 §13 那条 C11 http SSRF 面，非本轮引入）＝gateway ruleSpec/port 感知幂等改动（纯 ufw 参数文法，无新执行面）零新增发现。诚实核心沿用 §1。
+
+## 17. 轮六十四下线窗终封（部署回退＋CI 栈拆除，纯账本/证据树）
+
+- 树＝dev tip 749a906；jobId scan-job-mwzuswkh；**scanId=scan-2026-11-28T03-32-19.272Z-2d2ce757e530；封印=sha256:290ec60bc12905989b768ade4edf666b00dbe652c51c1b2da806d66ae54d0090**。
+- **560＝基线全等**（+1 仍为 §13 的 C11 http SSRF 面，非本窗引入）＝部署回退与 CI 栈下线两笔（evidence/DEV-BASELINE/status.json/AM，零生产码改动）零新增发现面。
+- **本窗 enobufs 兼容放行欠账就此清偿**（累计逐笔封 §9–§16 ＋ 本终封）。诚实核心沿用 §1（partial/inconclusive/static-only/verdictEffect none），不构成安全背书。

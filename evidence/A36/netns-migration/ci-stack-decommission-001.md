@@ -34,3 +34,8 @@ ufw ALLOW 28（全程未增未删）；主 daemon nat DOCKER 链 33 行（窗内
 - 218 上本项目的**运行态足迹全部归零**（部署轮 + CI 栈），残留清点两轮各自 13/14 项＝0。
 - 代码资产（A35 ①②、C11 三切片、gateway 文法、D-1/D-2）与全部真机证据保留在 git main；恢复部署＝一次向导，恢复 CI 栈＝netns 迁移工件在 `evidence/A36/netns-migration/` 按记录重建（该工作**目的已达成且已被 owner 主动关闭**）。
 - 依赖 CI 栈的验证臂（docker_e2e/boundarydocker 在 218 的道）自此无宿主＝这些道回归"CI 未覆盖"既有状态，如实登记。
+
+## 5. 独立复查（不同探测模式，补定向枚举之不足）
+
+全盘 grep `/etc /usr/local/{sbin,bin} /run /var/lib/systemd` 无任何 `shz-ci|shorizon` 提及；cron/wants/generator 零引用；docker 镜像/容器/网络零残留；iptables＋nft＋ip6tables 对 `shz-ci|10.199|10.200|veth-ci` **零命中**；7333-5 无监听；mount 零残留；/usr/local/bin 与 /root 家目录干净。
+**A40 教训当场二次生效**：本复查的 grep 模式 `shz` 命中了租户镜像 `ghcr.io/shilin66/fastgpt:shzl-4.14.17-fix5`（标签含 "shzl" 子串）＝假阳性，属租户资产**未触碰**。若采"名称相似即我的"判据，这一步就会误删租户镜像——正是 A40 要防的事故形态。
