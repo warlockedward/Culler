@@ -1,0 +1,10 @@
+AM v0.2.47 双面哈希登记（轮六十四＝A35 修到底三码真机证＋干净重装 Linux 运行时达 supervision＋A37 诊断 EVIDENCED 定根因＝proxy 环回绑定不可达非协议＋A38/A39 立票候裁＋零干扰全程 ufw 恒 28）
+- 文件: docs/contracts/ACCEPTANCE-MATRIX.md
+- sha256(dev worktree 登记轮工作态) = a004e48437846db68c78c65520a874142b0ad4d3c7d63f66cc977d24cb40daa4
+- sha256(主工作树未跟踪副本) = a004e48437846db68c78c65520a874142b0ad4d3c7d63f66cc977d24cb40daa4（DUAL-EQUAL）
+- 链自检: 登记前 AM 文件 sha256 = 862223c0111159605d4e02d1685f142cd22c9f031991e1ff4857eca88402e7e0，与 am-v0.2.46-hash.txt 登记值逐字相等（零漂移）
+- 前轮: v0.2.46 = 862223c0…e7e0；v0.2.45 = c0ba2182…c8b09；v0.2.44 = f988bcd8…5b7c
+- 同轮并入 dev 的提交: 8528118(B 图边)+4d499c9(①)+e0e7d41(载体)+0ccd2c9(TS 目录)+8bf944b(D-2 平台化)+4e641fd(②出站)+0c49142(重装证明)+A37 证据件与本登记；E01–E05 维持 BLOCKED；A35=IN_PROGRESS A37=EVIDENCED A38/A39=BACKLOG
+- 关键事实: 真实 agent 回合 A2 已通（PONG+usage E1）；产品路径最后一公里＝A36 provisioning（bind 桥网+scoped allow）＝候 owner R-a 逐字批；Linux 运行时达 supervision=done（干净重装证明）＝"不残疾"成立
+- 诚实边界: ③ wiki export 未触达（部署未走到该路径）；provision 后的 acceptance/双臂＝预计一次收口（E2 推断，待实测升 E1）；new-api key 对话明文出现过＝候 owner 轮换
+- 账: dev tip=本登记笔 / push 第 15 次随本笔执行 / 本地 main PRISTINE b22df40 / identity 不变
