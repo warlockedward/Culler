@@ -39,7 +39,11 @@ prompt（`provider_acceptance.go:26`）：
 - **甲**：换一个更接近 OpenAI 原生事件语义的后端/模型配置复测 acceptance（不改产品）；治标、验证成本最低。
 - **乙**：立独立票评估 acceptance 校验对第三方兼容后端的稳健性（如 tool 次数容 >=1、final text 容忍前后空白/trim 比较）——**但这是放宽一道刻意严格的安全自检**，须 Acceptance Authority 权衡"放过假阳性 vs 误拒真可用后端"，属治理决定，非执行侧自改。
 
-本部署现停"未 provision 网关 + 干净静默"，宿主防火墙零多余暴露（见 §5）。
+## 6. "甲"实测后记（2026-11-28）
+
+new-api 仅列 4 模型（`Qwen3.8-27B`/`Qwen3.8-Flash-Next-FP8` 为 chat，余两为 embedding/reranker）——**无第三个 chat 候选**。27B 已测（§2 形状不符）；Flash 同经**同一 vllm `wire_api=responses` 转译层**，§2 证据表明不吻合发生在转译层（tool item×2、final text 前导空白、模型元数据缺失走 fallback）而**非具体权重**⇒ 同后端换模型证据上判死（换 Flash 只是多烧调用，预期同果）。⇒ 真"甲"需一个**原生 OpenAI Responses 语义**的端点（OpenRouter/真 OpenAI 等），而 owner 明示无任何外部账号/key ⇒ 现有基座上"甲"无低成本可行路径。
+
+**出路收敛**（归 owner）：(乙) 由 Authority 权衡是否放宽 acceptance 自检对第三方兼容后端的形状假设（tool 次数 `>=1`、final text trim 比较）——**放宽安全自检须具名签署**；(丙) 接受当前已知态＝"Linux 运行时不残疾（supervision/tick/proxy/桥可达全 E1）＋首次启用自检对 vllm 转译后端偏脆"，双臂（A36-F1/A31-F1③）改由**非自检路径**取证（B1/DNAT 可达已证，代理在场已证），C11-e2e 真实回合留待有原生后端时补；(丁) 提供一个原生 OpenAI 兼容后端再复测。
 
 ## 5. 零干扰终证（本 provisioning 子窗）
 
