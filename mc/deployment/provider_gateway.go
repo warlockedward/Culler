@@ -82,12 +82,15 @@ func canonicalize(bind, network, iface string) (canonicalPair, error) {
 // address itself is the exposure surface the operator opted into, and by
 // deployment design only the proxy listens on the bridge IP. A caller that
 // runs the proxy on a stable port passes it and the rule narrows to that
-// single port.
+// single port. ufw spells the narrowing `to <address> port <n>` before the
+// protocol; the 218 acceptance arm is what pinned that grammar — the earlier
+// trailing form was rejected as improper syntax by real ufw.
 func ruleSpec(p canonicalPair, port int) []string {
-	args := []string{"allow", "from", p.Network, "to", p.Bind, "proto", "tcp"}
+	args := []string{"allow", "from", p.Network, "to", p.Bind}
 	if port > 0 {
-		args = append(args, "to", strconv.Itoa(port))
+		args = append(args, "port", strconv.Itoa(port))
 	}
+	args = append(args, "proto", "tcp")
 	return append(args, "comment", providerGatewayTag)
 }
 
@@ -167,12 +170,30 @@ func bridgeNetwork(routeOutput, bridgeLinksOutput, bind string) (canonicalPair, 
 	return canonicalPair{}, fmt.Errorf("the bind %s is not inside a directly-attached kernel-classified bridge network; refusing to guess a source", bind)
 }
 
-// matchedTaggedRules extracts rule indices whose lines carry this tool's
-// comment tag AND name this canonical bind. Untagged lines never match.
-func matchedTaggedRules(numberedStatus, bind string) []int {
+// numberedLineMatchesRule decides whether one ufw status line IS the rule the
+// caller asked about. A portless request matches any tagged rule for the bind
+// (the wide shape the tool itself adds by default). A port-scoped request
+// matches only a line carrying that port — real ufw echoes a port rule as
+// "<bind> <port>/tcp" — so a wide rule never satisfies a scoped status or
+// idempotence check, and vice versa the scoped add stays honest.
+func numberedLineMatchesRule(line, bind string, port int) bool {
+	if !strings.Contains(line, providerGatewayTag) || !strings.Contains(line, bind) {
+		return false
+	}
+	if port <= 0 {
+		return true
+	}
+	return strings.Contains(line, bind+" "+strconv.Itoa(port)+"/tcp")
+}
+
+// matchedTaggedRules lists the rule indices carrying this tool's tag for one
+// bind. port<=0 matches every tagged rule for the bind (revoke sweeps them all;
+// a portless status asks "is any gateway rule present"); port>0 matches only a
+// rule scoped to that exact port (idempotence and a scoped status).
+func matchedTaggedRules(numberedStatus, bind string, port int) []int {
 	var numbers []int
 	for _, line := range strings.Split(numberedStatus, "\n") {
-		if !strings.Contains(line, providerGatewayTag) || !strings.Contains(line, bind) {
+		if !numberedLineMatchesRule(line, bind, port) {
 			continue
 		}
 		// ufw numbers rules as "[ 1]" — bracketed, spaced, digits. Strip
@@ -258,7 +279,7 @@ func ProviderGatewayAllow(home string, port int) (ProviderGatewayStatus, error) 
 	if err != nil {
 		return ProviderGatewayStatus{}, fmt.Errorf("read ufw rules: %w", err)
 	}
-	if len(matchedTaggedRules(numbered, pair.Bind)) > 0 {
+	if len(matchedTaggedRules(numbered, pair.Bind, port)) > 0 {
 		return ProviderGatewayStatus{State: "present", Bind: bind, Network: pair.Network,
 			Interface: pair.Iface, Port: port,
 			Detail: "the scoped rule already exists; nothing changed"}, nil
@@ -300,7 +321,7 @@ func ProviderGatewayRevoke(home string) (ProviderGatewayStatus, error) {
 	if err != nil {
 		return ProviderGatewayStatus{}, fmt.Errorf("read ufw rules: %w", err)
 	}
-	numbers := matchedTaggedRules(numbered, pair.Bind)
+	numbers := matchedTaggedRules(numbered, pair.Bind, 0)
 	if len(numbers) == 0 {
 		return ProviderGatewayStatus{State: "absent", Bind: bind,
 			Detail: "no tagged rule for this bind exists; nothing was removed"}, nil
@@ -346,7 +367,7 @@ func ProviderGatewayStatusOf(home string, port int) (ProviderGatewayStatus, erro
 		return ProviderGatewayStatus{}, fmt.Errorf("read ufw rules: %w", err)
 	}
 	state := "absent"
-	if len(matchedTaggedRules(numbered, pair.Bind)) > 0 {
+	if len(matchedTaggedRules(numbered, pair.Bind, port)) > 0 {
 		state = "present"
 	}
 	return ProviderGatewayStatus{State: state, Bind: bind, Network: pair.Network,

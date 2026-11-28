@@ -168,13 +168,13 @@ func TestGatewayAllowShapeAndIdempotence(t *testing.T) {
 		t.Fatalf("state=%s edits=%v", got.State, f.allowRecs)
 	}
 	joined := strings.Join(f.allowRecs[0], " ")
-	want := "allow from 10.199.0.0/24 to 10.199.0.1 proto tcp to 8443 comment " + providerGatewayTag
+	want := "allow from 10.199.0.0/24 to 10.199.0.1 port 8443 proto tcp comment " + providerGatewayTag
 	if joined != want {
 		t.Fatalf("rule = %q; want %q", joined, want)
 	}
-	// the numbered listing now carries the rule: the second allow is a
-	// proven no-op.
-	f.numbered = "[ 1] ufw allow from 10.199.0.0/24 to 10.199.0.1 proto tcp to 8443 comment " + providerGatewayTag
+	// the numbered listing now carries the rule in real ufw status shape
+	// ("<bind> <port>/tcp ... # <tag>"): the second allow is a proven no-op.
+	f.numbered = "[ 1] 10.199.0.1 8443/tcp             ALLOW IN    10.199.0.0/24              # " + providerGatewayTag
 	again, err := ProviderGatewayAllow("/unused", 8443)
 	if err != nil {
 		t.Fatal(err)
