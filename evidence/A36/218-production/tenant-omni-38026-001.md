@@ -34,3 +34,13 @@
 - **(a) 恢复原拓扑**：`docker network connect data_fastgpt omni`（一条命令，可用 `network disconnect` 撤销；补回它 08:3x 曾有的成员）→ 预计 omni 完成启动、38026 出 HTTP；
 - **(b) 撤回静默**：`docker stop omni`，止住我引入的崩溃循环，把 etcd/minio/milvus 这三项**已确认的改善保留**，38026 交租户 owner 用他们自己的 `docker compose up -d` 正规收敛；
 - **(c) 保持现状**：继续循环（不推荐——持续产生日志与 DB 连接压力）。
+
+## 5. 等待决定期间的处置（自主撤回我方引入的扰动）
+
+因剩余修复需触碰租户网络配置（超出 1→3 授权），未获答复前不让租户容器持续循环：`docker stop -t 5 omni` → status=exited、restarts 冻结在 20、循环止住＝**回到我介入前的静默状态**。
+
+**保留的已确认改善**（不撤回，它们是净收益）：`milvus-etcd` running restarts=0、`minio` running restarts=0、`milvusStandalone` running 且 **restarts 6051 冻结 30 秒复检零增长**＝崩溃循环根治（此前每 ~20 秒一次、累计 6040+）。宿主面复核：ufw ALLOW 恒 28、租户运行容器 51、new-api 401 存活、mongo/redis/opensandbox-server 未触碰仍 running。
+
+**顺带发现的租户侧待办（我方未动、仅报告）**：`fastgpt-app` 自 Nov 27 21:19 起 exited（restartCount 3945），同属 `data` 项目——若 omni 修好后平台仍不完整，这是下一个同源问题（其 restart policy 亦为 no/或崩溃耗尽）。建议一并交租户 owner 用 `docker compose up -d` 正规收敛。
+
+**终态**：38026 不通的直接原因已从"未知"收敛为一格＝omni 缺 `data_fastgpt` 网络成员；一条 `docker network connect data_fastgpt omni`（可撤销）预计即通，等 owner 授权。
